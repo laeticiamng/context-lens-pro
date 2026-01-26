@@ -25,6 +25,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import APIEndpointsDocs from "@/components/docs/APIEndpointsDocs";
 import DocSearch from "@/components/docs/DocSearch";
+import TableOfContents from "@/components/docs/TableOfContents";
+import Breadcrumbs from "@/components/layout/Breadcrumbs";
+import ErrorBoundary from "@/components/ui/error-boundary";
 
 const CodeBlock = ({ code, language = "typescript" }: { code: string; language?: string }) => {
   const [copied, setCopied] = useState(false);
@@ -239,47 +242,67 @@ const Documentation = () => {
     }
   };
 
+  // TOC items for sidebar
+  const tocItems = [
+    { id: "tier-0", title: "Tier 0 — Universal Fallback", level: 1 },
+    { id: "tier-1", title: "Tier 1 — Display via SDK", level: 1 },
+    { id: "tier-2", title: "Tier 2 — On-Device Mode", level: 1 },
+    { id: "tier-3", title: "Tier 3 — Vision + AR", level: 1 },
+    { id: "device-sdks", title: "Device-Specific SDKs", level: 1 },
+    { id: "api-reference", title: "API Reference", level: 1 },
+  ];
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
-      <main className="pt-24 pb-16">
-        <div className="container px-4">
-          {/* Hero */}
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <Badge variant="outline" className="mb-4 border-primary/30 text-primary">
-              <BookOpen className="h-3 w-3 mr-1" />
-              Developer Documentation
-            </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              SDK Integration <span className="text-gradient">Guides</span>
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              Comprehensive guides for integrating ContextLens with smart glasses at every tier level.
-              From phone fallback to full AR spatial computing.
-            </p>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background text-foreground">
+        <Header />
+        <main className="pt-24 pb-16">
+          <div className="container px-4">
+            <Breadcrumbs />
+            
+            {/* Hero */}
+            <div className="max-w-4xl mx-auto text-center mb-16">
+              <Badge variant="outline" className="mb-4 border-primary/30 text-primary">
+                <BookOpen className="h-3 w-3 mr-1" />
+                Developer Documentation
+              </Badge>
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                SDK Integration <span className="text-gradient">Guides</span>
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+                Comprehensive guides for integrating ContextLens with smart glasses at every tier level.
+                From phone fallback to full AR spatial computing.
+              </p>
 
-            {/* Search */}
-            <div className="flex justify-center mb-8">
-              <DocSearch onResultClick={handleSearchResultClick} />
+              {/* Search */}
+              <div className="flex justify-center mb-8">
+                <DocSearch onResultClick={handleSearchResultClick} />
+              </div>
+
+              {/* Quick nav */}
+              <div className="flex flex-wrap justify-center gap-3">
+                {tierDocs.map((doc) => (
+                  <a
+                    key={doc.tier}
+                    href={`#tier-${doc.tier}`}
+                    className={`tier-badge tier-${doc.tier} hover:scale-105 transition-transform`}
+                  >
+                    <doc.icon className="h-3.5 w-3.5" />
+                    Tier {doc.tier}
+                  </a>
+                ))}
+              </div>
             </div>
 
-            {/* Quick nav */}
-            <div className="flex flex-wrap justify-center gap-3">
-              {tierDocs.map((doc) => (
-                <a
-                  key={doc.tier}
-                  href={`#tier-${doc.tier}`}
-                  className={`tier-badge tier-${doc.tier} hover:scale-105 transition-transform`}
-                >
-                  <doc.icon className="h-3.5 w-3.5" />
-                  Tier {doc.tier}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Tier Documentation Sections */}
-          <div className="max-w-5xl mx-auto space-y-12">
+            {/* Main content with TOC sidebar */}
+            <div className="max-w-6xl mx-auto flex gap-8">
+              {/* TOC Sidebar - Hidden on mobile */}
+              <aside className="hidden lg:block w-64 shrink-0">
+                <TableOfContents items={tocItems} />
+              </aside>
+              
+              {/* Tier Documentation Sections */}
+              <div className="flex-1 space-y-12">
             {tierDocs.map((doc) => (
               <section key={doc.tier} id={`tier-${doc.tier}`} className="scroll-mt-24">
                 <Card className="glass-card border-border/50 overflow-hidden">
@@ -886,11 +909,13 @@ await contextLens.startSession({
                 </div>
               </CardContent>
             </Card>
+            </div>
+            </div>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+        </main>
+        <Footer />
+      </div>
+    </ErrorBoundary>
   );
 };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +25,8 @@ import {
   Keyboard,
   Sparkles,
   Copy,
-  Command
+  Command,
+  Upload
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -65,6 +66,12 @@ import ConfirmDialog from "@/components/dashboard/ConfirmDialog";
 import QuickActionsBar from "@/components/dashboard/QuickActionsBar";
 import MarketplacePreview from "@/components/dashboard/MarketplacePreview";
 import UXControlsMapping from "@/components/dashboard/UXControlsMapping";
+import EmptyState from "@/components/dashboard/EmptyState";
+import ScriptImport from "@/components/dashboard/ScriptImport";
+import Pagination from "@/components/dashboard/Pagination";
+import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
+import HighlightText from "@/components/ui/highlight-text";
+import ErrorBoundary from "@/components/ui/error-boundary";
 import type { User } from "@supabase/supabase-js";
 
 interface Script {
@@ -285,12 +292,44 @@ const Dashboard = () => {
   // Get all unique tags for filter
   const allTags = [...new Set(scripts.flatMap(s => s.tags))].filter(Boolean);
 
-  const filteredScripts = scripts.filter(s => {
+  const filteredScripts = useMemo(() => scripts.filter(s => {
     const matchesSearch = s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.content.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesTag = tagFilter === "all" || s.tags.includes(tagFilter);
     return matchesSearch && matchesTag;
-  });
+  }), [scripts, searchQuery, tagFilter]);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
+  const totalPages = Math.ceil(filteredScripts.length / pageSize);
+  const paginatedScripts = useMemo(() => 
+    filteredScripts.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+  [filteredScripts, currentPage, pageSize]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, tagFilter]);
+
+  // Import handler
+  const handleImportScripts = async (importedScripts: { title: string; content: string; tags: string[] }[]) => {
+    if (!user) return;
+    
+    const scriptsToInsert = importedScripts.map(s => ({
+      user_id: user.id,
+      title: s.title,
+      content: s.content,
+      tags: s.tags,
+    }));
+
+    const { error } = await supabase.from("scripts").insert(scriptsToInsert);
+    if (error) {
+      toast({ title: "Error", description: "Failed to import scripts", variant: "destructive" });
+    } else {
+      fetchScripts();
+    }
+  };
 
   // Analytics
   const totalUsage = scripts.reduce((sum, s) => sum + s.usage_count, 0);
@@ -298,11 +337,7 @@ const Dashboard = () => {
   const connectedDevices = devices.filter(d => d.is_connected).length;
 
   if (authLoading || loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -519,6 +554,8 @@ const Dashboard = () => {
                     <ExportScriptsDialog scripts={scripts} />
                   )}
                   
+                  <ScriptImport onImport={handleImportScripts} />
+                  
                   <Button variant="hero" onClick={handleNewScript}>
                     <Plus className="h-4 w-4 mr-2" />
                     New Script
@@ -528,114 +565,118 @@ const Dashboard = () => {
 
               {/* Scripts Tab */}
               <TabsContent value="scripts" className="space-y-4">
-                {filteredScripts.length === 0 ? (
+                {scripts.length === 0 ? (
+                  <EmptyState type="scripts" onAction={handleNewScript} />
+                ) : filteredScripts.length === 0 ? (
                   <Card className="glass-card border-border/50">
                     <CardContent className="py-12 text-center">
-                      <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium mb-2">No scripts yet</h3>
-                      <p className="text-muted-foreground mb-4">
-                        Create your first script to get started with contextual prompting.
+                      <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No matching scripts</h3>
+                      <p className="text-muted-foreground">
+                        Try adjusting your search or filter criteria.
                       </p>
-                      <Button variant="hero" onClick={handleNewScript}>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create Script
-                      </Button>
                     </CardContent>
                   </Card>
                 ) : (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {filteredScripts.map((script) => (
-                      <Card 
-                        key={script.id} 
-                        className="glass-card border-border/50 hover:border-primary/30 transition-colors cursor-pointer"
-                        onClick={() => handleEditScript(script)}
-                      >
-                        <CardHeader className="pb-3">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <CardTitle className="text-base">{script.title}</CardTitle>
-                              <CardDescription className="mt-1">
-                                {script.content.slice(0, 60)}...
-                              </CardDescription>
+                  <>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {paginatedScripts.map((script) => (
+                        <Card 
+                          key={script.id} 
+                          className="glass-card border-border/50 hover:border-primary/30 transition-colors cursor-pointer"
+                          onClick={() => handleEditScript(script)}
+                        >
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <CardTitle className="text-base">
+                                  <HighlightText text={script.title} highlight={searchQuery} />
+                                </CardTitle>
+                                <CardDescription className="mt-1">
+                                  <HighlightText 
+                                    text={script.content.slice(0, 60) + "..."} 
+                                    highlight={searchQuery} 
+                                  />
+                                </CardDescription>
+                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditScript(script); }}>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); duplicateScript(script); }}>
+                                    <Copy className="h-4 w-4 mr-2" />
+                                    Duplicate
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleToggleActive(script.id, !script.is_active); }}>
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    {script.is_active ? "Deactivate" : "Activate"}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem 
+                                    className="text-destructive focus:text-destructive"
+                                    onClick={(e) => { e.stopPropagation(); setDeleteConfirm({ type: "script", id: script.id, name: script.title }); }}
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditScript(script); }}>
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); duplicateScript(script); }}>
-                                  <Copy className="h-4 w-4 mr-2" />
-                                  Duplicate
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleToggleActive(script.id, !script.is_active); }}>
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  {script.is_active ? "Deactivate" : "Activate"}
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem 
-                                  className="text-destructive focus:text-destructive"
-                                  onClick={(e) => { e.stopPropagation(); setDeleteConfirm({ type: "script", id: script.id, name: script.title }); }}
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex flex-wrap gap-1.5 mb-3">
-                            {script.tags.map((tag) => (
-                              <Badge key={tag} variant="secondary" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                            {script.is_active && (
-                              <Badge className="bg-accent/10 text-accent border-accent/20 text-xs">
-                                <Sparkles className="h-3 w-3 mr-1" />
-                                Active
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Eye className="h-3 w-3" />
-                              {script.usage_count} uses
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {new Date(script.created_at).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex flex-wrap gap-1.5 mb-3">
+                              {script.tags.map((tag) => (
+                                <Badge key={tag} variant="secondary" className="text-xs">
+                                  {tag}
+                                </Badge>
+                              ))}
+                              {script.is_active && (
+                                <Badge className="bg-accent/10 text-accent border-accent/20 text-xs">
+                                  <Sparkles className="h-3 w-3 mr-1" />
+                                  Active
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Eye className="h-3 w-3" />
+                                {script.usage_count} uses
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {new Date(script.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                    
+                    {totalPages > 1 && (
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                        pageSize={pageSize}
+                        totalItems={filteredScripts.length}
+                      />
+                    )}
+                  </>
                 )}
               </TabsContent>
+
 
               {/* Devices Tab */}
               <TabsContent value="devices" className="space-y-4">
                 {devices.length === 0 ? (
-                  <Card className="glass-card border-border/50">
-                    <CardContent className="py-12 text-center">
-                      <Glasses className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium mb-2">No devices connected</h3>
-                      <p className="text-muted-foreground mb-4">
-                        Connect your smart glasses to start using ContextLens.
-                      </p>
-                      <Button variant="hero" onClick={() => setIsAddDeviceOpen(true)}>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Device
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <EmptyState type="devices" onAction={() => setIsAddDeviceOpen(true)} />
                 ) : (
                   <div className="grid md:grid-cols-2 gap-4">
                     {devices.map((device) => (

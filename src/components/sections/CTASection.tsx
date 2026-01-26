@@ -1,20 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Mail } from "lucide-react";
-import { useState, forwardRef } from "react";
-import { useWaitlist } from "@/hooks/useWaitlist";
+import { forwardRef } from "react";
+import WaitlistForm from "@/components/sections/WaitlistForm";
 
 const CTASection = forwardRef<HTMLElement>((_, ref) => {
-  const [email, setEmail] = useState("");
-  const { joinWaitlist, loading } = useWaitlist();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const success = await joinWaitlist(email);
-    if (success) {
-      setEmail("");
-    }
-  };
-
   return (
     <section ref={ref} className="py-24 md:py-32 relative overflow-hidden">
       {/* Background effects */}
@@ -49,32 +36,8 @@ const CTASection = forwardRef<HTMLElement>((_, ref) => {
             contextual prompter technology.
           </p>
 
-          {/* Email Form */}
-          <form 
-            onSubmit={handleSubmit}
-            className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-8"
-          >
-            <div className="relative flex-1">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full h-12 pl-12 pr-4 rounded-xl bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
-              />
-            </div>
-            <Button type="submit" variant="hero" size="lg" disabled={loading}>
-              {loading ? "Joining..." : "Get Early Access"}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </form>
-
-          {/* Social proof */}
-          <p className="text-sm text-muted-foreground">
-            Join <span className="text-foreground font-medium">500+</span> developers and professionals on the waitlist
-          </p>
+          {/* Waitlist Form */}
+          <WaitlistForm source="cta" className="max-w-md mx-auto" />
         </div>
       </div>
     </section>

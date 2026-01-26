@@ -1,11 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import { Users, Glasses, FileText, Zap } from "lucide-react";
 
 interface StatItemProps {
   value: number;
   suffix?: string;
   label: string;
   delay?: number;
+  icon: React.ElementType;
+  color: "primary" | "accent";
 }
 
 const AnimatedNumber = ({ value, suffix = "", delay = 0 }: { value: number; suffix?: string; delay?: number }) => {
@@ -45,7 +48,7 @@ const AnimatedNumber = ({ value, suffix = "", delay = 0 }: { value: number; suff
   );
 };
 
-const StatItem = ({ value, suffix, label, delay }: StatItemProps) => {
+const StatItem = ({ value, suffix, label, delay, icon: Icon, color }: StatItemProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   
@@ -57,7 +60,18 @@ const StatItem = ({ value, suffix, label, delay }: StatItemProps) => {
       transition={{ duration: 0.6, delay: delay ? delay / 1000 : 0 }}
       className="text-center"
     >
-      <p className="text-4xl md:text-5xl font-bold text-gradient mb-2">
+      <div
+        className={`mx-auto mb-4 h-14 w-14 rounded-2xl flex items-center justify-center ${
+          color === "primary" ? "bg-primary/10" : "bg-accent/10"
+        }`}
+      >
+        <Icon
+          className={`h-7 w-7 ${
+            color === "primary" ? "text-primary" : "text-accent"
+          }`}
+        />
+      </div>
+      <p className="text-3xl md:text-4xl font-bold text-gradient mb-2">
         <AnimatedNumber value={value} suffix={suffix} delay={delay} />
       </p>
       <p className="text-sm text-muted-foreground">{label}</p>
@@ -67,14 +81,14 @@ const StatItem = ({ value, suffix, label, delay }: StatItemProps) => {
 
 const AnimatedStats = () => {
   const stats = [
-    { value: 10000, suffix: "+", label: "Active Users", delay: 0 },
-    { value: 50, suffix: "+", label: "Device Models", delay: 200 },
-    { value: 1000000, suffix: "+", label: "Prompts Delivered", delay: 400 },
-    { value: 99.9, suffix: "%", label: "Uptime SLA", delay: 600 },
+    { value: 10000, suffix: "+", label: "Active Users", delay: 0, icon: Users, color: "primary" as const },
+    { value: 50, suffix: "+", label: "Device Models", delay: 200, icon: Glasses, color: "accent" as const },
+    { value: 1000000, suffix: "+", label: "Prompts Delivered", delay: 400, icon: FileText, color: "primary" as const },
+    { value: 99.9, suffix: "%", label: "Uptime SLA", delay: 600, icon: Zap, color: "accent" as const },
   ];
   
   return (
-    <section className="py-16 border-y border-border/50">
+    <section className="py-16 border-y border-border/50 bg-secondary/20">
       <div className="container px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat, i) => (
