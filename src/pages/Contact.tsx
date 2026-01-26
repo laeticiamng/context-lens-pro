@@ -13,14 +13,18 @@ import {
   Send,
   MapPin,
   Clock,
-  Check
+  Check,
+  AlertCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { contactSchema } from "@/lib/validations";
 
 const Contact = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -30,10 +34,42 @@ const Contact = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+    
+    // Validate form data
+    const result = contactSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+    
     setLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Save to database
+    const { error } = await supabase
+      .from("contact_messages")
+      .insert({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+      });
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
     
     toast({
       title: "Message sent!",
@@ -124,8 +160,8 @@ const Contact = () => {
 
                 <div className="p-4 rounded-xl glass-card border-border/50">
                   <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-emerald-500/10">
-                      <Clock className="h-5 w-5 text-emerald-400" />
+                    <div className="p-2 rounded-lg bg-accent/10">
+                      <Clock className="h-5 w-5 text-accent" />
                     </div>
                     <div>
                       <h3 className="font-medium">Response Time</h3>
@@ -178,8 +214,15 @@ const Contact = () => {
                               placeholder="Your name"
                               value={formData.name}
                               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                              className={errors.name ? "border-destructive" : ""}
                               required
                             />
+                            {errors.name && (
+                              <p className="text-xs text-destructive flex items-center gap-1">
+                                <AlertCircle className="h-3 w-3" />
+                                {errors.name}
+                              </p>
+                            )}
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
@@ -189,8 +232,15 @@ const Contact = () => {
                               placeholder="you@example.com"
                               value={formData.email}
                               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                              className={errors.email ? "border-destructive" : ""}
                               required
                             />
+                            {errors.email && (
+                              <p className="text-xs text-destructive flex items-center gap-1">
+                                <AlertCircle className="h-3 w-3" />
+                                {errors.email}
+                              </p>
+                            )}
                           </div>
                         </div>
                         
@@ -201,8 +251,15 @@ const Contact = () => {
                             placeholder="What's this about?"
                             value={formData.subject}
                             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                            className={errors.subject ? "border-destructive" : ""}
                             required
                           />
+                          {errors.subject && (
+                            <p className="text-xs text-destructive flex items-center gap-1">
+                              <AlertCircle className="h-3 w-3" />
+                              {errors.subject}
+                            </p>
+                          )}
                         </div>
                         
                         <div className="space-y-2">
@@ -213,8 +270,15 @@ const Contact = () => {
                             rows={5}
                             value={formData.message}
                             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                            className={errors.message ? "border-destructive" : ""}
                             required
                           />
+                          {errors.message && (
+                            <p className="text-xs text-destructive flex items-center gap-1">
+                              <AlertCircle className="h-3 w-3" />
+                              {errors.message}
+                            </p>
+                          )}
                         </div>
 
                         <Button type="submit" variant="hero" className="w-full" disabled={loading}>

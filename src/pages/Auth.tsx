@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Glasses, Mail, Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Glasses, Mail, Lock, ArrowLeft, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ForgotPasswordDialog from "@/components/auth/ForgotPasswordDialog";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
+import { signUpSchema, signInSchema } from "@/lib/validations";
+
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const [isLogin, setIsLogin] = useState(true);
@@ -16,6 +18,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -39,19 +42,36 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+    
+    // Validate form data
+    const schema = isLogin ? signInSchema : signUpSchema;
+    const result = schema.safeParse({ email, password });
+    
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+    
     setLoading(true);
 
     try {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
+          email: email.trim(),
           password,
         });
         if (error) throw error;
         toast({ title: "Welcome back!", description: "You've been signed in successfully." });
       } else {
         const { error } = await supabase.auth.signUp({
-          email,
+          email: email.trim(),
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/dashboard`,
@@ -64,6 +84,8 @@ const Auth = () => {
       let message = error.message;
       if (error.message.includes("User already registered")) {
         message = "This email is already registered. Try signing in instead.";
+      } else if (error.message.includes("Invalid login credentials")) {
+        message = "Invalid email or password. Please try again.";
       }
       toast({ title: "Error", description: message, variant: "destructive" });
     } finally {
@@ -111,10 +133,16 @@ const Auth = () => {
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className={`pl-10 ${errors.email ? "border-destructive" : ""}`}
                     required
                   />
                 </div>
+                {errors.email && (
+                  <p className="text-xs text-destructive flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.email}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -129,7 +157,7 @@ const Auth = () => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
+                    className={`pl-10 pr-10 ${errors.password ? "border-destructive" : ""}`}
                     required
                     minLength={6}
                   />
@@ -141,6 +169,12 @@ const Auth = () => {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="text-xs text-destructive flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.password}
+                  </p>
+                )}
                 {!isLogin && password && <PasswordStrengthMeter password={password} />}
               </div>
               <Button type="submit" variant="hero" className="w-full" disabled={loading}>

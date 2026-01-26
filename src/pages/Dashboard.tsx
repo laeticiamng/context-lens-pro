@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,18 +23,22 @@ import {
   ChevronRight,
   Filter,
   Keyboard,
-  Sparkles
+  Sparkles,
+  Copy,
+  Command
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeDevices } from "@/hooks/useRealtimeDevices";
 import { useOnboarding } from "@/hooks/useOnboarding";
+import { useScriptActions } from "@/hooks/useScriptActions";
 import { useKeyboardShortcuts } from "@/components/dashboard/KeyboardShortcuts";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
@@ -57,6 +61,8 @@ import ExportScriptsDialog from "@/components/dashboard/ExportScriptsDialog";
 import KeyboardShortcuts from "@/components/dashboard/KeyboardShortcuts";
 import UsageLimits from "@/components/dashboard/UsageLimits";
 import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
+import ConfirmDialog from "@/components/dashboard/ConfirmDialog";
+import QuickActionsBar from "@/components/dashboard/QuickActionsBar";
 import type { User } from "@supabase/supabase-js";
 
 interface Script {
@@ -83,11 +89,42 @@ const Dashboard = () => {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showQuickActions, setShowQuickActions] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ type: "script" | "device"; id: string; name: string } | null>(null);
 
   // Hooks
   const { devices, loading: devicesLoading, refreshDevices } = useRealtimeDevices(user?.id);
   const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
   const { showShortcuts, setShowShortcuts } = useKeyboardShortcuts();
+
+  // Fetch scripts function for useScriptActions
+  const fetchScripts = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("scripts")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to load scripts", variant: "destructive" });
+    } else {
+      setScripts(data || []);
+    }
+    setLoading(false);
+  }, [toast]);
+
+  const { duplicateScript, toggleActive, deleteScript } = useScriptActions(user?.id, fetchScripts);
+
+  // Quick actions keyboard shortcut (Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setShowQuickActions(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Auth state
   useEffect(() => {
@@ -113,26 +150,12 @@ const Dashboard = () => {
     }
   }, [user, authLoading, navigate]);
 
-  // Fetch scripts
+  // Fetch scripts on user change
   useEffect(() => {
     if (user) {
       fetchScripts();
     }
-  }, [user]);
-
-  const fetchScripts = async () => {
-    const { data, error } = await supabase
-      .from("scripts")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      toast({ title: "Error", description: "Failed to load scripts", variant: "destructive" });
-    } else {
-      setScripts(data || []);
-    }
-    setLoading(false);
-  };
+  }, [user, fetchScripts]);
 
   const handleSaveScript = async (scriptData: Partial<Script>) => {
     if (editingScript) {
@@ -293,6 +316,32 @@ const Dashboard = () => {
       {/* Keyboard Shortcuts Dialog */}
       <KeyboardShortcuts open={showShortcuts} onOpenChange={setShowShortcuts} />
 
+      {/* Quick Actions (Cmd+K) */}
+      <QuickActionsBar
+        open={showQuickActions}
+        onOpenChange={setShowQuickActions}
+        onNewScript={handleNewScript}
+        onAddDevice={() => setIsAddDeviceOpen(true)}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={!!deleteConfirm}
+        onOpenChange={(open) => !open && setDeleteConfirm(null)}
+        title={`Delete ${deleteConfirm?.type === "script" ? "Script" : "Device"}?`}
+        description={`Are you sure you want to delete "${deleteConfirm?.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        variant="destructive"
+        onConfirm={() => {
+          if (deleteConfirm?.type === "script") {
+            deleteScript(deleteConfirm.id);
+          } else if (deleteConfirm?.type === "device") {
+            handleDeleteDevice(deleteConfirm.id);
+          }
+          setDeleteConfirm(null);
+        }}
+      />
+
       {/* Header */}
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="container px-4">
@@ -379,8 +428,8 @@ const Dashboard = () => {
           <Card className="glass-card border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                  <Glasses className="h-5 w-5 text-emerald-500" />
+                <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                  <Glasses className="h-5 w-5 text-accent" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{connectedDevices}</p>
@@ -392,8 +441,8 @@ const Dashboard = () => {
           <Card className="glass-card border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-amber-500" />
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <BarChart3 className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{totalUsage}</p>
@@ -518,13 +567,18 @@ const Dashboard = () => {
                                   <Edit className="h-4 w-4 mr-2" />
                                   Edit
                                 </DropdownMenuItem>
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); duplicateScript(script); }}>
+                                  <Copy className="h-4 w-4 mr-2" />
+                                  Duplicate
+                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleToggleActive(script.id, !script.is_active); }}>
                                   <Eye className="h-4 w-4 mr-2" />
                                   {script.is_active ? "Deactivate" : "Activate"}
                                 </DropdownMenuItem>
+                                <DropdownMenuSeparator />
                                 <DropdownMenuItem 
-                                  className="text-destructive"
-                                  onClick={(e) => { e.stopPropagation(); handleDeleteScript(script.id); }}
+                                  className="text-destructive focus:text-destructive"
+                                  onClick={(e) => { e.stopPropagation(); setDeleteConfirm({ type: "script", id: script.id, name: script.title }); }}
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
                                   Delete
@@ -587,10 +641,10 @@ const Dashboard = () => {
                         <CardContent className="p-4">
                           <div className="flex items-start gap-3">
                             <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                              device.is_connected ? "bg-emerald-500/10" : "bg-secondary"
+                              device.is_connected ? "bg-accent/10" : "bg-secondary"
                             }`}>
                               {device.is_connected ? (
-                                <Wifi className="h-5 w-5 text-emerald-500" />
+                                <Wifi className="h-5 w-5 text-accent" />
                               ) : (
                                 <WifiOff className="h-5 w-5 text-muted-foreground" />
                               )}
