@@ -20,11 +20,16 @@ import {
   Copy,
   Check,
   Eye,
-  EyeOff
+  EyeOff,
+  Lock
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import PrivacyControls from "@/components/dashboard/PrivacyControls";
+import PasswordChangeDialog from "@/components/settings/PasswordChangeDialog";
+import SessionManagement from "@/components/settings/SessionManagement";
+import AvatarUpload from "@/components/settings/AvatarUpload";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -35,6 +40,7 @@ const Settings = () => {
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   
   // Profile state
   const [displayName, setDisplayName] = useState("");
@@ -104,6 +110,38 @@ const Settings = () => {
     toast({ title: "Copied", description: "API key copied to clipboard" });
   };
 
+  const handleExportData = async () => {
+    // Export all user data as JSON
+    const { data: scripts } = await supabase.from("scripts").select("*");
+    const { data: devices } = await supabase.from("connected_devices").select("*");
+    const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", user?.id).maybeSingle();
+    
+    const exportData = {
+      exportedAt: new Date().toISOString(),
+      profile,
+      scripts,
+      devices,
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `contextlens-export-${new Date().toISOString().split("T")[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    toast({ title: "Export Complete", description: "Your data has been downloaded." });
+  };
+
+  const handleDeleteData = async () => {
+    // In production, this would delete all user data
+    toast({
+      title: "Data Deletion Requested",
+      description: "Please contact support@contextlens.io to complete this request.",
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -140,26 +178,30 @@ const Settings = () => {
       <main className="container px-4 py-8 max-w-4xl">
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2">Settings</h1>
-          <p className="text-muted-foreground">Manage your account and preferences</p>
+          <p className="text-muted-foreground">Manage your account, privacy, and preferences</p>
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-lg">
+          <TabsList className="grid w-full grid-cols-5 max-w-2xl">
             <TabsTrigger value="profile" className="gap-2">
               <User className="h-4 w-4" />
-              Profile
+              <span className="hidden sm:inline">Profile</span>
+            </TabsTrigger>
+            <TabsTrigger value="security" className="gap-2">
+              <Shield className="h-4 w-4" />
+              <span className="hidden sm:inline">Security</span>
             </TabsTrigger>
             <TabsTrigger value="notifications" className="gap-2">
               <Bell className="h-4 w-4" />
-              Alerts
+              <span className="hidden sm:inline">Alerts</span>
             </TabsTrigger>
             <TabsTrigger value="api" className="gap-2">
               <Key className="h-4 w-4" />
-              API
+              <span className="hidden sm:inline">API</span>
             </TabsTrigger>
             <TabsTrigger value="billing" className="gap-2">
               <CreditCard className="h-4 w-4" />
-              Billing
+              <span className="hidden sm:inline">Billing</span>
             </TabsTrigger>
           </TabsList>
 
@@ -168,9 +210,18 @@ const Settings = () => {
             <Card className="glass-card border-border/50">
               <CardHeader>
                 <CardTitle>Profile Information</CardTitle>
-                <CardDescription>Update your personal details</CardDescription>
+                <CardDescription>Update your personal details and avatar</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
+                {user && (
+                  <AvatarUpload
+                    currentUrl={avatarUrl}
+                    userId={user.id}
+                    displayName={displayName}
+                    onUpload={setAvatarUrl}
+                  />
+                )}
+                
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -191,16 +242,6 @@ const Settings = () => {
                     onChange={(e) => setDisplayName(e.target.value)}
                   />
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="avatarUrl">Avatar URL</Label>
-                  <Input
-                    id="avatarUrl"
-                    placeholder="https://..."
-                    value={avatarUrl}
-                    onChange={(e) => setAvatarUrl(e.target.value)}
-                  />
-                </div>
 
                 <Button variant="hero" onClick={handleSaveProfile} disabled={saving}>
                   <Save className="h-4 w-4 mr-2" />
@@ -208,6 +249,29 @@ const Settings = () => {
                 </Button>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Security Tab */}
+          <TabsContent value="security" className="space-y-6">
+            <Card className="glass-card border-border/50">
+              <CardHeader>
+                <CardTitle>Password</CardTitle>
+                <CardDescription>Change your account password</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" onClick={() => setShowPasswordDialog(true)}>
+                  <Lock className="h-4 w-4 mr-2" />
+                  Change Password
+                </Button>
+              </CardContent>
+            </Card>
+
+            <SessionManagement />
+            
+            <PrivacyControls 
+              onExportData={handleExportData}
+              onDeleteData={handleDeleteData}
+            />
           </TabsContent>
 
           {/* Notifications Tab */}
@@ -356,6 +420,11 @@ const Settings = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      <PasswordChangeDialog 
+        open={showPasswordDialog} 
+        onOpenChange={setShowPasswordDialog} 
+      />
     </div>
   );
 };
