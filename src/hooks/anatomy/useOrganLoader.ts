@@ -36,10 +36,13 @@ export function useOrganLoader(patientId: string | null): UseOrganLoaderResult {
 
     async function fetchStructures() {
       try {
+        console.log('[OrganLoader] Fetching structures for patient:', patientId);
         const data = await anatomyApi.getStructures(patientId!);
         setStructures(data);
+        console.log('[OrganLoader] Loaded', data.length, 'structures');
       } catch (err) {
         console.error('[OrganLoader] Failed to fetch structures:', err);
+        // Continue with empty structures array - mock data will be used
       }
     }
 

@@ -89,8 +89,11 @@ export function AnatomyHUD({
     all: language === 'fr' ? 'Tous' : 'All',
     focus: language === 'fr' ? 'Focus' : 'Focus',
     voice: language === 'fr' ? 'Commandes vocales' : 'Voice Commands',
-    volume: language === 'fr' ? 'Volume' : 'Volume',
+    volume: language === 'fr' ? 'Volume (mL)' : 'Volume (mL)',
     noAnomalies: language === 'fr' ? 'Aucune anomalie' : 'No anomalies',
+    loading: language === 'fr' ? 'Chargement...' : 'Loading...',
+    hide: language === 'fr' ? 'Masquer' : 'Hide',
+    isolate: language === 'fr' ? 'Isoler' : 'Isolate',
   };
 
   return (
@@ -218,9 +221,10 @@ export function AnatomyHUD({
                   size="sm" 
                   className="flex-1"
                   onClick={() => store.hideOrgan(focusedOrganData.structure.structure_code)}
+                  aria-label={t.hide}
                 >
                   <EyeOff className="w-4 h-4 mr-1" />
-                  {language === 'fr' ? 'Masquer' : 'Hide'}
+                  {t.hide}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -234,9 +238,10 @@ export function AnatomyHUD({
                       }
                     });
                   }}
+                  aria-label={t.isolate}
                 >
                   <Eye className="w-4 h-4 mr-1" />
-                  {language === 'fr' ? 'Isoler' : 'Isolate'}
+                  {t.isolate}
                 </Button>
               </div>
             </CardContent>
@@ -280,8 +285,10 @@ export function AnatomyHUD({
                   size="sm"
                   onClick={() => store.setActiveSystem(system)}
                   style={store.activeSystem === system ? { backgroundColor: SYSTEM_LABELS[system].color } : {}}
+                  aria-label={SYSTEM_LABELS[system][language]}
+                  title={SYSTEM_LABELS[system][language]}
                 >
-                  {SYSTEM_LABELS[system][language].slice(0, 5)}
+                  {SYSTEM_LABELS[system][language].slice(0, 6)}
                 </Button>
               ))}
             </div>

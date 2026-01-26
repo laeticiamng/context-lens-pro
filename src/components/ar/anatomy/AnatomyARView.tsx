@@ -35,9 +35,9 @@ function LoadingIndicator() {
 
 function NoPatientBanner({ language }: { language: string }) {
   return (
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" role="alert" aria-live="polite">
       <Alert variant="destructive" className="bg-destructive/90 backdrop-blur-sm">
-        <AlertCircle className="h-4 w-4" />
+        <AlertCircle className="h-4 w-4" aria-hidden="true" />
         <AlertTitle>
           {language === 'fr' ? 'Patient non détecté' : 'Patient not detected'}
         </AlertTitle>
@@ -236,22 +236,27 @@ export function AnatomyARView({ patientId, patientName, onSessionEnd }: AnatomyA
       )}
       
       {/* Debug controls */}
-      <div className="absolute bottom-20 right-4 flex flex-col gap-2 pointer-events-auto">
+      <div className="absolute bottom-20 right-4 flex flex-col gap-2 pointer-events-auto" role="toolbar" aria-label={language === 'fr' ? 'Contrôles AR' : 'AR Controls'}>
         <Button
           variant="outline"
           size="sm"
           onClick={() => setShowBodyTracker(!showBodyTracker)}
           className="bg-background/80"
-        >
-          {showBodyTracker 
+          aria-pressed={showBodyTracker}
+          aria-label={showBodyTracker 
             ? (language === 'fr' ? 'Masquer le squelette' : 'Hide Skeleton')
             : (language === 'fr' ? 'Afficher le squelette' : 'Show Skeleton')}
+        >
+          {showBodyTracker 
+            ? (language === 'fr' ? 'Masquer squelette' : 'Hide Skeleton')
+            : (language === 'fr' ? 'Afficher squelette' : 'Show Skeleton')}
         </Button>
         {onSessionEnd && (
           <Button
             variant="destructive"
             size="sm"
             onClick={onSessionEnd}
+            aria-label={language === 'fr' ? 'Terminer la session' : 'End session'}
           >
             {language === 'fr' ? 'Terminer' : 'End Session'}
           </Button>

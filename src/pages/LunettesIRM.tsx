@@ -260,13 +260,13 @@ function LunettesIRMContent() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="overview">
-            <Activity className="h-4 w-4 mr-2" />
+        <TabsList aria-label={language === 'fr' ? 'Navigation du tableau de bord' : 'Dashboard navigation'}>
+          <TabsTrigger value="overview" aria-label={language === 'fr' ? "Vue d'ensemble" : "Overview"}>
+            <Activity className="h-4 w-4 mr-2" aria-hidden="true" />
             {language === 'fr' ? 'Vue d\'ensemble' : 'Overview'}
           </TabsTrigger>
-          <TabsTrigger value="protocols">
-            <Glasses className="h-4 w-4 mr-2" />
+          <TabsTrigger value="protocols" aria-label={language === 'fr' ? 'Protocoles de dépistage' : 'Screening Protocols'}>
+            <Glasses className="h-4 w-4 mr-2" aria-hidden="true" />
             {language === 'fr' ? 'Protocoles' : 'Protocols'}
           </TabsTrigger>
         </TabsList>
