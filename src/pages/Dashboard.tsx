@@ -21,18 +21,19 @@ import {
   LogOut,
   Settings,
   ChevronRight,
-  Download,
   Filter,
-  Power,
-  PowerOff
+  Keyboard,
+  Sparkles
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useRealtimeDevices } from "@/hooks/useRealtimeDevices";
+import { useOnboarding } from "@/hooks/useOnboarding";
+import { useKeyboardShortcuts } from "@/components/dashboard/KeyboardShortcuts";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -53,6 +54,9 @@ import ScriptEditor from "@/components/dashboard/ScriptEditor";
 import AnalyticsCharts from "@/components/dashboard/AnalyticsCharts";
 import AddDeviceDialog from "@/components/dashboard/AddDeviceDialog";
 import ExportScriptsDialog from "@/components/dashboard/ExportScriptsDialog";
+import KeyboardShortcuts from "@/components/dashboard/KeyboardShortcuts";
+import UsageLimits from "@/components/dashboard/UsageLimits";
+import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
 import type { User } from "@supabase/supabase-js";
 
 interface Script {
@@ -66,16 +70,6 @@ interface Script {
   created_at: string;
 }
 
-interface Device {
-  id: string;
-  device_name: string;
-  device_type: string;
-  manufacturer: string | null;
-  tier: number;
-  is_connected: boolean;
-  last_connected_at: string | null;
-}
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -83,13 +77,17 @@ const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [scripts, setScripts] = useState<Script[]>([]);
-  const [devices, setDevices] = useState<Device[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [tagFilter, setTagFilter] = useState<string>("all");
   const [editingScript, setEditingScript] = useState<Script | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Hooks
+  const { devices, loading: devicesLoading, refreshDevices } = useRealtimeDevices(user?.id);
+  const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
+  const { showShortcuts, setShowShortcuts } = useKeyboardShortcuts();
 
   // Auth state
   useEffect(() => {
@@ -108,10 +106,6 @@ const Dashboard = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
-
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
@@ -119,11 +113,10 @@ const Dashboard = () => {
     }
   }, [user, authLoading, navigate]);
 
-  // Fetch data
+  // Fetch scripts
   useEffect(() => {
     if (user) {
       fetchScripts();
-      fetchDevices();
     }
   }, [user]);
 
@@ -141,20 +134,8 @@ const Dashboard = () => {
     setLoading(false);
   };
 
-  const fetchDevices = async () => {
-    const { data, error } = await supabase
-      .from("connected_devices")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (!error) {
-      setDevices(data || []);
-    }
-  };
-
   const handleSaveScript = async (scriptData: Partial<Script>) => {
     if (editingScript) {
-      // Update existing
       const { error } = await supabase
         .from("scripts")
         .update({
@@ -173,7 +154,6 @@ const Dashboard = () => {
         fetchScripts();
       }
     } else {
-      // Create new
       const { error } = await supabase.from("scripts").insert({
         user_id: user?.id as string,
         title: scriptData.title || "",
@@ -212,7 +192,7 @@ const Dashboard = () => {
   };
 
   const handleSignOut = async () => {
-    await signOut();
+    await supabase.auth.signOut();
     navigate("/");
   };
 
@@ -235,7 +215,7 @@ const Dashboard = () => {
       toast({ title: "Error", description: "Failed to add device", variant: "destructive" });
     } else {
       toast({ title: "Success", description: "Device added successfully" });
-      fetchDevices();
+      refreshDevices();
     }
   };
 
@@ -263,7 +243,7 @@ const Dashboard = () => {
       toast({ title: "Error", description: "Failed to update device", variant: "destructive" });
     } else {
       toast({ title: "Updated", description: `Device ${isConnected ? "connected" : "disconnected"}` });
-      fetchDevices();
+      refreshDevices();
     }
   };
 
@@ -273,7 +253,7 @@ const Dashboard = () => {
       toast({ title: "Error", description: "Failed to remove device", variant: "destructive" });
     } else {
       toast({ title: "Removed", description: "Device removed" });
-      fetchDevices();
+      refreshDevices();
     }
   };
 
@@ -302,6 +282,17 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Onboarding Flow */}
+      {showOnboarding && (
+        <OnboardingFlow 
+          onComplete={completeOnboarding} 
+          onSkip={skipOnboarding} 
+        />
+      )}
+
+      {/* Keyboard Shortcuts Dialog */}
+      <KeyboardShortcuts open={showShortcuts} onOpenChange={setShowShortcuts} />
+
       {/* Header */}
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="container px-4">
@@ -320,6 +311,14 @@ const Dashboard = () => {
             </div>
             
             <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowShortcuts(true)}
+                title="Keyboard shortcuts (⌘/)"
+              >
+                <Keyboard className="h-5 w-5" />
+              </Button>
               <Button variant="ghost" size="icon" onClick={() => navigate("/settings")}>
                 <Settings className="h-5 w-5" />
               </Button>
@@ -405,235 +404,259 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="scripts" className="space-y-6">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <TabsList>
-              <TabsTrigger value="scripts" className="gap-2">
-                <FileText className="h-4 w-4" />
-                Scripts
-              </TabsTrigger>
-              <TabsTrigger value="devices" className="gap-2">
-                <Glasses className="h-4 w-4" />
-                Devices
-              </TabsTrigger>
-              <TabsTrigger value="analytics" className="gap-2">
-                <BarChart3 className="h-4 w-4" />
-                Analytics
-              </TabsTrigger>
-            </TabsList>
-            
-            <div className="flex items-center gap-3 flex-wrap">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search scripts..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 w-48 lg:w-64"
-                />
-              </div>
-              
-              {allTags.length > 0 && (
-                <Select value={tagFilter} onValueChange={setTagFilter}>
-                  <SelectTrigger className="w-36">
-                    <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Filter by tag" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Tags</SelectItem>
-                    {allTags.map((tag) => (
-                      <SelectItem key={tag} value={tag}>{tag}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-              
-              {scripts.length > 0 && (
-                <ExportScriptsDialog scripts={scripts} />
-              )}
-              
-              <Button variant="hero" onClick={handleNewScript}>
-                <Plus className="h-4 w-4 mr-2" />
-                New Script
-              </Button>
-            </div>
+        {/* Main Content */}
+        <div className="grid lg:grid-cols-4 gap-6">
+          {/* Left Column - Usage Limits */}
+          <div className="lg:col-span-1 space-y-6">
+            <UsageLimits
+              scriptsCount={scripts.length}
+              scriptsLimit={10}
+              analysesUsed={totalUsage}
+              analysesLimit={100}
+              devicesCount={devices.length}
+              devicesLimit={3}
+              plan="free"
+            />
           </div>
 
-          {/* Scripts Tab */}
-          <TabsContent value="scripts" className="space-y-4">
-            {filteredScripts.length === 0 ? (
-              <Card className="glass-card border-border/50">
-                <CardContent className="py-12 text-center">
-                  <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No scripts yet</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Create your first script to get started with contextual prompting.
-                  </p>
+          {/* Right Column - Main Content */}
+          <div className="lg:col-span-3">
+            <Tabs defaultValue="scripts" className="space-y-6">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <TabsList>
+                  <TabsTrigger value="scripts" className="gap-2">
+                    <FileText className="h-4 w-4" />
+                    Scripts
+                  </TabsTrigger>
+                  <TabsTrigger value="devices" className="gap-2">
+                    <Glasses className="h-4 w-4" />
+                    Devices
+                  </TabsTrigger>
+                  <TabsTrigger value="analytics" className="gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Analytics
+                  </TabsTrigger>
+                </TabsList>
+                
+                <div className="flex items-center gap-3 flex-wrap">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search scripts..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-9 w-48 lg:w-64"
+                    />
+                  </div>
+                  
+                  {allTags.length > 0 && (
+                    <Select value={tagFilter} onValueChange={setTagFilter}>
+                      <SelectTrigger className="w-36">
+                        <Filter className="h-4 w-4 mr-2" />
+                        <SelectValue placeholder="Filter by tag" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Tags</SelectItem>
+                        {allTags.map((tag) => (
+                          <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  
+                  {scripts.length > 0 && (
+                    <ExportScriptsDialog scripts={scripts} />
+                  )}
+                  
                   <Button variant="hero" onClick={handleNewScript}>
                     <Plus className="h-4 w-4 mr-2" />
-                    Create Script
+                    New Script
                   </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredScripts.map((script) => (
-                  <Card 
-                    key={script.id} 
-                    className="glass-card border-border/50 hover:border-primary/30 transition-colors cursor-pointer"
-                    onClick={() => handleEditScript(script)}
-                  >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="text-base">{script.title}</CardTitle>
-                          <CardDescription className="mt-1">
-                            {script.content.slice(0, 60)}...
-                          </CardDescription>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditScript(script); }}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleToggleActive(script.id, !script.is_active); }}>
-                              <Eye className="h-4 w-4 mr-2" />
-                              {script.is_active ? "Deactivate" : "Activate"}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              className="text-destructive"
-                              onClick={(e) => { e.stopPropagation(); handleDeleteScript(script.id); }}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-wrap gap-1.5 mb-3">
-                        {script.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Eye className="h-3 w-3" />
-                          {script.usage_count} uses
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {new Date(script.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
+                </div>
+              </div>
+
+              {/* Scripts Tab */}
+              <TabsContent value="scripts" className="space-y-4">
+                {filteredScripts.length === 0 ? (
+                  <Card className="glass-card border-border/50">
+                    <CardContent className="py-12 text-center">
+                      <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No scripts yet</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Create your first script to get started with contextual prompting.
+                      </p>
+                      <Button variant="hero" onClick={handleNewScript}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Script
+                      </Button>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {filteredScripts.map((script) => (
+                      <Card 
+                        key={script.id} 
+                        className="glass-card border-border/50 hover:border-primary/30 transition-colors cursor-pointer"
+                        onClick={() => handleEditScript(script)}
+                      >
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <CardTitle className="text-base">{script.title}</CardTitle>
+                              <CardDescription className="mt-1">
+                                {script.content.slice(0, 60)}...
+                              </CardDescription>
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditScript(script); }}>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleToggleActive(script.id, !script.is_active); }}>
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  {script.is_active ? "Deactivate" : "Activate"}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="text-destructive"
+                                  onClick={(e) => { e.stopPropagation(); handleDeleteScript(script.id); }}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex flex-wrap gap-1.5 mb-3">
+                            {script.tags.map((tag) => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {script.is_active && (
+                              <Badge className="bg-accent/10 text-accent border-accent/20 text-xs">
+                                <Sparkles className="h-3 w-3 mr-1" />
+                                Active
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Eye className="h-3 w-3" />
+                              {script.usage_count} uses
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {new Date(script.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
 
-          {/* Devices Tab */}
-          <TabsContent value="devices" className="space-y-4">
-            {devices.length === 0 ? (
-              <Card className="glass-card border-border/50">
-                <CardContent className="py-12 text-center">
-                  <Glasses className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No devices connected</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Connect your smart glasses to start using ContextLens.
-                  </p>
-                  <Button variant="hero" onClick={() => setIsAddDeviceOpen(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Device
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {devices.map((device) => (
-                  <Card key={device.id} className="glass-card border-border/50">
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                          device.is_connected ? "bg-emerald-500/10" : "bg-secondary"
-                        }`}>
-                          {device.is_connected ? (
-                            <Wifi className="h-5 w-5 text-emerald-500" />
-                          ) : (
-                            <WifiOff className="h-5 w-5 text-muted-foreground" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">{device.device_name}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {device.manufacturer} • Tier {device.tier}
-                          </p>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleToggleDeviceConnection(device.id, !device.is_connected)}>
+              {/* Devices Tab */}
+              <TabsContent value="devices" className="space-y-4">
+                {devices.length === 0 ? (
+                  <Card className="glass-card border-border/50">
+                    <CardContent className="py-12 text-center">
+                      <Glasses className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No devices connected</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Connect your smart glasses to start using ContextLens.
+                      </p>
+                      <Button variant="hero" onClick={() => setIsAddDeviceOpen(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Device
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {devices.map((device) => (
+                      <Card key={device.id} className="glass-card border-border/50">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3">
+                            <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                              device.is_connected ? "bg-emerald-500/10" : "bg-secondary"
+                            }`}>
                               {device.is_connected ? (
-                                <>
-                                  <WifiOff className="h-4 w-4 mr-2" />
-                                  Disconnect
-                                </>
+                                <Wifi className="h-5 w-5 text-emerald-500" />
                               ) : (
-                                <>
-                                  <Wifi className="h-4 w-4 mr-2" />
-                                  Reconnect
-                                </>
+                                <WifiOff className="h-5 w-5 text-muted-foreground" />
                               )}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              className="text-destructive"
-                              onClick={() => handleDeleteDevice(device.id)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Remove
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-                {/* Add device button */}
-                <Card 
-                  className="glass-card border-border/50 border-dashed hover:border-primary/50 cursor-pointer transition-colors"
-                  onClick={() => setIsAddDeviceOpen(true)}
-                >
-                  <CardContent className="p-4 flex items-center justify-center h-full min-h-[80px]">
-                    <div className="text-center">
-                      <Plus className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
-                      <span className="text-sm text-muted-foreground">Add Device</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </TabsContent>
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-medium">{device.device_name}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {device.manufacturer} • Tier {device.tier}
+                              </p>
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleToggleDeviceConnection(device.id, !device.is_connected)}>
+                                  {device.is_connected ? (
+                                    <>
+                                      <WifiOff className="h-4 w-4 mr-2" />
+                                      Disconnect
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Wifi className="h-4 w-4 mr-2" />
+                                      Reconnect
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="text-destructive"
+                                  onClick={() => handleDeleteDevice(device.id)}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Remove
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    {/* Add device button */}
+                    <Card 
+                      className="glass-card border-border/50 border-dashed hover:border-primary/50 cursor-pointer transition-colors"
+                      onClick={() => setIsAddDeviceOpen(true)}
+                    >
+                      <CardContent className="p-4 flex items-center justify-center h-full min-h-[80px]">
+                        <div className="text-center">
+                          <Plus className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
+                          <span className="text-sm text-muted-foreground">Add Device</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+              </TabsContent>
 
-          {/* Analytics Tab */}
-          <TabsContent value="analytics">
-            <AnalyticsCharts scripts={scripts} devices={devices} />
-          </TabsContent>
-        </Tabs>
+              {/* Analytics Tab */}
+              <TabsContent value="analytics">
+                <AnalyticsCharts scripts={scripts} devices={devices} />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
       </main>
 
       {/* Script Editor Dialog */}

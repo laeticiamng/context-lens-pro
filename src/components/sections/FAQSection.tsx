@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -37,11 +37,11 @@ const faqs = [
   },
 ];
 
-const FAQSection = () => {
+const FAQSection = forwardRef<HTMLElement>((props, ref) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="py-24 md:py-32">
+    <section ref={ref} id="faq" className="py-24 md:py-32">
       <div className="container px-4">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-12">
@@ -97,6 +97,8 @@ const FAQSection = () => {
       </div>
     </section>
   );
-};
+});
+
+FAQSection.displayName = "FAQSection";
 
 export default FAQSection;

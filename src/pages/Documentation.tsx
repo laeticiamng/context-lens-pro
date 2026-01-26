@@ -19,9 +19,11 @@ import {
   Layers,
   Terminal,
   FileCode,
-  ArrowRight
+  ArrowRight,
+  Server
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import APIEndpointsDocs from "@/components/docs/APIEndpointsDocs";
 
 const CodeBlock = ({ code, language = "typescript" }: { code: string; language?: string }) => {
   const [copied, setCopied] = useState(false);
@@ -799,8 +801,16 @@ await contextLens.startSession({
             </Tabs>
           </div>
 
-          {/* API Reference */}
+          {/* REST API Endpoints */}
           <div className="max-w-5xl mx-auto mt-16">
+            <h2 className="text-2xl font-bold mb-8 text-center">
+              REST API <span className="text-gradient">Reference</span>
+            </h2>
+            <APIEndpointsDocs />
+          </div>
+
+          {/* SDK API Reference */}
+          <div className="max-w-5xl mx-auto mt-12">
             <Card className="glass-card border-border/50">
               <CardHeader>
                 <div className="flex items-center gap-3">
@@ -808,7 +818,7 @@ await contextLens.startSession({
                     <Terminal className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <CardTitle>ContextLens API Reference</CardTitle>
+                    <CardTitle>SDK Method Reference</CardTitle>
                     <CardDescription>Common methods available across all SDKs</CardDescription>
                   </div>
                 </div>
