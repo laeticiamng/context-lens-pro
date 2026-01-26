@@ -19,6 +19,7 @@ import {
   Play,
   Share2
 } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface Script {
   id: string;
@@ -67,6 +68,18 @@ const ScriptPreviewCard = ({
   onShare,
 }: ScriptPreviewCardProps) => {
   const previewLines = script.content.split("\n").slice(0, 3);
+  const { language } = useLanguage();
+
+  const labels = {
+    edit: language === "fr" ? "Modifier" : "Edit",
+    duplicate: language === "fr" ? "Dupliquer" : "Duplicate",
+    deactivate: language === "fr" ? "Désactiver" : "Deactivate",
+    activate: language === "fr" ? "Activer" : "Activate",
+    share: language === "fr" ? "Partager" : "Share",
+    delete: language === "fr" ? "Supprimer" : "Delete",
+    uses: language === "fr" ? "utilisations" : "uses",
+    active: language === "fr" ? "Actif" : "Active",
+  };
 
   return (
     <Card 
@@ -92,29 +105,29 @@ const ScriptPreviewCard = ({
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(); }}>
                 <Edit className="h-4 w-4 mr-2" />
-                Edit
+                {labels.edit}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDuplicate(); }}>
                 <Copy className="h-4 w-4 mr-2" />
-                Duplicate
+                {labels.duplicate}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onToggleActive(); }}>
                 {script.is_active ? (
                   <>
                     <Eye className="h-4 w-4 mr-2" />
-                    Deactivate
+                    {labels.deactivate}
                   </>
                 ) : (
                   <>
                     <Play className="h-4 w-4 mr-2" />
-                    Activate
+                    {labels.activate}
                   </>
                 )}
               </DropdownMenuItem>
               {onShare && (
                 <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onShare(); }}>
                   <Share2 className="h-4 w-4 mr-2" />
-                  Share
+                  {labels.share}
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
@@ -123,7 +136,7 @@ const ScriptPreviewCard = ({
                 onClick={(e) => { e.stopPropagation(); onDelete(); }}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+                {labels.delete}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -154,7 +167,7 @@ const ScriptPreviewCard = ({
           {script.is_active && (
             <Badge className="bg-accent/10 text-accent border-accent/20 text-xs ml-auto">
               <Sparkles className="h-3 w-3 mr-1" />
-              Active
+              {labels.active}
             </Badge>
           )}
         </div>
@@ -163,7 +176,7 @@ const ScriptPreviewCard = ({
         <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/30">
           <span className="flex items-center gap-1">
             <Eye className="h-3 w-3" />
-            {script.usage_count} uses
+            {script.usage_count} {labels.uses}
           </span>
           <span className="flex items-center gap-1">
             <Clock className="h-3 w-3" />

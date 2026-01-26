@@ -33,26 +33,7 @@ const UsageLimits = ({
   plan,
 }: UsageLimitsProps) => {
   const navigate = useNavigate();
-  const { language } = useLanguage();
-
-  const t = {
-    usageThisMonth: language === "fr" ? "Utilisation ce mois" : "Usage This Month",
-    reachedLimits: language === "fr" 
-      ? "Vous avez atteint vos limites. Passez à un plan supérieur."
-      : "You've reached your plan limits. Upgrade to continue.",
-    approachingLimits: language === "fr"
-      ? "Vous approchez de vos limites."
-      : "You're approaching your plan limits.",
-    trackUsage: language === "fr" ? "Suivez votre utilisation" : "Track your usage and limits",
-    scripts: "Scripts",
-    aiAnalyses: language === "fr" ? "Analyses IA" : "AI Analyses",
-    devices: language === "fr" ? "Appareils" : "Devices",
-    upgradeToPro: language === "fr" ? "Passer à Pro" : "Upgrade to Pro",
-    limitsReset: language === "fr" 
-      ? "Les limites sont réinitialisées le 1er de chaque mois"
-      : "Limits reset on the 1st of each month",
-    plan: "Plan",
-  };
+  const { t, language } = useLanguage();
 
   const scriptsPercent = Math.min((scriptsCount / scriptsLimit) * 100, 100);
   const analysesPercent = Math.min((analysesUsed / analysesLimit) * 100, 100);
@@ -67,13 +48,21 @@ const UsageLimits = ({
     enterprise: { label: "Enterprise", color: "bg-amber-500", textColor: "text-amber-500" },
   };
 
+  const limitsReset = language === "fr" 
+    ? "Les limites sont réinitialisées le 1er de chaque mois"
+    : "Limits reset on the 1st of each month";
+
+  const approachingLimits = language === "fr"
+    ? "Vous approchez de vos limites."
+    : "You're approaching your plan limits.";
+
   return (
     <Card className="glass-card border-border/50">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
             <Zap className="h-4 w-4 text-primary" />
-            {t.usageThisMonth}
+            {t.usageLimits.title}
           </CardTitle>
           <Badge 
             variant="outline" 
@@ -85,10 +74,10 @@ const UsageLimits = ({
         </div>
         <CardDescription>
           {isAtLimit 
-            ? t.reachedLimits
+            ? t.usageLimits.freePlanLimits
             : isNearLimit
-            ? t.approachingLimits
-            : t.trackUsage
+            ? approachingLimits
+            : t.usageLimits.title
           }
         </CardDescription>
       </CardHeader>
@@ -98,10 +87,10 @@ const UsageLimits = ({
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-2 text-muted-foreground">
               <FileText className="h-4 w-4" />
-              {t.scripts}
+              {t.usageLimits.scriptsUsed}
             </span>
             <span className={scriptsPercent >= 100 ? "text-destructive font-medium" : ""}>
-              {scriptsCount} / {scriptsLimit === Infinity ? "∞" : scriptsLimit}
+              {scriptsCount} / {scriptsLimit === Infinity ? t.usageLimits.unlimited : scriptsLimit}
             </span>
           </div>
           <Progress 
@@ -115,10 +104,10 @@ const UsageLimits = ({
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-2 text-muted-foreground">
               <Eye className="h-4 w-4" />
-              {t.aiAnalyses}
+              {t.usageLimits.monthlyAnalyses}
             </span>
             <span className={analysesPercent >= 100 ? "text-destructive font-medium" : ""}>
-              {analysesUsed} / {analysesLimit === Infinity ? "∞" : analysesLimit}
+              {analysesUsed} / {analysesLimit === Infinity ? t.usageLimits.unlimited : analysesLimit}
             </span>
           </div>
           <Progress 
@@ -132,10 +121,10 @@ const UsageLimits = ({
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-2 text-muted-foreground">
               <Glasses className="h-4 w-4" />
-              {t.devices}
+              {t.usageLimits.devicesConnected}
             </span>
             <span className={devicesPercent >= 100 ? "text-destructive font-medium" : ""}>
-              {devicesCount} / {devicesLimit === Infinity ? "∞" : devicesLimit}
+              {devicesCount} / {devicesLimit === Infinity ? t.usageLimits.unlimited : devicesLimit}
             </span>
           </div>
           <Progress 
@@ -153,7 +142,7 @@ const UsageLimits = ({
               className="w-full"
               onClick={() => navigate("/#pricing")}
             >
-              {t.upgradeToPro}
+              {t.usageLimits.upgradeToPro}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
@@ -161,7 +150,7 @@ const UsageLimits = ({
 
         {/* Resets info */}
         <p className="text-xs text-muted-foreground text-center">
-          {t.limitsReset}
+          {limitsReset}
         </p>
       </CardContent>
     </Card>

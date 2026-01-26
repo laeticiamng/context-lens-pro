@@ -1,19 +1,21 @@
 import { Link, useLocation } from "react-router-dom";
 import { ChevronRight, Home } from "lucide-react";
-
-const routeLabels: Record<string, string> = {
-  dashboard: "Dashboard",
-  settings: "Settings",
-  docs: "Documentation",
-  auth: "Sign In",
-  privacy: "Privacy Policy",
-  terms: "Terms of Service",
-  contact: "Contact",
-};
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const Breadcrumbs = () => {
   const location = useLocation();
+  const { language } = useLanguage();
   const pathnames = location.pathname.split("/").filter((x) => x);
+
+  const routeLabels: Record<string, string> = {
+    dashboard: language === "fr" ? "Tableau de bord" : "Dashboard",
+    settings: language === "fr" ? "Paramètres" : "Settings",
+    docs: "Documentation",
+    auth: language === "fr" ? "Connexion" : "Sign In",
+    privacy: language === "fr" ? "Politique de confidentialité" : "Privacy Policy",
+    terms: language === "fr" ? "Conditions d'utilisation" : "Terms of Service",
+    contact: "Contact",
+  };
 
   // Don't show breadcrumbs on home page
   if (pathnames.length === 0) return null;
@@ -25,7 +27,7 @@ const Breadcrumbs = () => {
         className="flex items-center gap-1 hover:text-foreground transition-colors"
       >
         <Home className="h-4 w-4" />
-        <span className="sr-only">Home</span>
+        <span className="sr-only">{language === "fr" ? "Accueil" : "Home"}</span>
       </Link>
 
       {pathnames.map((name, index) => {

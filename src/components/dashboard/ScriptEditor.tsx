@@ -17,6 +17,7 @@ import {
   AlignLeft,
   AlignCenter
 } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface Script {
   id: string;
@@ -42,6 +43,7 @@ const ScriptEditor = ({ script, onSave, onClose }: ScriptEditorProps) => {
   const [currentLine, setCurrentLine] = useState(0);
   const [fontSize, setFontSize] = useState(16);
   const [textAlign, setTextAlign] = useState<"left" | "center">("center");
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (script) {
@@ -87,7 +89,7 @@ const ScriptEditor = ({ script, onSave, onClose }: ScriptEditorProps) => {
       <div className="flex-1 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">
-            {script ? "Edit Script" : "New Script"}
+            {script ? t.scriptEditor.editScript : t.scriptEditor.newScript}
           </h2>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
@@ -96,10 +98,10 @@ const ScriptEditor = ({ script, onSave, onClose }: ScriptEditorProps) => {
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">{t.scriptEditor.title}</Label>
             <Input
               id="title"
-              placeholder="e.g., Sales Pitch"
+              placeholder={t.scriptEditor.titlePlaceholder}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="bg-secondary/50"
@@ -107,25 +109,25 @@ const ScriptEditor = ({ script, onSave, onClose }: ScriptEditorProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="content">Script Content</Label>
+            <Label htmlFor="content">{t.scriptEditor.content}</Label>
             <Textarea
               id="content"
-              placeholder="Enter your script content... Each line will be a separate prompt block."
+              placeholder={t.scriptEditor.contentPlaceholder}
               rows={12}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="bg-secondary/50 font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              {lines.length} lines • Use line breaks to separate prompt blocks
+              {lines.length} {t.scriptEditor.lines} • {t.scriptEditor.lineBreakHint}
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">Tags (comma-separated)</Label>
+            <Label htmlFor="tags">{t.scriptEditor.tags}</Label>
             <Input
               id="tags"
-              placeholder="e.g., sales, meeting, pitch"
+              placeholder={t.scriptEditor.tagsPlaceholder}
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               className="bg-secondary/50"
@@ -141,11 +143,11 @@ const ScriptEditor = ({ script, onSave, onClose }: ScriptEditorProps) => {
 
           <div className="flex gap-3">
             <Button variant="ghost" onClick={onClose}>
-              Cancel
+              {t.scriptEditor.cancel}
             </Button>
             <Button variant="hero" onClick={handleSave} disabled={saving || !title.trim()}>
               <Save className="h-4 w-4 mr-2" />
-              {saving ? "Saving..." : "Save Script"}
+              {saving ? t.scriptEditor.saving : t.scriptEditor.save}
             </Button>
           </div>
         </div>
@@ -159,7 +161,7 @@ const ScriptEditor = ({ script, onSave, onClose }: ScriptEditorProps) => {
             className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
           >
             {showPreview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            {showPreview ? "Hide Preview" : ""}
+            {showPreview ? t.scriptEditor.hidePreview : ""}
           </button>
 
           {showPreview && (
@@ -221,7 +223,7 @@ const ScriptEditor = ({ script, onSave, onClose }: ScriptEditorProps) => {
                   </div>
                 ) : (
                   <p className="text-center text-muted-foreground text-sm">
-                    Type content to preview
+                    {t.scriptEditor.typeToPreview}
                   </p>
                 )}
               </div>
@@ -297,7 +299,7 @@ const ScriptEditor = ({ script, onSave, onClose }: ScriptEditorProps) => {
             </div>
 
             <p className="text-xs text-muted-foreground text-center">
-              Use ↑↓ keys to scroll • This simulates the HUD display
+              {t.scriptEditor.hudHint}
             </p>
           </>
         )}
