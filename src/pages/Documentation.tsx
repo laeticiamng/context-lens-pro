@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import APIEndpointsDocs from "@/components/docs/APIEndpointsDocs";
+import DocSearch from "@/components/docs/DocSearch";
 
 const CodeBlock = ({ code, language = "typescript" }: { code: string; language?: string }) => {
   const [copied, setCopied] = useState(false);
@@ -231,6 +232,13 @@ await contextLens.displayPrompt({
 const Documentation = () => {
   const [activeTier, setActiveTier] = useState<number | null>(null);
 
+  const handleSearchResultClick = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
@@ -249,6 +257,11 @@ const Documentation = () => {
               Comprehensive guides for integrating ContextLens with smart glasses at every tier level.
               From phone fallback to full AR spatial computing.
             </p>
+
+            {/* Search */}
+            <div className="flex justify-center mb-8">
+              <DocSearch onResultClick={handleSearchResultClick} />
+            </div>
 
             {/* Quick nav */}
             <div className="flex flex-wrap justify-center gap-3">

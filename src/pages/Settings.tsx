@@ -30,6 +30,7 @@ import PrivacyControls from "@/components/dashboard/PrivacyControls";
 import PasswordChangeDialog from "@/components/settings/PasswordChangeDialog";
 import SessionManagement from "@/components/settings/SessionManagement";
 import AvatarUpload from "@/components/settings/AvatarUpload";
+import SettingsSkeleton from "@/components/settings/SettingsSkeleton";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -147,40 +148,80 @@ const Settings = () => {
     // Export all user data as JSON
     const { data: scripts } = await supabase.from("scripts").select("*");
     const { data: devices } = await supabase.from("connected_devices").select("*");
+    const { data: analytics } = await supabase.from("usage_analytics").select("*");
     const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", user?.id).maybeSingle();
     
     const exportData = {
       exportedAt: new Date().toISOString(),
+      exportVersion: "1.0",
+      user: {
+        email: user?.email,
+        id: user?.id,
+        createdAt: user?.created_at,
+      },
       profile,
-      scripts,
+      scripts: scripts?.map(s => ({
+        ...s,
+        // Ensure content is fully included
+        content: s.content,
+      })),
       devices,
+      analytics,
+      summary: {
+        totalScripts: scripts?.length || 0,
+        totalDevices: devices?.length || 0,
+        totalAnalytics: analytics?.length || 0,
+      }
     };
     
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `contextlens-export-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `contextlens-full-export-${new Date().toISOString().split("T")[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
     
-    toast({ title: "Export Complete", description: "Your data has been downloaded." });
+    toast({ title: "Export Complete", description: `Exported ${scripts?.length || 0} scripts, ${devices?.length || 0} devices, and usage data.` });
   };
 
   const handleDeleteData = async () => {
-    // In production, this would delete all user data
-    toast({
-      title: "Data Deletion Requested",
-      description: "Please contact support@contextlens.io to complete this request.",
-    });
+    if (!user) return;
+    
+    // Show confirmation with real deletion
+    const confirmed = window.confirm(
+      "Are you sure you want to delete ALL your data? This action cannot be undone. " +
+      "All scripts, devices, and analytics will be permanently deleted."
+    );
+    
+    if (!confirmed) return;
+    
+    try {
+      // Delete all user data
+      await supabase.from("usage_analytics").delete().eq("user_id", user.id);
+      await supabase.from("scripts").delete().eq("user_id", user.id);
+      await supabase.from("connected_devices").delete().eq("user_id", user.id);
+      await supabase.from("profiles").delete().eq("user_id", user.id);
+      
+      toast({ 
+        title: "Data Deleted", 
+        description: "All your data has been permanently deleted." 
+      });
+      
+      // Sign out after deletion
+      await supabase.auth.signOut();
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete some data. Please contact support.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
-      </div>
-    );
+    return <SettingsSkeleton />;
   }
 
   return (
