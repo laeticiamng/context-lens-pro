@@ -37,28 +37,33 @@ export function DeviceStatusCard({
       icon: React.ReactNode; 
       label: string; 
       labelFr: string;
+      bgColor: string;
     }> = {
       online: { 
-        color: 'bg-emerald-500', 
-        icon: <Wifi className="h-4 w-4" />, 
+        color: 'text-white', 
+        bgColor: 'bg-emerald-500',
+        icon: <Wifi className="h-4 w-4" aria-hidden="true" />, 
         label: 'Online',
         labelFr: 'En ligne',
       },
       offline: { 
-        color: 'bg-muted', 
-        icon: <WifiOff className="h-4 w-4" />, 
+        color: 'text-muted-foreground', 
+        bgColor: 'bg-muted',
+        icon: <WifiOff className="h-4 w-4" aria-hidden="true" />, 
         label: 'Offline',
         labelFr: 'Hors ligne',
       },
       maintenance: { 
-        color: 'bg-amber-500', 
-        icon: <Wrench className="h-4 w-4" />, 
+        color: 'text-white', 
+        bgColor: 'bg-amber-500',
+        icon: <Wrench className="h-4 w-4" aria-hidden="true" />, 
         label: 'Maintenance',
         labelFr: 'Maintenance',
       },
       error: { 
-        color: 'bg-destructive', 
-        icon: <AlertTriangle className="h-4 w-4" />, 
+        color: 'text-white', 
+        bgColor: 'bg-destructive',
+        icon: <AlertTriangle className="h-4 w-4" aria-hidden="true" />, 
         label: 'Error',
         labelFr: 'Erreur',
       },
@@ -95,7 +100,7 @@ export function DeviceStatusCard({
           <Activity className="h-5 w-5" />
           {language === 'fr' ? 'Appareil IRM' : 'MRI Device'}
         </CardTitle>
-        <Badge className={`${statusInfo.color} text-white`}>
+        <Badge className={`${statusInfo.bgColor} ${statusInfo.color}`}>
           <span className="flex items-center gap-1">
             {statusInfo.icon}
             {language === 'fr' ? statusInfo.labelFr : statusInfo.label}

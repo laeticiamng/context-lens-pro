@@ -106,7 +106,7 @@ export function useCabinet() {
   }, []);
 
   // Fetch cabinet
-  const { data: cabinet, isLoading: isLoadingCabinet } = useQuery({
+  const { data: cabinet, isLoading: isLoadingCabinet, error: cabinetError } = useQuery({
     queryKey: ['cabinet', user?.id],
     queryFn: async () => {
       if (!user) return null;
@@ -117,14 +117,18 @@ export function useCabinet() {
         .eq('owner_id', user.id)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('[useCabinet] Failed to fetch cabinet:', error);
+        throw error;
+      }
       return data as Cabinet | null;
     },
     enabled: !!user,
+    retry: 2,
   });
 
   // Fetch MRI devices
-  const { data: devices = [], isLoading: isLoadingDevices } = useQuery({
+  const { data: devices = [], isLoading: isLoadingDevices, error: devicesError } = useQuery({
     queryKey: ['mri-devices', cabinet?.id],
     queryFn: async () => {
       if (!cabinet) return [];
@@ -135,10 +139,14 @@ export function useCabinet() {
         .eq('cabinet_id', cabinet.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[useCabinet] Failed to fetch devices:', error);
+        throw error;
+      }
       return data as MRIDevice[];
     },
     enabled: !!cabinet,
+    retry: 2,
   });
 
   // Fetch subscription
@@ -280,23 +288,39 @@ export function useCabinet() {
     },
   });
 
-  // Create scan mutation
+  // Create scan mutation with validation
   const createScan = useMutation({
     mutationFn: async (scanData: Partial<MRIScan>) => {
       if (!cabinet) throw new Error('No cabinet found');
+      
+      // Validate required fields
+      if (!scanData.patient_reference || scanData.patient_reference.trim().length < 3) {
+        throw new Error('Patient reference is required (min 3 characters)');
+      }
+      if (!scanData.protocol_id || scanData.protocol_id.trim().length === 0) {
+        throw new Error('Protocol ID is required');
+      }
+
+      console.log('[useCabinet] Creating scan:', { 
+        patient_reference: scanData.patient_reference, 
+        protocol_id: scanData.protocol_id 
+      });
 
       const { data, error } = await supabase
         .from('mri_scans')
         .insert({
           cabinet_id: cabinet.id,
-          patient_reference: scanData.patient_reference,
+          patient_reference: scanData.patient_reference.trim(),
           protocol_id: scanData.protocol_id,
           device_id: scanData.device_id ?? null,
         })
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('[useCabinet] Failed to create scan:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {

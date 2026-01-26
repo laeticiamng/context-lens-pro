@@ -84,6 +84,7 @@ import HelpCenter from "@/components/dashboard/HelpCenter";
 import HighlightText from "@/components/ui/highlight-text";
 import ErrorBoundary from "@/components/ui/error-boundary";
 import SEOHead from "@/components/layout/SEOHead";
+import { DiagnosticsPanel } from "@/components/dashboard/DiagnosticsPanel";
 import type { User } from "@supabase/supabase-js";
 
 interface Script {
@@ -933,6 +934,9 @@ const Dashboard = () => {
           </DialogContent>
         </Dialog>
       )}
+      
+      {/* Diagnostics Panel (dev only) */}
+      <DiagnosticsPanel />
     </div>
     </>
   );

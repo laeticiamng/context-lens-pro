@@ -143,9 +143,21 @@ export function SubscriptionCard({
         <div className="flex items-center justify-between text-sm">
           <span className="flex items-center gap-1">
             <TrendingUp className="h-4 w-4" />
+            {language === 'fr' ? 'Fin de période' : 'Period ends'}
+          </span>
+          <span className="font-medium">
+            {new Date(subscription.current_period_end).toLocaleDateString(
+              language === 'fr' ? 'fr-FR' : 'en-US',
+              { day: 'numeric', month: 'short', year: 'numeric' }
+            )}
+          </span>
+        </div>
+        
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span>
             {language === 'fr' ? 'Jours restants' : 'Days remaining'}
           </span>
-          <span className="font-medium">{daysRemaining}</span>
+          <span className="font-medium text-foreground">{daysRemaining}</span>
         </div>
 
         {/* Status */}
