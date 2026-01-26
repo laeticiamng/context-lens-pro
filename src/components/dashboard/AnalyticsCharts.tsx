@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface Script {
   id: string;
@@ -34,9 +35,12 @@ const COLORS = {
 };
 
 const AnalyticsCharts = ({ scripts, devices }: AnalyticsProps) => {
+  const { language } = useLanguage();
   // Usage over time (simulated daily data)
   const usageData = useMemo(() => {
-    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const days = language === "fr" 
+      ? ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
+      : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     const totalUsage = scripts.reduce((sum, s) => sum + s.usage_count, 0);
     
     return days.map((day, i) => ({
@@ -44,7 +48,7 @@ const AnalyticsCharts = ({ scripts, devices }: AnalyticsProps) => {
       usage: Math.floor((totalUsage / 7) * (0.5 + Math.random())),
       prompts: Math.floor(Math.random() * 50 + 20),
     }));
-  }, [scripts]);
+  }, [scripts, language]);
 
   // Top scripts by usage
   const topScripts = useMemo(() => {
@@ -109,25 +113,33 @@ const AnalyticsCharts = ({ scripts, devices }: AnalyticsProps) => {
         <Card className="glass-card border-border/50">
           <CardContent className="p-4 text-center">
             <p className="text-3xl font-bold text-primary">{totalUsage}</p>
-            <p className="text-xs text-muted-foreground">Total Prompts Displayed</p>
+            <p className="text-xs text-muted-foreground">
+              {language === "fr" ? "Prompts affichés au total" : "Total Prompts Displayed"}
+            </p>
           </CardContent>
         </Card>
         <Card className="glass-card border-border/50">
           <CardContent className="p-4 text-center">
             <p className="text-3xl font-bold text-accent">{avgPerScript}</p>
-            <p className="text-xs text-muted-foreground">Avg Usage per Script</p>
+            <p className="text-xs text-muted-foreground">
+              {language === "fr" ? "Utilisation moy. par script" : "Avg Usage per Script"}
+            </p>
           </CardContent>
         </Card>
         <Card className="glass-card border-border/50">
           <CardContent className="p-4 text-center">
             <p className="text-3xl font-bold text-emerald-400">{activeRate}%</p>
-            <p className="text-xs text-muted-foreground">Active Scripts Rate</p>
+            <p className="text-xs text-muted-foreground">
+              {language === "fr" ? "Taux de scripts actifs" : "Active Scripts Rate"}
+            </p>
           </CardContent>
         </Card>
         <Card className="glass-card border-border/50">
           <CardContent className="p-4 text-center">
             <p className="text-3xl font-bold text-amber-400">{devices.filter(d => d.is_connected).length}</p>
-            <p className="text-xs text-muted-foreground">Connected Devices</p>
+            <p className="text-xs text-muted-foreground">
+              {language === "fr" ? "Appareils connectés" : "Connected Devices"}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -137,8 +149,12 @@ const AnalyticsCharts = ({ scripts, devices }: AnalyticsProps) => {
         {/* Usage Trend */}
         <Card className="glass-card border-border/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Usage Trend</CardTitle>
-            <CardDescription>Prompts displayed over the past week</CardDescription>
+            <CardTitle className="text-base">
+              {language === "fr" ? "Tendance d'utilisation" : "Usage Trend"}
+            </CardTitle>
+            <CardDescription>
+              {language === "fr" ? "Prompts affichés au cours de la semaine" : "Prompts displayed over the past week"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-64">
@@ -184,8 +200,12 @@ const AnalyticsCharts = ({ scripts, devices }: AnalyticsProps) => {
         {/* Top Scripts */}
         <Card className="glass-card border-border/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Top Scripts</CardTitle>
-            <CardDescription>Most used scripts by prompt count</CardDescription>
+            <CardTitle className="text-base">
+              {language === "fr" ? "Scripts les plus utilisés" : "Top Scripts"}
+            </CardTitle>
+            <CardDescription>
+              {language === "fr" ? "Scripts les plus utilisés par nombre de prompts" : "Most used scripts by prompt count"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-64">
@@ -217,7 +237,7 @@ const AnalyticsCharts = ({ scripts, devices }: AnalyticsProps) => {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-full flex items-center justify-center text-muted-foreground">
-                  No script data yet
+                  {language === "fr" ? "Aucune donnée de script" : "No script data yet"}
                 </div>
               )}
             </div>
@@ -230,8 +250,12 @@ const AnalyticsCharts = ({ scripts, devices }: AnalyticsProps) => {
         {/* Device Distribution */}
         <Card className="glass-card border-border/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Device Tiers</CardTitle>
-            <CardDescription>Distribution by capability level</CardDescription>
+            <CardTitle className="text-base">
+              {language === "fr" ? "Tiers d'appareils" : "Device Tiers"}
+            </CardTitle>
+            <CardDescription>
+              {language === "fr" ? "Distribution par niveau de capacité" : "Distribution by capability level"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-48">
@@ -269,8 +293,12 @@ const AnalyticsCharts = ({ scripts, devices }: AnalyticsProps) => {
         {/* Tag Cloud */}
         <Card className="glass-card border-border/50 md:col-span-2">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Popular Tags</CardTitle>
-            <CardDescription>Most used content categories</CardDescription>
+            <CardTitle className="text-base">
+              {language === "fr" ? "Tags populaires" : "Popular Tags"}
+            </CardTitle>
+            <CardDescription>
+              {language === "fr" ? "Catégories de contenu les plus utilisées" : "Most used content categories"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-48 flex flex-wrap items-center justify-center gap-2 p-4">
@@ -289,7 +317,7 @@ const AnalyticsCharts = ({ scripts, devices }: AnalyticsProps) => {
                 ))
               ) : (
                 <div className="text-muted-foreground text-sm">
-                  Add tags to your scripts to see analytics
+                  {language === "fr" ? "Ajoutez des tags à vos scripts pour voir les analyses" : "Add tags to your scripts to see analytics"}
                 </div>
               )}
             </div>

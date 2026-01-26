@@ -7,15 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Shield, 
   Eye, 
-  EyeOff, 
   Cloud, 
-  Smartphone, 
   Trash2,
   Download,
-  AlertTriangle,
   Check
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface PrivacyControlsProps {
   onExportData: () => void;
@@ -24,6 +22,7 @@ interface PrivacyControlsProps {
 
 const PrivacyControls = ({ onExportData, onDeleteData }: PrivacyControlsProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [settings, setSettings] = useState({
     visualAnalysisEnabled: false,
     localOnlyMode: true,
@@ -35,8 +34,8 @@ const PrivacyControls = ({ onExportData, onDeleteData }: PrivacyControlsProps) =
   const handleSettingChange = (key: keyof typeof settings, value: boolean | string) => {
     setSettings(prev => ({ ...prev, [key]: value }));
     toast({
-      title: "Privacy Setting Updated",
-      description: "Your preferences have been saved.",
+      title: t.privacyControls.settingUpdated,
+      description: t.privacyControls.settingUpdatedDesc,
     });
   };
 
@@ -51,15 +50,15 @@ const PrivacyControls = ({ onExportData, onDeleteData }: PrivacyControlsProps) =
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <h4 className="font-medium">Privacy Mode</h4>
+                <h4 className="font-medium">{t.privacyControls.privacyMode}</h4>
                 <Badge variant="outline" className={settings.localOnlyMode ? "border-accent text-accent" : ""}>
-                  {settings.localOnlyMode ? "Local Only" : "Cloud Processing"}
+                  {settings.localOnlyMode ? t.privacyControls.localOnly : t.privacyControls.cloudProcessing}
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">
                 {settings.localOnlyMode 
-                  ? "All analysis runs on your device. No data leaves your phone."
-                  : "Some analysis uses cloud AI for better accuracy."}
+                  ? t.privacyControls.localOnlyDesc
+                  : t.privacyControls.cloudDesc}
               </p>
             </div>
           </div>
@@ -71,18 +70,18 @@ const PrivacyControls = ({ onExportData, onDeleteData }: PrivacyControlsProps) =
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Eye className="h-5 w-5 text-primary" />
-            Visual Analysis
+            {t.privacyControls.visualAnalysis}
           </CardTitle>
           <CardDescription>
-            Control how ContextLens analyzes camera input
+            {t.privacyControls.visualAnalysisDesc}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Enable Visual Analysis</Label>
+              <Label>{t.privacyControls.enableVisualAnalysis}</Label>
               <p className="text-sm text-muted-foreground">
-                Allow AI to analyze camera feed for context
+                {t.privacyControls.enableVisualAnalysisDesc}
               </p>
             </div>
             <Switch
@@ -94,11 +93,11 @@ const PrivacyControls = ({ onExportData, onDeleteData }: PrivacyControlsProps) =
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="flex items-center gap-2">
-                Local-Only Processing
-                <Badge variant="secondary" className="text-xs">Recommended</Badge>
+                {t.privacyControls.localOnlyProcessing}
+                <Badge variant="secondary" className="text-xs">{t.privacyControls.recommended}</Badge>
               </Label>
               <p className="text-sm text-muted-foreground">
-                Use on-device ML, never send images to cloud
+                {t.privacyControls.localOnlyProcessingDesc}
               </p>
             </div>
             <Switch
@@ -109,9 +108,9 @@ const PrivacyControls = ({ onExportData, onDeleteData }: PrivacyControlsProps) =
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Capture Indicator</Label>
+              <Label>{t.privacyControls.captureIndicator}</Label>
               <p className="text-sm text-muted-foreground">
-                Show visible indicator when camera is active
+                {t.privacyControls.captureIndicatorDesc}
               </p>
             </div>
             <Switch
@@ -127,18 +126,18 @@ const PrivacyControls = ({ onExportData, onDeleteData }: PrivacyControlsProps) =
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Cloud className="h-5 w-5 text-primary" />
-            Data Management
+            {t.privacyControls.dataManagement}
           </CardTitle>
           <CardDescription>
-            GDPR compliant data controls
+            {t.privacyControls.dataManagementDesc}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Share Anonymous Analytics</Label>
+              <Label>{t.privacyControls.shareAnonymousAnalytics}</Label>
               <p className="text-sm text-muted-foreground">
-                Help improve ContextLens with usage data
+                {t.privacyControls.shareAnonymousAnalyticsDesc}
               </p>
             </div>
             <Switch
@@ -150,19 +149,18 @@ const PrivacyControls = ({ onExportData, onDeleteData }: PrivacyControlsProps) =
           <div className="pt-4 border-t border-border/50 space-y-3">
             <Button variant="outline" className="w-full justify-start" onClick={onExportData}>
               <Download className="h-4 w-4 mr-2" />
-              Export All My Data (JSON)
+              {t.privacyControls.exportAllData}
             </Button>
             <Button variant="outline" className="w-full justify-start text-destructive hover:text-destructive" onClick={onDeleteData}>
               <Trash2 className="h-4 w-4 mr-2" />
-              Delete All My Data
+              {t.privacyControls.deleteAllData}
             </Button>
           </div>
 
           <div className="p-3 rounded-lg bg-secondary/50 flex items-start gap-2">
             <Check className="h-4 w-4 text-accent mt-0.5 shrink-0" />
             <p className="text-xs text-muted-foreground">
-              ContextLens complies with GDPR. You can request data export or deletion at any time. 
-              We never sell your data to third parties.
+              {t.privacyControls.gdprNotice}
             </p>
           </div>
         </CardContent>

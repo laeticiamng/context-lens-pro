@@ -293,6 +293,75 @@ interface UsageLimitsTranslations {
   freePlanLimits: string;
 }
 
+interface PrivacyControlsTranslations {
+  privacyMode: string;
+  localOnly: string;
+  cloudProcessing: string;
+  localOnlyDesc: string;
+  cloudDesc: string;
+  visualAnalysis: string;
+  visualAnalysisDesc: string;
+  enableVisualAnalysis: string;
+  enableVisualAnalysisDesc: string;
+  localOnlyProcessing: string;
+  localOnlyProcessingDesc: string;
+  recommended: string;
+  captureIndicator: string;
+  captureIndicatorDesc: string;
+  dataManagement: string;
+  dataManagementDesc: string;
+  shareAnonymousAnalytics: string;
+  shareAnonymousAnalyticsDesc: string;
+  exportAllData: string;
+  deleteAllData: string;
+  gdprNotice: string;
+  settingUpdated: string;
+  settingUpdatedDesc: string;
+}
+
+interface ScriptTemplatesTranslations {
+  title: string;
+  useTemplate: string;
+  templates: {
+    salesPitch: { title: string; content: string };
+    meetingNotes: { title: string; content: string };
+    presentation: { title: string; content: string };
+    interview: { title: string; content: string };
+    training: { title: string; content: string };
+    customerService: { title: string; content: string };
+  };
+}
+
+interface ScriptPreviewTranslations {
+  edit: string;
+  duplicate: string;
+  share: string;
+  delete: string;
+  inactive: string;
+  uses: string;
+  lines: string;
+  lastUsed: string;
+  never: string;
+}
+
+interface ExportDialogTranslations {
+  title: string;
+  description: string;
+  format: string;
+  json: string;
+  jsonDesc: string;
+  markdown: string;
+  markdownDesc: string;
+  text: string;
+  textDesc: string;
+  includeMetadata: string;
+  cancel: string;
+  export: string;
+  exporting: string;
+  success: string;
+  successDesc: string;
+}
+
 export interface TranslationKeys {
   nav: NavTranslations;
   hero: HeroTranslations;
@@ -320,6 +389,10 @@ export interface TranslationKeys {
   password: PasswordTranslations;
   scriptEditor: ScriptEditorTranslations;
   usageLimits: UsageLimitsTranslations;
+  privacyControls: PrivacyControlsTranslations;
+  scriptTemplates: ScriptTemplatesTranslations;
+  scriptPreview: ScriptPreviewTranslations;
+  exportDialog: ExportDialogTranslations;
 }
 
 export const translations = {
@@ -616,6 +689,75 @@ export const translations = {
       upgradeToPro: "Upgrade to Pro",
       freePlanLimits: "Free plan limits",
     },
+    // Privacy Controls
+    privacyControls: {
+      privacyMode: "Privacy Mode",
+      localOnly: "Local Only",
+      cloudProcessing: "Cloud Processing",
+      localOnlyDesc: "All analysis runs on your device. No data leaves your phone.",
+      cloudDesc: "Some analysis uses cloud AI for better accuracy.",
+      visualAnalysis: "Visual Analysis",
+      visualAnalysisDesc: "Control how ContextLens analyzes camera input",
+      enableVisualAnalysis: "Enable Visual Analysis",
+      enableVisualAnalysisDesc: "Allow AI to analyze camera feed for context",
+      localOnlyProcessing: "Local-Only Processing",
+      localOnlyProcessingDesc: "Use on-device ML, never send images to cloud",
+      recommended: "Recommended",
+      captureIndicator: "Capture Indicator",
+      captureIndicatorDesc: "Show visible indicator when camera is active",
+      dataManagement: "Data Management",
+      dataManagementDesc: "GDPR compliant data controls",
+      shareAnonymousAnalytics: "Share Anonymous Analytics",
+      shareAnonymousAnalyticsDesc: "Help improve ContextLens with usage data",
+      exportAllData: "Export All My Data (JSON)",
+      deleteAllData: "Delete All My Data",
+      gdprNotice: "ContextLens complies with GDPR. You can request data export or deletion at any time. We never sell your data to third parties.",
+      settingUpdated: "Privacy Setting Updated",
+      settingUpdatedDesc: "Your preferences have been saved.",
+    },
+    // Script Templates
+    scriptTemplates: {
+      title: "Script Templates",
+      useTemplate: "Use Template",
+      templates: {
+        salesPitch: { title: "Sales Pitch", content: "Opening hook and value proposition\n\nKey benefits for the client\n• Benefit 1\n• Benefit 2\n• Benefit 3\n\nPricing and next steps\n\nClosing and call to action" },
+        meetingNotes: { title: "Meeting Notes", content: "Meeting objective: [State main goal]\n\nKey discussion points:\n• Point 1\n• Point 2\n\nAction items:\n• [Owner] - Task by [date]\n\nNext meeting: [Date/Time]" },
+        presentation: { title: "Presentation", content: "Introduction & hook\n\nAgenda overview\n\nMain point 1 with supporting data\n\nMain point 2 with examples\n\nMain point 3 with case study\n\nConclusion and Q&A" },
+        interview: { title: "Interview Guide", content: "Candidate: [Name]\nPosition: [Role]\n\nIntroduction (2 min)\n\nExperience questions:\n• Tell me about...\n• How did you handle...\n\nTechnical questions:\n• Describe your approach to...\n\nClosing and next steps" },
+        training: { title: "Training Module", content: "Module: [Topic Name]\nDuration: [X minutes]\n\nLearning objectives:\n• Objective 1\n• Objective 2\n\nKey concepts:\n• Concept A - [explanation]\n• Concept B - [explanation]\n\nPractice exercise\n\nSummary & quiz" },
+        customerService: { title: "Customer Service", content: "Greeting: Hello! How can I help you today?\n\nListen and acknowledge concern\n\nGather information:\n• Order number?\n• Issue details?\n\nProvide solution options\n\nConfirm resolution\n\nClosing: Is there anything else I can help with?" },
+      },
+    },
+    // Script Preview
+    scriptPreview: {
+      edit: "Edit",
+      duplicate: "Duplicate",
+      share: "Share",
+      delete: "Delete",
+      inactive: "Inactive",
+      uses: "uses",
+      lines: "lines",
+      lastUsed: "Last used",
+      never: "Never",
+    },
+    // Export Dialog
+    exportDialog: {
+      title: "Export Scripts",
+      description: "Export your scripts in different formats",
+      format: "Format",
+      json: "JSON",
+      jsonDesc: "Full data with metadata, importable",
+      markdown: "Markdown",
+      markdownDesc: "Human-readable, great for docs",
+      text: "Plain Text",
+      textDesc: "Simple text format, no metadata",
+      includeMetadata: "Include metadata (tags, dates, usage)",
+      cancel: "Cancel",
+      export: "Export",
+      exporting: "Exporting...",
+      success: "Scripts exported",
+      successDesc: "Downloaded {count} scripts as {format}",
+    },
   },
   fr: {
     // Navigation
@@ -909,6 +1051,75 @@ export const translations = {
       unlimited: "Illimité",
       upgradeToPro: "Passer à Pro",
       freePlanLimits: "Limites du plan gratuit",
+    },
+    // Privacy Controls
+    privacyControls: {
+      privacyMode: "Mode confidentialité",
+      localOnly: "Local uniquement",
+      cloudProcessing: "Traitement cloud",
+      localOnlyDesc: "Toute l'analyse s'exécute sur votre appareil. Aucune donnée ne quitte votre téléphone.",
+      cloudDesc: "Certaines analyses utilisent l'IA cloud pour une meilleure précision.",
+      visualAnalysis: "Analyse visuelle",
+      visualAnalysisDesc: "Contrôlez comment ContextLens analyse les entrées caméra",
+      enableVisualAnalysis: "Activer l'analyse visuelle",
+      enableVisualAnalysisDesc: "Permettre à l'IA d'analyser le flux caméra pour le contexte",
+      localOnlyProcessing: "Traitement local uniquement",
+      localOnlyProcessingDesc: "Utiliser le ML sur l'appareil, ne jamais envoyer d'images au cloud",
+      recommended: "Recommandé",
+      captureIndicator: "Indicateur de capture",
+      captureIndicatorDesc: "Afficher un indicateur visible quand la caméra est active",
+      dataManagement: "Gestion des données",
+      dataManagementDesc: "Contrôles de données conformes au RGPD",
+      shareAnonymousAnalytics: "Partager les analyses anonymes",
+      shareAnonymousAnalyticsDesc: "Aider à améliorer ContextLens avec des données d'utilisation",
+      exportAllData: "Exporter toutes mes données (JSON)",
+      deleteAllData: "Supprimer toutes mes données",
+      gdprNotice: "ContextLens est conforme au RGPD. Vous pouvez demander l'export ou la suppression de vos données à tout moment. Nous ne vendons jamais vos données à des tiers.",
+      settingUpdated: "Paramètre de confidentialité mis à jour",
+      settingUpdatedDesc: "Vos préférences ont été enregistrées.",
+    },
+    // Script Templates
+    scriptTemplates: {
+      title: "Modèles de scripts",
+      useTemplate: "Utiliser le modèle",
+      templates: {
+        salesPitch: { title: "Pitch commercial", content: "Accroche d'ouverture et proposition de valeur\n\nAvantages clés pour le client\n• Avantage 1\n• Avantage 2\n• Avantage 3\n\nTarifs et prochaines étapes\n\nConclusion et appel à l'action" },
+        meetingNotes: { title: "Notes de réunion", content: "Objectif de la réunion : [Indiquer l'objectif principal]\n\nPoints de discussion clés :\n• Point 1\n• Point 2\n\nActions à faire :\n• [Responsable] - Tâche avant le [date]\n\nProchaine réunion : [Date/Heure]" },
+        presentation: { title: "Présentation", content: "Introduction & accroche\n\nAperçu de l'agenda\n\nPoint principal 1 avec données de support\n\nPoint principal 2 avec exemples\n\nPoint principal 3 avec étude de cas\n\nConclusion et Q&R" },
+        interview: { title: "Guide d'entretien", content: "Candidat : [Nom]\nPoste : [Rôle]\n\nIntroduction (2 min)\n\nQuestions d'expérience :\n• Parlez-moi de...\n• Comment avez-vous géré...\n\nQuestions techniques :\n• Décrivez votre approche de...\n\nConclusion et prochaines étapes" },
+        training: { title: "Module de formation", content: "Module : [Nom du sujet]\nDurée : [X minutes]\n\nObjectifs d'apprentissage :\n• Objectif 1\n• Objectif 2\n\nConcepts clés :\n• Concept A - [explication]\n• Concept B - [explication]\n\nExercice pratique\n\nRésumé & quiz" },
+        customerService: { title: "Service client", content: "Salutation : Bonjour ! Comment puis-je vous aider aujourd'hui ?\n\nÉcouter et reconnaître la préoccupation\n\nRecueillir les informations :\n• Numéro de commande ?\n• Détails du problème ?\n\nProposer des solutions\n\nConfirmer la résolution\n\nConclusion : Y a-t-il autre chose que je puisse faire pour vous ?" },
+      },
+    },
+    // Script Preview
+    scriptPreview: {
+      edit: "Modifier",
+      duplicate: "Dupliquer",
+      share: "Partager",
+      delete: "Supprimer",
+      inactive: "Inactif",
+      uses: "utilisations",
+      lines: "lignes",
+      lastUsed: "Dernière utilisation",
+      never: "Jamais",
+    },
+    // Export Dialog
+    exportDialog: {
+      title: "Exporter les scripts",
+      description: "Exportez vos scripts dans différents formats",
+      format: "Format",
+      json: "JSON",
+      jsonDesc: "Données complètes avec métadonnées, importable",
+      markdown: "Markdown",
+      markdownDesc: "Lisible par l'humain, idéal pour la doc",
+      text: "Texte brut",
+      textDesc: "Format texte simple, sans métadonnées",
+      includeMetadata: "Inclure les métadonnées (tags, dates, utilisation)",
+      cancel: "Annuler",
+      export: "Exporter",
+      exporting: "Exportation...",
+      success: "Scripts exportés",
+      successDesc: "{count} scripts téléchargés en {format}",
     },
   },
 } as const;

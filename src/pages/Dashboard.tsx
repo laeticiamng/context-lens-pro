@@ -367,9 +367,13 @@ const Dashboard = () => {
       <ConfirmDialog
         open={!!deleteConfirm}
         onOpenChange={(open) => !open && setDeleteConfirm(null)}
-        title={`Delete ${deleteConfirm?.type === "script" ? "Script" : "Device"}?`}
-        description={`Are you sure you want to delete "${deleteConfirm?.name}"? This action cannot be undone.`}
-        confirmLabel="Delete"
+        title={language === "fr" 
+          ? `Supprimer ${deleteConfirm?.type === "script" ? "le script" : "l'appareil"} ?`
+          : `Delete ${deleteConfirm?.type === "script" ? "Script" : "Device"}?`}
+        description={language === "fr"
+          ? `Êtes-vous sûr de vouloir supprimer "${deleteConfirm?.name}" ? Cette action est irréversible.`
+          : `Are you sure you want to delete "${deleteConfirm?.name}"? This action cannot be undone.`}
+        confirmLabel={t.common.delete}
         variant="destructive"
         onConfirm={() => {
           if (deleteConfirm?.type === "script") {
