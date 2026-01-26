@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      cabinets: {
+        Row: {
+          address: string | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+          owner_id: string
+          phone: string | null
+          postal_code: string | null
+          siret: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          phone?: string | null
+          postal_code?: string | null
+          siret?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          postal_code?: string | null
+          siret?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       connected_devices: {
         Row: {
           created_at: string
@@ -80,6 +125,199 @@ export type Database = {
         }
         Relationships: []
       }
+      mri_devices: {
+        Row: {
+          cabinet_id: string
+          capabilities: Json | null
+          created_at: string | null
+          device_type: string
+          firmware_version: string | null
+          id: string
+          ip_address: unknown
+          last_maintenance_at: string | null
+          last_seen_at: string | null
+          manufacturer: string
+          metadata: Json | null
+          model: string
+          next_maintenance_at: string | null
+          serial_number: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          cabinet_id: string
+          capabilities?: Json | null
+          created_at?: string | null
+          device_type?: string
+          firmware_version?: string | null
+          id?: string
+          ip_address?: unknown
+          last_maintenance_at?: string | null
+          last_seen_at?: string | null
+          manufacturer: string
+          metadata?: Json | null
+          model: string
+          next_maintenance_at?: string | null
+          serial_number: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          cabinet_id?: string
+          capabilities?: Json | null
+          created_at?: string | null
+          device_type?: string
+          firmware_version?: string | null
+          id?: string
+          ip_address?: unknown
+          last_maintenance_at?: string | null
+          last_seen_at?: string | null
+          manufacturer?: string
+          metadata?: Json | null
+          model?: string
+          next_maintenance_at?: string | null
+          serial_number?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mri_devices_cabinet_id_fkey"
+            columns: ["cabinet_id"]
+            isOneToOne: false
+            referencedRelation: "cabinets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mri_scans: {
+        Row: {
+          anomalies_detected: number | null
+          body_zones: string[] | null
+          cabinet_id: string
+          completed_at: string | null
+          created_at: string | null
+          device_id: string | null
+          duration_seconds: number | null
+          findings: Json | null
+          id: string
+          metadata: Json | null
+          patient_reference: string
+          protocol_id: string
+          report_url: string | null
+          risk_level: string | null
+          started_at: string | null
+          status: string | null
+        }
+        Insert: {
+          anomalies_detected?: number | null
+          body_zones?: string[] | null
+          cabinet_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          device_id?: string | null
+          duration_seconds?: number | null
+          findings?: Json | null
+          id?: string
+          metadata?: Json | null
+          patient_reference: string
+          protocol_id: string
+          report_url?: string | null
+          risk_level?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          anomalies_detected?: number | null
+          body_zones?: string[] | null
+          cabinet_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          device_id?: string | null
+          duration_seconds?: number | null
+          findings?: Json | null
+          id?: string
+          metadata?: Json | null
+          patient_reference?: string
+          protocol_id?: string
+          report_url?: string | null
+          risk_level?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mri_scans_cabinet_id_fkey"
+            columns: ["cabinet_id"]
+            isOneToOne: false
+            referencedRelation: "cabinets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mri_scans_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "mri_devices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mri_subscriptions: {
+        Row: {
+          cabinet_id: string
+          created_at: string | null
+          current_period_end: string
+          current_period_start: string
+          glasses_included: number | null
+          id: string
+          plan_id: string
+          scans_limit: number | null
+          scans_this_period: number | null
+          status: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          cabinet_id: string
+          created_at?: string | null
+          current_period_end?: string
+          current_period_start?: string
+          glasses_included?: number | null
+          id?: string
+          plan_id?: string
+          scans_limit?: number | null
+          scans_this_period?: number | null
+          status?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          cabinet_id?: string
+          created_at?: string | null
+          current_period_end?: string
+          current_period_start?: string
+          glasses_included?: number | null
+          id?: string
+          plan_id?: string
+          scans_limit?: number | null
+          scans_this_period?: number | null
+          status?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mri_subscriptions_cabinet_id_fkey"
+            columns: ["cabinet_id"]
+            isOneToOne: false
+            referencedRelation: "cabinets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -107,6 +345,48 @@ export type Database = {
           notification_preferences?: Json | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      screening_protocols: {
+        Row: {
+          body_zones: string[]
+          created_at: string | null
+          description: string | null
+          description_fr: string | null
+          duration_minutes: number
+          id: string
+          is_active: boolean | null
+          name: string
+          name_fr: string
+          sequence_types: string[] | null
+          targets: string[] | null
+        }
+        Insert: {
+          body_zones: string[]
+          created_at?: string | null
+          description?: string | null
+          description_fr?: string | null
+          duration_minutes: number
+          id: string
+          is_active?: boolean | null
+          name: string
+          name_fr: string
+          sequence_types?: string[] | null
+          targets?: string[] | null
+        }
+        Update: {
+          body_zones?: string[]
+          created_at?: string | null
+          description?: string | null
+          description_fr?: string | null
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_fr?: string
+          sequence_types?: string[] | null
+          targets?: string[] | null
         }
         Relationships: []
       }

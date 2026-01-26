@@ -18,6 +18,7 @@ import Contact from "./pages/Contact";
 import ClinicalAR from "./pages/ClinicalAR";
 import SharedScript from "./pages/SharedScript";
 import VisionIRM from "./pages/VisionIRM";
+import LunettesIRM from "./pages/LunettesIRM";
 import OfflineIndicator from "./components/OfflineIndicator";
 
 const queryClient = new QueryClient({
@@ -52,6 +53,7 @@ const App = () => (
                 <Route path="/clinical-ar/:patientId" element={<ClinicalAR />} />
                 <Route path="/shared/:scriptId" element={<SharedScript />} />
                 <Route path="/vision-irm" element={<VisionIRM />} />
+                <Route path="/lunettes-irm" element={<LunettesIRM />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

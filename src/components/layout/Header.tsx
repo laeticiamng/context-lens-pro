@@ -37,6 +37,7 @@ const Header = () => {
     { label: t.pipeline.title.split(" ")[0], href: "#pipeline" },
     { label: t.nav.pricing, href: "#pricing" },
     { label: t.nav.docs, href: "/docs" },
+    { label: "LUNETTES IRM", href: "/lunettes-irm" },
     { label: "Vision IRM", href: "/vision-irm" },
   ];
 
