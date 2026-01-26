@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 interface UseShareScriptOptions {
@@ -6,9 +7,11 @@ interface UseShareScriptOptions {
 
 export const useShareScript = (options: UseShareScriptOptions = {}) => {
   const { toast } = useToast();
+  const [isSharing, setIsSharing] = useState(false);
   const baseUrl = options.baseUrl || window.location.origin;
 
   const shareScript = async (script: { id: string; title: string; content: string }) => {
+    setIsSharing(true);
     const shareUrl = `${baseUrl}/shared/${script.id}`;
     const shareData = {
       title: `ContextLens Script: ${script.title}`,
@@ -21,6 +24,7 @@ export const useShareScript = (options: UseShareScriptOptions = {}) => {
       try {
         await navigator.share(shareData);
         toast({ title: "Shared", description: "Script shared successfully" });
+        setIsSharing(false);
         return true;
       } catch (error: any) {
         if (error.name !== "AbortError") {
@@ -36,6 +40,7 @@ export const useShareScript = (options: UseShareScriptOptions = {}) => {
         title: "Link copied", 
         description: "Share URL copied to clipboard" 
       });
+      setIsSharing(false);
       return true;
     } catch {
       toast({
@@ -43,6 +48,7 @@ export const useShareScript = (options: UseShareScriptOptions = {}) => {
         description: "Could not share or copy link",
         variant: "destructive",
       });
+      setIsSharing(false);
       return false;
     }
   };
@@ -58,5 +64,5 @@ export const useShareScript = (options: UseShareScriptOptions = {}) => {
     }
   };
 
-  return { shareScript, copyScriptContent };
+  return { shareScript, copyScriptContent, isSharing };
 };

@@ -8,7 +8,7 @@ import PricingSection from "@/components/sections/PricingSection";
 import CTASection from "@/components/sections/CTASection";
 import DemoSection from "@/components/sections/DemoSection";
 import FAQSection from "@/components/sections/FAQSection";
-import StatsSection from "@/components/sections/StatsSection";
+import AnimatedStats from "@/components/sections/AnimatedStats";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 
 const Index = () => {
@@ -17,7 +17,7 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
-        <StatsSection />
+        <AnimatedStats />
         <DemoSection />
         <CapabilityMatrix />
         <DevicesSection />

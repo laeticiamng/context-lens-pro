@@ -54,8 +54,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import ScriptEditor from "@/components/dashboard/ScriptEditor";
-import AnalyticsCharts from "@/components/dashboard/AnalyticsCharts";
+import ScriptEditorWithTemplates from "@/components/dashboard/ScriptEditorWithTemplates";
+import AnalyticsWithDateRange from "@/components/dashboard/AnalyticsWithDateRange";
 import AddDeviceDialog from "@/components/dashboard/AddDeviceDialog";
 import ExportScriptsDialog from "@/components/dashboard/ExportScriptsDialog";
 import KeyboardShortcuts from "@/components/dashboard/KeyboardShortcuts";
@@ -63,6 +63,8 @@ import UsageLimits from "@/components/dashboard/UsageLimits";
 import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
 import ConfirmDialog from "@/components/dashboard/ConfirmDialog";
 import QuickActionsBar from "@/components/dashboard/QuickActionsBar";
+import MarketplacePreview from "@/components/dashboard/MarketplacePreview";
+import UXControlsMapping from "@/components/dashboard/UXControlsMapping";
 import type { User } from "@supabase/supabase-js";
 
 interface Script {
@@ -677,7 +679,7 @@ const Dashboard = () => {
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
                                   className="text-destructive"
-                                  onClick={() => handleDeleteDevice(device.id)}
+                                  onClick={() => setDeleteConfirm({ type: "device", id: device.id, name: device.device_name })}
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
                                   Remove
@@ -705,8 +707,14 @@ const Dashboard = () => {
               </TabsContent>
 
               {/* Analytics Tab */}
-              <TabsContent value="analytics">
-                <AnalyticsCharts scripts={scripts} devices={devices} />
+              <TabsContent value="analytics" className="space-y-6">
+                <AnalyticsWithDateRange scripts={scripts} devices={devices} userId={user?.id} />
+                
+                {/* UX Controls Mapping */}
+                <UXControlsMapping />
+                
+                {/* Marketplace Preview */}
+                <MarketplacePreview />
               </TabsContent>
             </Tabs>
           </div>
@@ -722,7 +730,7 @@ const Dashboard = () => {
               {editingScript ? "Edit your script content and settings." : "Create a new script for your prompter."}
             </DialogDescription>
           </DialogHeader>
-          <ScriptEditor
+          <ScriptEditorWithTemplates
             script={editingScript}
             onSave={handleSaveScript}
             onClose={() => {
