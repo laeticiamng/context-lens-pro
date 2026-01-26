@@ -3,76 +3,78 @@ import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
-
-const plans = [
-  {
-    name: "Free",
-    priceMonthly: 0,
-    priceYearly: 0,
-    period: "forever",
-    description: "Perfect for trying out ContextLens",
-    features: [
-      "10 scripts",
-      "Tier 0 (phone fallback)",
-      "100 analyses/month",
-      "Basic analytics",
-      "Community support",
-    ],
-    cta: "Get Started",
-    variant: "glass" as const,
-    highlight: false,
-    popular: false,
-  },
-  {
-    name: "Pro",
-    priceMonthly: 9.99,
-    priceYearly: 99,
-    period: "/month",
-    description: "For professionals who need more power",
-    features: [
-      "Unlimited scripts",
-      "Tier 1-2 device support",
-      "Unlimited analyses",
-      "Advanced analytics",
-      "Priority support",
-      "Custom prompts",
-      "Offline caching",
-    ],
-    cta: "Start Free Trial",
-    variant: "hero" as const,
-    highlight: true,
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    priceMonthly: null,
-    priceYearly: null,
-    period: "",
-    description: "For teams and organizations",
-    features: [
-      "Everything in Pro",
-      "On-premise deployment",
-      "SSO & SAML",
-      "Custom integrations",
-      "Dedicated support",
-      "SLA guarantee",
-      "API access",
-    ],
-    cta: "Contact Sales",
-    variant: "glass" as const,
-    highlight: false,
-    popular: false,
-  },
-];
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const PricingSection = () => {
   const navigate = useNavigate();
   const [isYearly, setIsYearly] = useState(false);
+  const { t, language } = useLanguage();
+
+  const plans = [
+    {
+      name: t.pricing.free,
+      priceMonthly: 0,
+      priceYearly: 0,
+      period: language === "fr" ? "gratuit" : "forever",
+      description: language === "fr" ? "Parfait pour découvrir ContextLens" : "Perfect for trying out ContextLens",
+      features: [
+        "10 scripts",
+        "Tier 0 (phone fallback)",
+        language === "fr" ? "100 analyses/mois" : "100 analyses/month",
+        language === "fr" ? "Analytique basique" : "Basic analytics",
+        language === "fr" ? "Support communautaire" : "Community support",
+      ],
+      cta: t.pricing.getStarted,
+      variant: "glass" as const,
+      highlight: false,
+      popular: false,
+    },
+    {
+      name: t.pricing.pro,
+      priceMonthly: 9.99,
+      priceYearly: 99,
+      period: t.pricing.perMonth,
+      description: language === "fr" ? "Pour les professionnels qui ont besoin de plus" : "For professionals who need more power",
+      features: [
+        language === "fr" ? "Scripts illimités" : "Unlimited scripts",
+        language === "fr" ? "Support appareils Tier 1-2" : "Tier 1-2 device support",
+        language === "fr" ? "Analyses illimitées" : "Unlimited analyses",
+        language === "fr" ? "Analytique avancée" : "Advanced analytics",
+        language === "fr" ? "Support prioritaire" : "Priority support",
+        language === "fr" ? "Prompts personnalisés" : "Custom prompts",
+        language === "fr" ? "Cache hors ligne" : "Offline caching",
+      ],
+      cta: language === "fr" ? "Essai gratuit" : "Start Free Trial",
+      variant: "hero" as const,
+      highlight: true,
+      popular: true,
+    },
+    {
+      name: t.pricing.enterprise,
+      priceMonthly: null,
+      priceYearly: null,
+      period: "",
+      description: language === "fr" ? "Pour les équipes et organisations" : "For teams and organizations",
+      features: [
+        language === "fr" ? "Tout de Pro inclus" : "Everything in Pro",
+        language === "fr" ? "Déploiement on-premise" : "On-premise deployment",
+        "SSO & SAML",
+        language === "fr" ? "Intégrations personnalisées" : "Custom integrations",
+        language === "fr" ? "Support dédié" : "Dedicated support",
+        language === "fr" ? "Garantie SLA" : "SLA guarantee",
+        language === "fr" ? "Accès API" : "API access",
+      ],
+      cta: t.pricing.contactSales,
+      variant: "glass" as const,
+      highlight: false,
+      popular: false,
+    },
+  ];
 
   const handlePlanClick = (planName: string) => {
-    if (planName === "Free") {
+    if (planName === t.pricing.free) {
       navigate("/auth");
-    } else if (planName === "Enterprise") {
+    } else if (planName === t.pricing.enterprise) {
       navigate("/contact");
     } else {
       navigate("/auth");
@@ -80,15 +82,15 @@ const PricingSection = () => {
   };
 
   const getPrice = (plan: typeof plans[0]) => {
-    if (plan.priceMonthly === null) return "Custom";
+    if (plan.priceMonthly === null) return language === "fr" ? "Sur devis" : "Custom";
     if (plan.priceMonthly === 0) return "0";
     return isYearly ? Math.round(plan.priceYearly / 12).toString() : plan.priceMonthly.toString();
   };
 
   const getPeriod = (plan: typeof plans[0]) => {
     if (plan.priceMonthly === null) return "";
-    if (plan.priceMonthly === 0) return "forever";
-    return "/month";
+    if (plan.priceMonthly === 0) return plan.period;
+    return t.pricing.perMonth;
   };
 
   return (
@@ -97,21 +99,21 @@ const PricingSection = () => {
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Simple, <span className="text-gradient">transparent</span> pricing
+            {t.pricing.title} <span className="text-gradient">{t.pricing.titleHighlight}</span>
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Start free, upgrade when you need more. No hidden fees.
+            {t.pricing.description}
           </p>
 
           {/* Billing Toggle */}
           <div className="inline-flex items-center gap-3 p-1 rounded-full bg-secondary/50 border border-border/50">
             <span className={`px-3 py-1.5 rounded-full text-sm transition-colors ${!isYearly ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
-              Monthly
+              {language === "fr" ? "Mensuel" : "Monthly"}
             </span>
             <Switch checked={isYearly} onCheckedChange={setIsYearly} />
             <span className={`px-3 py-1.5 rounded-full text-sm transition-colors ${isYearly ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
-              Yearly
-              <span className="ml-1 text-xs text-accent">Save 17%</span>
+              {language === "fr" ? "Annuel" : "Yearly"}
+              <span className="ml-1 text-xs text-accent">{language === "fr" ? "-17%" : "Save 17%"}</span>
             </span>
           </div>
         </div>
@@ -135,7 +137,7 @@ const PricingSection = () => {
                 <div className="absolute top-4 right-4">
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
                     <Sparkles className="h-3 w-3" />
-                    Popular
+                    {t.pricing.popular}
                   </span>
                 </div>
               )}
@@ -145,7 +147,7 @@ const PricingSection = () => {
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold mb-2">{plan.name}</h3>
                   <div className="flex items-baseline gap-1">
-                    {getPrice(plan) !== "Custom" && (
+                    {getPrice(plan) !== "Custom" && getPrice(plan) !== "Sur devis" && (
                       <span className="text-sm text-muted-foreground">€</span>
                     )}
                     <span className="text-4xl font-bold">{getPrice(plan)}</span>
@@ -153,7 +155,7 @@ const PricingSection = () => {
                   </div>
                   {isYearly && plan.priceYearly && plan.priceYearly > 0 && (
                     <p className="text-xs text-accent mt-1">
-                      €{plan.priceYearly} billed annually
+                      €{plan.priceYearly} {language === "fr" ? "facturé annuellement" : "billed annually"}
                     </p>
                   )}
                   <p className="text-sm text-muted-foreground mt-2">
@@ -186,7 +188,9 @@ const PricingSection = () => {
 
         {/* Enterprise note */}
         <p className="text-center text-sm text-muted-foreground mt-12">
-          All plans include GDPR compliance, E2E encryption, and privacy-first defaults.
+          {language === "fr" 
+            ? "Tous les plans incluent la conformité RGPD, le chiffrement E2E et des paramètres de confidentialité par défaut."
+            : "All plans include GDPR compliance, E2E encryption, and privacy-first defaults."}
         </p>
       </div>
     </section>

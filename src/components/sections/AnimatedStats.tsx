@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Users, Glasses, FileText, Zap } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface StatItemProps {
   value: number;
@@ -80,11 +81,13 @@ const StatItem = ({ value, suffix, label, delay, icon: Icon, color }: StatItemPr
 };
 
 const AnimatedStats = () => {
+  const { t } = useLanguage();
+
   const stats = [
-    { value: 10000, suffix: "+", label: "Active Users", delay: 0, icon: Users, color: "primary" as const },
-    { value: 50, suffix: "+", label: "Device Models", delay: 200, icon: Glasses, color: "accent" as const },
-    { value: 1000000, suffix: "+", label: "Prompts Delivered", delay: 400, icon: FileText, color: "primary" as const },
-    { value: 99.9, suffix: "%", label: "Uptime SLA", delay: 600, icon: Zap, color: "accent" as const },
+    { value: 10000, suffix: "+", label: t.stats.activeUsers, delay: 0, icon: Users, color: "primary" as const },
+    { value: 50, suffix: "+", label: t.stats.deviceModels, delay: 200, icon: Glasses, color: "accent" as const },
+    { value: 1000000, suffix: "+", label: t.stats.promptsDelivered, delay: 400, icon: FileText, color: "primary" as const },
+    { value: 99.9, suffix: "%", label: t.stats.uptimeSla, delay: 600, icon: Zap, color: "accent" as const },
   ];
   
   return (

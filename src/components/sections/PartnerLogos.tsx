@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const partners = [
   { name: "Even Realities", logo: "EVEN" },
@@ -10,11 +11,13 @@ const partners = [
 ];
 
 const PartnerLogos = () => {
+  const { t } = useLanguage();
+
   return (
     <section className="py-12 border-y border-border/50 bg-secondary/30">
       <div className="container px-4">
         <p className="text-center text-sm text-muted-foreground mb-8">
-          Compatible with leading smart glasses manufacturers
+          {t.partners.compatible}
         </p>
         
         <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">

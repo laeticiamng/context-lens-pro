@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Glasses, Smartphone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const scrollToDemo = () => {
     const demoSection = document.getElementById("demo");
@@ -30,36 +32,34 @@ const HeroSection = () => {
           {/* Badge */}
           <div className="animate-fade-up inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-sm text-primary mb-8">
             <Sparkles className="h-4 w-4" />
-            <span>Universal Smart Glasses Platform</span>
+            <span>{t.hero.badge}</span>
           </div>
 
           {/* Headline */}
           <h1 className="animate-fade-up delay-100 text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-balance">
-            Transform any glasses into a{" "}
-            <span className="text-gradient">contextual prompter</span>
+            {t.hero.title}{" "}
+            <span className="text-gradient">{t.hero.titleHighlight}</span>
           </h1>
 
           {/* Subheadline */}
           <p className="animate-fade-up delay-200 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 text-balance">
-            ContextLens uses AI vision to understand your environment and delivers 
-            relevant scripts, notes, and information directly to your smart glasses — 
-            works with any device.
+            {t.hero.description}
           </p>
 
           {/* CTA Buttons */}
           <div className="animate-fade-up delay-300 flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Button variant="hero" size="xl" onClick={() => navigate("/auth")}>
-              Get Early Access
+              {t.hero.cta}
               <ArrowRight className="h-5 w-5" />
             </Button>
             <Button variant="heroOutline" size="xl" onClick={scrollToDemo}>
-              View Demo
+              {t.hero.secondaryCta}
             </Button>
           </div>
 
           {/* Device compatibility hint */}
           <div className="animate-fade-up delay-400 flex flex-col items-center gap-4">
-            <p className="text-sm text-muted-foreground">Works with</p>
+            <p className="text-sm text-muted-foreground">{t.partners.compatible.split(" ").slice(0, 2).join(" ")}</p>
             <div className="flex items-center gap-6 text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Glasses className="h-5 w-5" />

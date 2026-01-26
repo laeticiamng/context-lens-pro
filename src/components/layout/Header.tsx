@@ -5,11 +5,14 @@ import { Menu, X, Glasses } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Get initial session
@@ -28,12 +31,12 @@ const Header = () => {
   }, []);
 
   const navLinks = [
-    { label: "Features", href: "#features" },
+    { label: t.nav.features, href: "#features" },
     { label: "Demo", href: "#demo" },
-    { label: "Devices", href: "#devices" },
+    { label: t.devices.title.split(" ")[0], href: "#devices" },
     { label: "Pipeline", href: "#pipeline" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "Docs", href: "/docs" },
+    { label: t.nav.pricing, href: "#pricing" },
+    { label: t.nav.docs, href: "/docs" },
   ];
 
   return (
@@ -75,18 +78,19 @@ const Header = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
+            <LanguageSwitcher />
             <ThemeToggle />
             {user ? (
               <Button variant="hero" size="sm" onClick={() => navigate("/dashboard")}>
-                Dashboard
+                {t.nav.dashboard}
               </Button>
             ) : (
               <>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
-                  Sign In
+                  {t.nav.signIn}
                 </Button>
                 <Button variant="hero" size="sm" onClick={() => navigate("/auth")}>
-                  Get Early Access
+                  {t.nav.getStarted}
                 </Button>
               </>
             )}
@@ -94,6 +98,7 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-2">
+            <LanguageSwitcher />
             <ThemeToggle />
             <button
               className="p-2 text-muted-foreground hover:text-foreground"
@@ -132,15 +137,15 @@ const Header = () => {
               <div className="flex flex-col gap-2 pt-4 mt-2 border-t border-border/50">
                 {user ? (
                   <Button variant="hero" onClick={() => navigate("/dashboard")}>
-                    Dashboard
+                    {t.nav.dashboard}
                   </Button>
                 ) : (
                   <>
                     <Button variant="ghost" className="justify-start" onClick={() => navigate("/auth")}>
-                      Sign In
+                      {t.nav.signIn}
                     </Button>
                     <Button variant="hero" onClick={() => navigate("/auth")}>
-                      Get Early Access
+                      {t.nav.getStarted}
                     </Button>
                   </>
                 )}
