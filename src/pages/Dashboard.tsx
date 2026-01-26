@@ -225,6 +225,44 @@ const Dashboard = () => {
     }
   };
 
+  const handleToggleActive = async (scriptId: string, isActive: boolean) => {
+    const { error } = await supabase
+      .from("scripts")
+      .update({ is_active: isActive })
+      .eq("id", scriptId);
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to update script", variant: "destructive" });
+    } else {
+      toast({ title: "Updated", description: `Script ${isActive ? "activated" : "deactivated"}` });
+      fetchScripts();
+    }
+  };
+
+  const handleToggleDeviceConnection = async (deviceId: string, isConnected: boolean) => {
+    const { error } = await supabase
+      .from("connected_devices")
+      .update({ is_connected: isConnected, last_connected_at: isConnected ? new Date().toISOString() : null })
+      .eq("id", deviceId);
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to update device", variant: "destructive" });
+    } else {
+      toast({ title: "Updated", description: `Device ${isConnected ? "connected" : "disconnected"}` });
+      fetchDevices();
+    }
+  };
+
+  const handleDeleteDevice = async (deviceId: string) => {
+    const { error } = await supabase.from("connected_devices").delete().eq("id", deviceId);
+    if (error) {
+      toast({ title: "Error", description: "Failed to remove device", variant: "destructive" });
+    } else {
+      toast({ title: "Removed", description: "Device removed" });
+      fetchDevices();
+    }
+  };
+
   const filteredScripts = scripts.filter(s => 
     s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.content.toLowerCase().includes(searchQuery.toLowerCase())
@@ -263,7 +301,7 @@ const Dashboard = () => {
             </div>
             
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/settings")}>
                 <Settings className="h-5 w-5" />
               </Button>
               <DropdownMenu>
@@ -426,6 +464,10 @@ const Dashboard = () => {
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleToggleActive(script.id, !script.is_active); }}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              {script.is_active ? "Deactivate" : "Activate"}
+                            </DropdownMenuItem>
                             <DropdownMenuItem 
                               className="text-destructive"
                               onClick={(e) => { e.stopPropagation(); handleDeleteScript(script.id); }}
@@ -499,9 +541,35 @@ const Dashboard = () => {
                             {device.manufacturer} • Tier {device.tier}
                           </p>
                         </div>
-                        <Badge variant={device.is_connected ? "default" : "secondary"}>
-                          {device.is_connected ? "Connected" : "Offline"}
-                        </Badge>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleToggleDeviceConnection(device.id, !device.is_connected)}>
+                              {device.is_connected ? (
+                                <>
+                                  <WifiOff className="h-4 w-4 mr-2" />
+                                  Disconnect
+                                </>
+                              ) : (
+                                <>
+                                  <Wifi className="h-4 w-4 mr-2" />
+                                  Reconnect
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              className="text-destructive"
+                              onClick={() => handleDeleteDevice(device.id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Remove
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </CardContent>
                   </Card>

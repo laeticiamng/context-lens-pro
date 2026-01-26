@@ -17,15 +17,15 @@ const footerLinks = {
   ],
   company: [
     { label: "About", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "Contact", href: "/contact" },
     { label: "Careers", href: "#" },
     { label: "Press Kit", href: "#" },
   ],
   legal: [
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
-    { label: "GDPR", href: "#" },
-    { label: "Cookie Policy", href: "#" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+    { label: "GDPR", href: "/privacy" },
+    { label: "Cookie Policy", href: "/privacy" },
   ],
 };
 
@@ -50,19 +50,25 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             </p>
             <div className="flex gap-4">
               <a 
-                href="#" 
+                href="https://twitter.com/contextlens" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
               >
                 <Twitter className="h-5 w-5" />
               </a>
               <a 
-                href="#" 
+                href="https://github.com/contextlens" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
               >
                 <Github className="h-5 w-5" />
               </a>
               <a 
-                href="#" 
+                href="https://linkedin.com/company/contextlens" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
               >
                 <Linkedin className="h-5 w-5" />
@@ -117,12 +123,21 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
-                  <a 
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </a>
+                  {link.href.startsWith("/") ? (
+                    <Link 
+                      to={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a 
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -133,12 +148,12 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.label}>
-                  <a 
-                    href={link.href}
+                  <Link 
+                    to={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

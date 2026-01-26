@@ -1,7 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Glasses, Smartphone } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
+  const scrollToDemo = () => {
+    const demoSection = document.getElementById("demo");
+    if (demoSection) {
+      demoSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
       {/* Background effects */}
@@ -38,11 +48,11 @@ const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="animate-fade-up delay-300 flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <Button variant="hero" size="xl">
+            <Button variant="hero" size="xl" onClick={() => navigate("/auth")}>
               Get Early Access
               <ArrowRight className="h-5 w-5" />
             </Button>
-            <Button variant="heroOutline" size="xl">
+            <Button variant="heroOutline" size="xl" onClick={scrollToDemo}>
               View Demo
             </Button>
           </div>
