@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,8 @@ interface WaitlistFormProps {
   className?: string;
 }
 
-const WaitlistForm = ({ source = "cta", className = "" }: WaitlistFormProps) => {
+const WaitlistForm = forwardRef<HTMLFormElement, WaitlistFormProps>(
+  ({ source = "cta", className = "" }, ref) => {
   const [email, setEmail] = useState("");
   const { joinWaitlist, isLoading, isSuccess, error } = useWaitlist();
 
@@ -79,6 +80,8 @@ const WaitlistForm = ({ source = "cta", className = "" }: WaitlistFormProps) => 
       </div>
     </form>
   );
-};
+});
+
+WaitlistForm.displayName = "WaitlistForm";
 
 export default WaitlistForm;
