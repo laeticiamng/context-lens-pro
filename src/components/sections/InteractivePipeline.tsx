@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Camera, Eye, Route, Database, FileText, Monitor, ChevronRight, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const pipelineSteps = [
   {
@@ -96,6 +97,7 @@ const pipelineSteps = [
 ];
 
 const InteractivePipeline = () => {
+  const { language } = useLanguage();
   const [activeStep, setActiveStep] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -134,10 +136,13 @@ const InteractivePipeline = () => {
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Universal <span className="text-gradient">Pipeline</span>
+            {language === "fr" ? "Pipeline " : "Universal "}
+            <span className="text-gradient">{language === "fr" ? "Universel" : "Pipeline"}</span>
           </h2>
           <p className="text-lg text-muted-foreground mb-6">
-            Same flow, every device. From capture to display in milliseconds.
+            {language === "fr" 
+              ? "Même flux, tous les appareils. De la capture à l'affichage en millisecondes."
+              : "Same flow, every device. From capture to display in milliseconds."}
           </p>
           <button 
             onClick={runAnimation}
@@ -145,7 +150,9 @@ const InteractivePipeline = () => {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 transition-colors disabled:opacity-50"
           >
             <Zap className="h-4 w-4" />
-            {isAnimating ? "Animating..." : "Run Pipeline Demo"}
+            {isAnimating 
+              ? (language === "fr" ? "Animation..." : "Animating...") 
+              : (language === "fr" ? "Lancer la démo" : "Run Pipeline Demo")}
           </button>
         </div>
 
@@ -320,7 +327,9 @@ const InteractivePipeline = () => {
         {!activeStepData && (
           <div className="max-w-4xl mx-auto text-center py-8">
             <p className="text-muted-foreground">
-              Click on any stage to see details, or run the demo to see the full flow.
+              {language === "fr" 
+                ? "Cliquez sur une étape pour voir les détails, ou lancez la démo pour voir le flux complet."
+                : "Click on any stage to see details, or run the demo to see the full flow."}
             </p>
           </div>
         )}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Check, X, Minus, Smartphone, Monitor, Cpu, Layers, ChevronDown, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const tiers = [
   {
@@ -124,6 +125,7 @@ const getColorClass = (tier: number, type: 'bg' | 'text' | 'border') => {
 };
 
 const CapabilityMatrix = () => {
+  const { language } = useLanguage();
   const [selectedTier, setSelectedTier] = useState<number | null>(null);
   const [showMatrix, setShowMatrix] = useState(false);
   const [showDevices, setShowDevices] = useState(false);
@@ -146,12 +148,13 @@ const CapabilityMatrix = () => {
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Tiered Architecture for{" "}
-            <span className="text-gradient">Every Device</span>
+            {language === "fr" ? "Architecture par niveaux pour " : "Tiered Architecture for "}
+            <span className="text-gradient">{language === "fr" ? "Tous les appareils" : "Every Device"}</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            From basic phone-only fallback to full AR anchoring — ContextLens adapts 
-            to what your glasses can do.
+            {language === "fr" 
+              ? "Du mode téléphone de secours à l'ancrage AR complet — ContextLens s'adapte aux capacités de vos lunettes."
+              : "From basic phone-only fallback to full AR anchoring — ContextLens adapts to what your glasses can do."}
           </p>
         </div>
 
@@ -232,7 +235,7 @@ const CapabilityMatrix = () => {
           >
             <div className="flex items-center gap-3">
               <Info className="h-5 w-5 text-primary" />
-              <span className="font-medium">Full Capability Matrix</span>
+              <span className="font-medium">{language === "fr" ? "Matrice complète des capacités" : "Full Capability Matrix"}</span>
             </div>
             <ChevronDown className={`h-5 w-5 transition-transform ${showMatrix ? "rotate-180" : ""}`} />
           </button>
@@ -249,7 +252,7 @@ const CapabilityMatrix = () => {
                   <table className="w-full min-w-[600px]">
                     <thead>
                       <tr className="border-b border-border/50">
-                        <th className="text-left p-4 font-medium text-sm">Capability</th>
+                        <th className="text-left p-4 font-medium text-sm">{language === "fr" ? "Capacité" : "Capability"}</th>
                         {tiers.map((tier) => (
                           <th key={tier.tier} className="p-4 text-center">
                             <span className={`tier-badge tier-${tier.tier}`}>T{tier.tier}</span>
@@ -285,7 +288,7 @@ const CapabilityMatrix = () => {
           >
             <div className="flex items-center gap-3">
               <Monitor className="h-5 w-5 text-accent" />
-              <span className="font-medium">Compatible Devices</span>
+              <span className="font-medium">{language === "fr" ? "Appareils compatibles" : "Compatible Devices"}</span>
             </div>
             <ChevronDown className={`h-5 w-5 transition-transform ${showDevices ? "rotate-180" : ""}`} />
           </button>

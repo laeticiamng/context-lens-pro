@@ -2,43 +2,76 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Play, Pause, SkipForward, SkipBack, Maximize2, Volume2 } from "lucide-react";
-
-const tourSteps = [
-  {
-    id: 1,
-    title: "Capture Context",
-    description: "Your phone camera or smart glasses capture the environment in real-time.",
-    timestamp: "0:00",
-  },
-  {
-    id: 2,
-    title: "AI Analysis",
-    description: "Our vision AI identifies text, objects, people, and scene context instantly.",
-    timestamp: "0:15",
-  },
-  {
-    id: 3,
-    title: "Smart Matching",
-    description: "ContextLens matches the scene to your relevant scripts and talking points.",
-    timestamp: "0:30",
-  },
-  {
-    id: 4,
-    title: "HUD Display",
-    description: "Prompts appear on your smart glasses HUD, perfectly timed and formatted.",
-    timestamp: "0:45",
-  },
-  {
-    id: 5,
-    title: "Silent Navigation",
-    description: "Navigate with touch gestures - no voice commands needed in any situation.",
-    timestamp: "1:00",
-  },
-];
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const DemoSection = () => {
+  const { language } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+
+  const tourSteps = language === "fr" ? [
+    {
+      id: 1,
+      title: "Capturer le contexte",
+      description: "Votre téléphone ou lunettes capturent l'environnement en temps réel.",
+      timestamp: "0:00",
+    },
+    {
+      id: 2,
+      title: "Analyse IA",
+      description: "Notre IA vision identifie texte, objets, personnes et contexte instantanément.",
+      timestamp: "0:15",
+    },
+    {
+      id: 3,
+      title: "Correspondance intelligente",
+      description: "ContextLens associe la scène à vos scripts et points de discussion.",
+      timestamp: "0:30",
+    },
+    {
+      id: 4,
+      title: "Affichage HUD",
+      description: "Les prompts apparaissent sur le HUD de vos lunettes, parfaitement synchronisés.",
+      timestamp: "0:45",
+    },
+    {
+      id: 5,
+      title: "Navigation silencieuse",
+      description: "Naviguez avec les gestes tactiles - aucune commande vocale nécessaire.",
+      timestamp: "1:00",
+    },
+  ] : [
+    {
+      id: 1,
+      title: "Capture Context",
+      description: "Your phone camera or smart glasses capture the environment in real-time.",
+      timestamp: "0:00",
+    },
+    {
+      id: 2,
+      title: "AI Analysis",
+      description: "Our vision AI identifies text, objects, people, and scene context instantly.",
+      timestamp: "0:15",
+    },
+    {
+      id: 3,
+      title: "Smart Matching",
+      description: "ContextLens matches the scene to your relevant scripts and talking points.",
+      timestamp: "0:30",
+    },
+    {
+      id: 4,
+      title: "HUD Display",
+      description: "Prompts appear on your smart glasses HUD, perfectly timed and formatted.",
+      timestamp: "0:45",
+    },
+    {
+      id: 5,
+      title: "Silent Navigation",
+      description: "Navigate with touch gestures - no voice commands needed in any situation.",
+      timestamp: "1:00",
+    },
+  ];
 
   return (
     <section id="demo" className="py-24 md:py-32 relative overflow-hidden">
@@ -51,11 +84,14 @@ const DemoSection = () => {
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            See <span className="text-gradient">ContextLens</span> in Action
+            {language === "fr" ? "Voyez " : "See "}
+            <span className="text-gradient">ContextLens</span>
+            {language === "fr" ? " en action" : " in Action"}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Watch how ContextLens transforms your smart glasses into an intelligent 
-            prompter system with real-time contextual awareness.
+            {language === "fr" 
+              ? "Découvrez comment ContextLens transforme vos lunettes connectées en système de prompteur intelligent avec conscience contextuelle en temps réel."
+              : "Watch how ContextLens transforms your smart glasses into an intelligent prompter system with real-time contextual awareness."}
           </p>
         </div>
 
@@ -92,7 +128,7 @@ const DemoSection = () => {
                       
                       {/* Demo text */}
                       <p className="text-center mt-8 text-sm text-muted-foreground">
-                        Interactive demo coming soon
+                        {language === "fr" ? "Démo interactive bientôt disponible" : "Interactive demo coming soon"}
                       </p>
                     </div>
                   </div>
@@ -166,7 +202,7 @@ const DemoSection = () => {
             {/* Tour Steps */}
             <div className="lg:col-span-2 space-y-3">
               <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wide">
-                Product Tour
+                {language === "fr" ? "Visite guidée" : "Product Tour"}
               </h3>
               {tourSteps.map((step, index) => (
                 <button
