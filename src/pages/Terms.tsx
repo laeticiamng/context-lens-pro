@@ -1,12 +1,14 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import SEOHead from "@/components/layout/SEOHead";
+import ErrorBoundary from "@/components/ui/error-boundary";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const Terms = () => {
   const { language } = useLanguage();
 
   return (
+    <ErrorBoundary>
     <div className="min-h-screen bg-background text-foreground">
       <SEOHead 
         title={language === "fr" ? "Conditions d'Utilisation - ContextLens" : "Terms of Service - ContextLens"}
@@ -148,6 +150,7 @@ const Terms = () => {
       </main>
       <Footer />
     </div>
+    </ErrorBoundary>
   );
 };
 

@@ -1,12 +1,14 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import SEOHead from "@/components/layout/SEOHead";
+import ErrorBoundary from "@/components/ui/error-boundary";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const Privacy = () => {
   const { language } = useLanguage();
 
   return (
+    <ErrorBoundary>
     <div className="min-h-screen bg-background text-foreground">
       <SEOHead 
         title={language === "fr" ? "Politique de Confidentialité - ContextLens" : "Privacy Policy - ContextLens"}
@@ -135,6 +137,7 @@ const Privacy = () => {
       </main>
       <Footer />
     </div>
+    </ErrorBoundary>
   );
 };
 

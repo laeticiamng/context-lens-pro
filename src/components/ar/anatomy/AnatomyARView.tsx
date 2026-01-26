@@ -243,7 +243,9 @@ export function AnatomyARView({ patientId, patientName, onSessionEnd }: AnatomyA
           onClick={() => setShowBodyTracker(!showBodyTracker)}
           className="bg-background/80"
         >
-          {showBodyTracker ? 'Hide Skeleton' : 'Show Skeleton'}
+          {showBodyTracker 
+            ? (language === 'fr' ? 'Masquer le squelette' : 'Hide Skeleton')
+            : (language === 'fr' ? 'Afficher le squelette' : 'Show Skeleton')}
         </Button>
         {onSessionEnd && (
           <Button

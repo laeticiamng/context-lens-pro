@@ -2,6 +2,7 @@ import { useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import SEOHead from "@/components/layout/SEOHead";
+import ErrorBoundary from "@/components/ui/error-boundary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -112,6 +113,7 @@ const Contact = () => {
   ];
 
   return (
+    <ErrorBoundary>
     <div className="min-h-screen bg-background text-foreground">
       <SEOHead 
         title={language === "fr" ? "Contact - ContextLens" : "Contact - ContextLens"}
@@ -317,6 +319,7 @@ const Contact = () => {
       </main>
       <Footer />
     </div>
+    </ErrorBoundary>
   );
 };
 
