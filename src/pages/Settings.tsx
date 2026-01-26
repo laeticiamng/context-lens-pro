@@ -33,6 +33,7 @@ import SessionManagement from "@/components/settings/SessionManagement";
 import AvatarUpload from "@/components/settings/AvatarUpload";
 import SettingsSkeleton from "@/components/settings/SettingsSkeleton";
 import APIKeyManager from "@/components/settings/APIKeyManager";
+import BillingTab from "@/components/settings/BillingTab";
 import ErrorBoundary from "@/components/ui/error-boundary";
 
 const Settings = () => {
@@ -436,56 +437,7 @@ const Settings = () => {
 
           {/* Billing Tab */}
           <TabsContent value="billing">
-            <Card className="glass-card border-border/50">
-              <CardHeader>
-                <CardTitle>{language === "fr" ? "Abonnement et facturation" : "Subscription & Billing"}</CardTitle>
-                <CardDescription>{language === "fr" ? "Gérez votre plan et méthodes de paiement" : "Manage your plan and payment methods"}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="p-4 rounded-lg bg-secondary/50 flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium">{language === "fr" ? "Plan Gratuit" : "Free Plan"}</h4>
-                      <Badge variant="secondary">{language === "fr" ? "Actuel" : "Current"}</Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {language === "fr" ? "10 scripts, 100 analyses/mois" : "10 scripts, 100 analyses/month"}
-                    </p>
-                  </div>
-                  <Button variant="hero" onClick={() => navigate("/#pricing")}>
-                    {language === "fr" ? "Passer à Pro" : "Upgrade"}
-                  </Button>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="font-medium">{language === "fr" ? "Utilisation ce mois" : "Usage This Month"}</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 rounded-lg bg-secondary/30">
-                      <p className="text-2xl font-bold text-primary">3/10</p>
-                      <p className="text-xs text-muted-foreground">
-                        {language === "fr" ? "Scripts créés" : "Scripts created"}
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-secondary/30">
-                      <p className="text-2xl font-bold text-accent">24/100</p>
-                      <p className="text-xs text-muted-foreground">
-                        {language === "fr" ? "Analyses utilisées" : "Analyses used"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-border/50">
-                  <p className="text-sm text-muted-foreground">
-                    {language === "fr" 
-                      ? <>Besoin de plus ? <a href="/#pricing" className="text-primary hover:underline">Comparez les plans</a> ou{" "}
-                        <a href="mailto:sales@contextlens.io" className="text-primary hover:underline">contactez les ventes</a> pour l'Entreprise.</>
-                      : <>Need more? <a href="/#pricing" className="text-primary hover:underline">Compare plans</a> or{" "}
-                        <a href="mailto:sales@contextlens.io" className="text-primary hover:underline">contact sales</a> for Enterprise.</>}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <BillingTab currentPlan="free" />
           </TabsContent>
         </Tabs>
       </main>

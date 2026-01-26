@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ARScene } from './ARScene';
 import { HUDPanel } from './hud/HUDPanel';
@@ -9,7 +9,8 @@ import { usePatientContext } from '@/hooks/usePatientContext';
 import { useARStore } from '@/stores/arStore';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Loader2, Glasses, ArrowLeft, Camera, FileText, Users } from 'lucide-react';
+import { ClinicalNotes } from './hud/ClinicalNotes';
+import { Loader2, Glasses, ArrowLeft, Camera, FileText, Users, StickyNote } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ClinicalARViewProps {
@@ -19,6 +20,7 @@ interface ClinicalARViewProps {
 export function ClinicalARView({ patientId }: ClinicalARViewProps) {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const [showNotes, setShowNotes] = useState(false);
   
   const { isARActive, isLoading, deviceType, startSession, endSession, isWebXRSupported } = useARSession();
   const { currentPatient, setVitalSigns } = useARStore();
@@ -237,7 +239,24 @@ export function ClinicalARView({ patientId }: ClinicalARViewProps) {
           <FileText className="h-4 w-4 mr-2" />
           {language === 'fr' ? 'Rapport' : 'Report'}
         </Button>
+        
+        <Button
+          size="sm"
+          variant="secondary"
+          className="backdrop-blur-sm bg-black/50 border-white/20 text-white hover:bg-black/70"
+          onClick={() => setShowNotes(prev => !prev)}
+        >
+          <StickyNote className="h-4 w-4 mr-2" />
+          {language === 'fr' ? 'Notes' : 'Notes'}
+        </Button>
       </div>
+
+      {/* Clinical Notes Panel */}
+      <ClinicalNotes 
+        patientId={currentPatient?.id || null}
+        isOpen={showNotes}
+        onClose={() => setShowNotes(false)}
+      />
 
       {/* Exit button */}
       <Button

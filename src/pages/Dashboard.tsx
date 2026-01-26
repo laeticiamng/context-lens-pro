@@ -27,7 +27,9 @@ import {
   Copy,
   Command,
   Upload,
-  Brain
+  Brain,
+  Share2,
+  Activity
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -72,6 +74,8 @@ import EmptyState from "@/components/dashboard/EmptyState";
 import ScriptImport from "@/components/dashboard/ScriptImport";
 import Pagination from "@/components/dashboard/Pagination";
 import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
+import ShareButton from "@/components/dashboard/ShareButton";
+import DeviceHealthCheck from "@/components/dashboard/DeviceHealthCheck";
 import HighlightText from "@/components/ui/highlight-text";
 import ErrorBoundary from "@/components/ui/error-boundary";
 import type { User } from "@supabase/supabase-js";
@@ -103,6 +107,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showQuickActions, setShowQuickActions] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ type: "script" | "device"; id: string; name: string } | null>(null);
+  const [healthCheckDevice, setHealthCheckDevice] = useState<typeof devices[0] | null>(null);
 
   // Hooks
   const { devices, loading: devicesLoading, refreshDevices } = useRealtimeDevices(user?.id);
@@ -657,6 +662,16 @@ const Dashboard = () => {
                                     <Eye className="h-4 w-4 mr-2" />
                                     {script.is_active ? "Deactivate" : "Activate"}
                                   </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                                    <Share2 className="h-4 w-4 mr-2" />
+                                    <ShareButton 
+                                      scriptId={script.id} 
+                                      scriptTitle={script.title} 
+                                      scriptContent={script.content}
+                                      variant="ghost"
+                                      size="sm"
+                                    />
+                                  </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem 
                                     className="text-destructive focus:text-destructive"
@@ -757,6 +772,11 @@ const Dashboard = () => {
                                     </>
                                   )}
                                 </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setHealthCheckDevice(device)}>
+                                  <Activity className="h-4 w-4 mr-2" />
+                                  {language === "fr" ? "Diagnostic" : "Health Check"}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
                                 <DropdownMenuItem 
                                   className="text-destructive"
                                   onClick={() => setDeleteConfirm({ type: "device", id: device.id, name: device.device_name })}
@@ -827,6 +847,24 @@ const Dashboard = () => {
         onOpenChange={setIsAddDeviceOpen}
         onDeviceAdded={handleAddDevice}
       />
+
+      {/* Device Health Check Dialog */}
+      {healthCheckDevice && (
+        <Dialog open={!!healthCheckDevice} onOpenChange={(open) => !open && setHealthCheckDevice(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader className="sr-only">
+              <DialogTitle>{language === "fr" ? "Diagnostic appareil" : "Device Health Check"}</DialogTitle>
+              <DialogDescription>
+                {language === "fr" ? "Vérifiez l'état de votre appareil" : "Check your device status"}
+              </DialogDescription>
+            </DialogHeader>
+            <DeviceHealthCheck 
+              device={healthCheckDevice}
+              onClose={() => setHealthCheckDevice(null)}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
