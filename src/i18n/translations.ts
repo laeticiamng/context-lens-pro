@@ -263,6 +263,36 @@ interface PasswordTranslations {
   updatedDesc: string;
 }
 
+interface ScriptEditorTranslations {
+  editScript: string;
+  newScript: string;
+  title: string;
+  titlePlaceholder: string;
+  content: string;
+  contentPlaceholder: string;
+  tags: string;
+  tagsPlaceholder: string;
+  lines: string;
+  lineBreakHint: string;
+  cancel: string;
+  save: string;
+  saving: string;
+  hidePreview: string;
+  showPreview: string;
+  typeToPreview: string;
+  hudHint: string;
+}
+
+interface UsageLimitsTranslations {
+  title: string;
+  scriptsUsed: string;
+  devicesConnected: string;
+  monthlyAnalyses: string;
+  unlimited: string;
+  upgradeToPro: string;
+  freePlanLimits: string;
+}
+
 export interface TranslationKeys {
   nav: NavTranslations;
   hero: HeroTranslations;
@@ -288,6 +318,8 @@ export interface TranslationKeys {
   apiKey: ApiKeyTranslations;
   session: SessionTranslations;
   password: PasswordTranslations;
+  scriptEditor: ScriptEditorTranslations;
+  usageLimits: UsageLimitsTranslations;
 }
 
 export const translations = {
@@ -554,6 +586,36 @@ export const translations = {
       updated: "Password Updated",
       updatedDesc: "Your password has been changed successfully.",
     },
+    // Script Editor
+    scriptEditor: {
+      editScript: "Edit Script",
+      newScript: "New Script",
+      title: "Title",
+      titlePlaceholder: "e.g., Sales Pitch",
+      content: "Script Content",
+      contentPlaceholder: "Enter your script content... Each line will be a separate prompt block.",
+      tags: "Tags (comma-separated)",
+      tagsPlaceholder: "e.g., sales, meeting, pitch",
+      lines: "lines",
+      lineBreakHint: "Use line breaks to separate prompt blocks",
+      cancel: "Cancel",
+      save: "Save Script",
+      saving: "Saving...",
+      hidePreview: "Hide Preview",
+      showPreview: "Show Preview",
+      typeToPreview: "Type content to preview",
+      hudHint: "Use ↑↓ keys to scroll • This simulates the HUD display",
+    },
+    // Usage Limits
+    usageLimits: {
+      title: "Usage Limits",
+      scriptsUsed: "Scripts Used",
+      devicesConnected: "Devices Connected",
+      monthlyAnalyses: "Monthly Analyses",
+      unlimited: "Unlimited",
+      upgradeToPro: "Upgrade to Pro",
+      freePlanLimits: "Free plan limits",
+    },
   },
   fr: {
     // Navigation
@@ -817,6 +879,36 @@ export const translations = {
       yesChange: "Oui, changer le mot de passe",
       updated: "Mot de passe mis à jour",
       updatedDesc: "Votre mot de passe a été changé avec succès.",
+    },
+    // Script Editor
+    scriptEditor: {
+      editScript: "Modifier le script",
+      newScript: "Nouveau script",
+      title: "Titre",
+      titlePlaceholder: "ex. Pitch commercial",
+      content: "Contenu du script",
+      contentPlaceholder: "Entrez le contenu de votre script... Chaque ligne sera un bloc de prompt séparé.",
+      tags: "Tags (séparés par des virgules)",
+      tagsPlaceholder: "ex. ventes, réunion, pitch",
+      lines: "lignes",
+      lineBreakHint: "Utilisez les sauts de ligne pour séparer les blocs de prompts",
+      cancel: "Annuler",
+      save: "Enregistrer le script",
+      saving: "Enregistrement...",
+      hidePreview: "Masquer l'aperçu",
+      showPreview: "Afficher l'aperçu",
+      typeToPreview: "Tapez du contenu pour prévisualiser",
+      hudHint: "Utilisez ↑↓ pour défiler • Ceci simule l'affichage HUD",
+    },
+    // Usage Limits
+    usageLimits: {
+      title: "Limites d'utilisation",
+      scriptsUsed: "Scripts utilisés",
+      devicesConnected: "Appareils connectés",
+      monthlyAnalyses: "Analyses mensuelles",
+      unlimited: "Illimité",
+      upgradeToPro: "Passer à Pro",
+      freePlanLimits: "Limites du plan gratuit",
     },
   },
 } as const;

@@ -11,6 +11,7 @@ import {
   ClipboardList,
   Plus
 } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface ScriptTemplate {
   id: string;
@@ -22,15 +23,41 @@ interface ScriptTemplate {
   content: string;
 }
 
-const templates: ScriptTemplate[] = [
-  {
-    id: "sales-pitch",
-    title: "Sales Pitch",
-    description: "Perfect for client presentations and demos",
-    icon: Briefcase,
-    category: "Business",
-    tags: ["sales", "pitch", "meeting"],
-    content: `Opening Hook
+interface ScriptTemplatesProps {
+  onSelectTemplate: (template: ScriptTemplate) => void;
+}
+
+const ScriptTemplates = ({ onSelectTemplate }: ScriptTemplatesProps) => {
+  const { language } = useLanguage();
+
+  const templates: ScriptTemplate[] = [
+    {
+      id: "sales-pitch",
+      title: language === "fr" ? "Argumentaire de Vente" : "Sales Pitch",
+      description: language === "fr" ? "Parfait pour les présentations et démos clients" : "Perfect for client presentations and demos",
+      icon: Briefcase,
+      category: language === "fr" ? "Affaires" : "Business",
+      tags: language === "fr" ? ["ventes", "pitch", "réunion"] : ["sales", "pitch", "meeting"],
+      content: language === "fr" ? `Accroche d'ouverture
+Commencez par un problème qui résonne avec le client.
+
+Proposition de valeur
+Notre solution vous aide à [bénéfice] en [comment ça marche].
+
+Fonctionnalités clés
+• Fonctionnalité 1 - Explication du bénéfice
+• Fonctionnalité 2 - Explication du bénéfice
+• Fonctionnalité 3 - Explication du bénéfice
+
+Preuve sociale
+"Citation d'un client satisfait" - Nom de l'entreprise
+
+Gestion des objections
+S'ils mentionnent le prix : Focus sur le ROI et la valeur long terme.
+S'ils mentionnent la concurrence : Mettre en avant les différenciateurs.
+
+Appel à l'action
+Planifions un programme pilote pour voir les résultats.` : `Opening Hook
 Start with a compelling problem statement that resonates with the client.
 
 Value Proposition
@@ -50,15 +77,32 @@ If they mention competition: Highlight unique differentiators.
 
 Call to Action
 Let's schedule a pilot program to see results firsthand.`,
-  },
-  {
-    id: "meeting-notes",
-    title: "Meeting Agenda",
-    description: "Stay on track during team meetings",
-    icon: Users,
-    category: "Business",
-    tags: ["meeting", "agenda", "team"],
-    content: `Meeting Objectives
+    },
+    {
+      id: "meeting-notes",
+      title: language === "fr" ? "Ordre du jour" : "Meeting Agenda",
+      description: language === "fr" ? "Restez organisé pendant les réunions" : "Stay on track during team meetings",
+      icon: Users,
+      category: language === "fr" ? "Affaires" : "Business",
+      tags: language === "fr" ? ["réunion", "agenda", "équipe"] : ["meeting", "agenda", "team"],
+      content: language === "fr" ? `Objectifs de la réunion
+• Revue des objectifs Q4
+• Discussion des blocages et solutions
+• Planification des priorités du prochain sprint
+
+Points de discussion
+1. Mise à jour du Projet Alpha
+2. Révision et ajustements du budget
+3. Capacité de l'équipe et recrutement
+
+Actions
+[ ] Tâche 1 - Responsable - Date
+[ ] Tâche 2 - Responsable - Date
+[ ] Tâche 3 - Responsable - Date
+
+Prochaines étapes
+Planifier un suivi pour [date]
+Partager les notes de réunion avant fin de journée` : `Meeting Objectives
 • Review progress on Q4 goals
 • Discuss blockers and solutions
 • Plan next sprint priorities
@@ -76,15 +120,37 @@ Action Items
 Next Steps
 Schedule follow-up for [date]
 Share meeting notes by EOD`,
-  },
-  {
-    id: "presentation",
-    title: "Presentation Notes",
-    description: "Key points for your next presentation",
-    icon: Mic,
-    category: "Speaking",
-    tags: ["presentation", "speaking", "keynote"],
-    content: `Introduction (2 min)
+    },
+    {
+      id: "presentation",
+      title: language === "fr" ? "Notes de Présentation" : "Presentation Notes",
+      description: language === "fr" ? "Points clés pour votre prochaine présentation" : "Key points for your next presentation",
+      icon: Mic,
+      category: language === "fr" ? "Prise de parole" : "Speaking",
+      tags: language === "fr" ? ["présentation", "conférence", "keynote"] : ["presentation", "speaking", "keynote"],
+      content: language === "fr" ? `Introduction (2 min)
+Remercier l'audience
+Brève présentation personnelle
+Définir les attentes
+
+Point principal 1 (5 min)
+Explication du concept clé
+Données/exemple à l'appui
+Transition vers le point suivant
+
+Point principal 2 (5 min)
+Explication du concept clé
+Données/exemple à l'appui
+Transition vers le point suivant
+
+Point principal 3 (5 min)
+Explication du concept clé
+Données/exemple à l'appui
+
+Conclusion (3 min)
+Récapitulatif des trois points
+Appel à l'action
+Invitation aux questions` : `Introduction (2 min)
 Thank the audience
 Personal brief intro
 Set expectations for the talk
@@ -107,15 +173,34 @@ Conclusion (3 min)
 Recap the three main points
 Call to action
 Q&A invitation`,
-  },
-  {
-    id: "medical-checklist",
-    title: "Medical Procedure",
-    description: "Step-by-step clinical protocols",
-    icon: Stethoscope,
-    category: "Healthcare",
-    tags: ["medical", "procedure", "checklist"],
-    content: `Pre-Procedure Checklist
+    },
+    {
+      id: "medical-checklist",
+      title: language === "fr" ? "Procédure Médicale" : "Medical Procedure",
+      description: language === "fr" ? "Protocoles cliniques étape par étape" : "Step-by-step clinical protocols",
+      icon: Stethoscope,
+      category: language === "fr" ? "Santé" : "Healthcare",
+      tags: language === "fr" ? ["médical", "procédure", "checklist"] : ["medical", "procedure", "checklist"],
+      content: language === "fr" ? `Checklist Pré-Procédure
+□ Vérifier l'identité du patient
+□ Confirmer la procédure et le site
+□ Revoir allergies et médicaments
+□ Vérifier le consentement éclairé
+
+Préparation de l'équipement
+□ Champ stérile en place
+□ Instruments requis prêts
+□ Équipement de monitoring calibré
+
+Étapes de la procédure
+1. [Description étape 1]
+2. [Description étape 2]
+3. [Description étape 3]
+
+Post-Procédure
+□ Documenter les observations
+□ Instructions post-soins
+□ Planifier le suivi` : `Pre-Procedure Checklist
 □ Verify patient identity
 □ Confirm procedure and site
 □ Review allergies and medications
@@ -135,15 +220,39 @@ Post-Procedure
 □ Document findings
 □ Post-care instructions
 □ Schedule follow-up`,
-  },
-  {
-    id: "training",
-    title: "Training Module",
-    description: "Educational content delivery",
-    icon: GraduationCap,
-    category: "Education",
-    tags: ["training", "learning", "education"],
-    content: `Learning Objectives
+    },
+    {
+      id: "training",
+      title: language === "fr" ? "Module de Formation" : "Training Module",
+      description: language === "fr" ? "Livraison de contenu éducatif" : "Educational content delivery",
+      icon: GraduationCap,
+      category: language === "fr" ? "Éducation" : "Education",
+      tags: language === "fr" ? ["formation", "apprentissage", "éducation"] : ["training", "learning", "education"],
+      content: language === "fr" ? `Objectifs d'apprentissage
+À la fin de ce module, vous serez capable de :
+• Comprendre [concept 1]
+• Appliquer [compétence 2]
+• Démontrer [compétence 3]
+
+Concept clé 1
+Définition et explication
+Exemple concret
+Application pratique
+
+Concept clé 2
+Définition et explication
+Exemple concret
+Application pratique
+
+Évaluation
+Questions de vérification rapide :
+Q1 : [Question]
+Q2 : [Question]
+
+Résumé
+Revue des points clés
+Ressources supplémentaires
+Aperçu du prochain module` : `Learning Objectives
 By the end of this module, you will be able to:
 • Understand [concept 1]
 • Apply [skill 2]
@@ -168,15 +277,42 @@ Summary
 Review of main takeaways
 Additional resources
 Next module preview`,
-  },
-  {
-    id: "sop",
-    title: "Standard Procedure",
-    description: "Repeatable process documentation",
-    icon: ClipboardList,
-    category: "Operations",
-    tags: ["sop", "process", "operations"],
-    content: `Procedure: [Name]
+    },
+    {
+      id: "sop",
+      title: language === "fr" ? "Procédure Standard" : "Standard Procedure",
+      description: language === "fr" ? "Documentation de processus reproductibles" : "Repeatable process documentation",
+      icon: ClipboardList,
+      category: language === "fr" ? "Opérations" : "Operations",
+      tags: language === "fr" ? ["sop", "processus", "opérations"] : ["sop", "process", "operations"],
+      content: language === "fr" ? `Procédure : [Nom]
+Version : 1.0
+Dernière mise à jour : [Date]
+
+Objectif
+Décrire pourquoi cette procédure existe.
+
+Portée
+À qui cela s'applique et quand.
+
+Prérequis
+□ Accès/permissions requis
+□ Outils/matériaux nécessaires
+□ Formation complétée
+
+Étapes
+1. [Verbe d'action] [quoi] [comment]
+2. [Verbe d'action] [quoi] [comment]
+3. [Verbe d'action] [quoi] [comment]
+4. [Verbe d'action] [quoi] [comment]
+
+Dépannage
+Si [problème] : Essayer [solution]
+Si [problème] : Escalader vers [contact]
+
+Validation
+Procédure complétée par : _______
+Date : _______` : `Procedure: [Name]
 Version: 1.0
 Last Updated: [Date]
 
@@ -204,22 +340,21 @@ If [problem]: Escalate to [contact]
 Sign-off
 Procedure completed by: _______
 Date: _______`,
-  },
-];
+    },
+  ];
 
-interface ScriptTemplatesProps {
-  onSelectTemplate: (template: ScriptTemplate) => void;
-}
-
-const ScriptTemplates = ({ onSelectTemplate }: ScriptTemplatesProps) => {
   const categories = [...new Set(templates.map(t => t.category))];
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-lg font-semibold mb-2">Start from a Template</h3>
+        <h3 className="text-lg font-semibold mb-2">
+          {language === "fr" ? "Commencer avec un modèle" : "Start from a Template"}
+        </h3>
         <p className="text-sm text-muted-foreground">
-          Choose a pre-built template to get started quickly
+          {language === "fr" 
+            ? "Choisissez un modèle prédéfini pour démarrer rapidement"
+            : "Choose a pre-built template to get started quickly"}
         </p>
       </div>
 

@@ -32,9 +32,9 @@ const Header = () => {
 
   const navLinks = [
     { label: t.nav.features, href: "#features" },
-    { label: "Demo", href: "#demo" },
+    { label: t.demo.title.split(" ")[0] + " " + t.demo.title.split(" ")[1], href: "#demo" },
     { label: t.devices.title.split(" ")[0], href: "#devices" },
-    { label: "Pipeline", href: "#pipeline" },
+    { label: t.pipeline.title.split(" ")[0], href: "#pipeline" },
     { label: t.nav.pricing, href: "#pricing" },
     { label: t.nav.docs, href: "/docs" },
   ];
