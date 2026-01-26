@@ -10,25 +10,30 @@ import DemoSection from "@/components/sections/DemoSection";
 import FAQSection from "@/components/sections/FAQSection";
 import AnimatedStats from "@/components/sections/AnimatedStats";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
+import PartnerLogos from "@/components/sections/PartnerLogos";
+import ErrorBoundary from "@/components/ui/error-boundary";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
-      <main>
-        <HeroSection />
-        <AnimatedStats />
-        <DemoSection />
-        <CapabilityMatrix />
-        <DevicesSection />
-        <InteractivePipeline />
-        <TestimonialsSection />
-        <PricingSection />
-        <FAQSection />
-        <CTASection />
-      </main>
-      <Footer />
-    </div>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background text-foreground">
+        <Header />
+        <main>
+          <HeroSection />
+          <PartnerLogos />
+          <AnimatedStats />
+          <DemoSection />
+          <CapabilityMatrix />
+          <DevicesSection />
+          <InteractivePipeline />
+          <TestimonialsSection />
+          <PricingSection />
+          <FAQSection />
+          <CTASection />
+        </main>
+        <Footer />
+      </div>
+    </ErrorBoundary>
   );
 };
 

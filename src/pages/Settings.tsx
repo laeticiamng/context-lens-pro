@@ -31,6 +31,8 @@ import PasswordChangeDialog from "@/components/settings/PasswordChangeDialog";
 import SessionManagement from "@/components/settings/SessionManagement";
 import AvatarUpload from "@/components/settings/AvatarUpload";
 import SettingsSkeleton from "@/components/settings/SettingsSkeleton";
+import APIKeyManager from "@/components/settings/APIKeyManager";
+import ErrorBoundary from "@/components/ui/error-boundary";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -402,58 +404,7 @@ const Settings = () => {
 
           {/* API Tab */}
           <TabsContent value="api">
-            <Card className="glass-card border-border/50">
-              <CardHeader>
-                <CardTitle>API Access</CardTitle>
-                <CardDescription>Manage your API keys for SDK integration</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Your API Key</Label>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Input
-                        value={showApiKey ? apiKey : "•".repeat(apiKey.length)}
-                        readOnly
-                        className="font-mono text-sm pr-20"
-                      />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-10 top-1/2 -translate-y-1/2 h-7 w-7"
-                        onClick={() => setShowApiKey(!showApiKey)}
-                      >
-                        {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                        onClick={copyApiKey}
-                      >
-                        {copied ? <Check className="h-4 w-4 text-accent" /> : <Copy className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Keep this key secret. Use it in your SDK integration.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-lg bg-secondary/50">
-                  <h4 className="font-medium mb-2">Quick Start</h4>
-                  <pre className="text-xs text-muted-foreground overflow-x-auto">
-{`const contextLens = new ContextLens({
-  apiKey: '${showApiKey ? apiKey : "YOUR_API_KEY"}',
-});`}
-                  </pre>
-                </div>
-
-                <Button variant="glass" onClick={() => navigate("/docs")}>
-                  View Documentation
-                </Button>
-              </CardContent>
-            </Card>
+            {user && <APIKeyManager userId={user.id} />}
           </TabsContent>
 
           {/* Billing Tab */}
