@@ -128,9 +128,11 @@ export function SubscriptionPlans({ onSelectPlan, currentPlan, isLoading }: Subs
               <CardTitle className="text-2xl">{plan.name}</CardTitle>
               <CardDescription>
                 <span className="text-4xl font-bold text-foreground">
-                  {plan.price.toLocaleString()} €
+                  {plan.price.toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US')} €
                 </span>
-                <span className="text-muted-foreground">/mois</span>
+                <span className="text-muted-foreground">
+                  /{language === 'fr' ? 'mois' : 'month'}
+                </span>
               </CardDescription>
             </CardHeader>
 
