@@ -362,6 +362,54 @@ interface ExportDialogTranslations {
   successDesc: string;
 }
 
+// Interactive Pipeline
+interface PipelineStepsTranslations {
+  capture: { title: string; subtitle: string; description: string; details: readonly string[] };
+  perception: { title: string; subtitle: string; description: string; details: readonly string[] };
+  routing: { title: string; subtitle: string; description: string; details: readonly string[] };
+  retrieval: { title: string; subtitle: string; description: string; details: readonly string[] };
+  composer: { title: string; subtitle: string; description: string; details: readonly string[] };
+  renderer: { title: string; subtitle: string; description: string; details: readonly string[] };
+  features: string;
+  techStack: string;
+  performance: string;
+  runDemo: string;
+  animating: string;
+  clickHint: string;
+}
+
+// Capability Matrix
+interface CapabilityMatrixTranslations {
+  tiers: {
+    t0: { title: string; subtitle: string; description: string; badge: string; features: readonly string[]; works: readonly string[] };
+    t1: { title: string; subtitle: string; description: string; badge: string; features: readonly string[]; works: readonly string[] };
+    t2: { title: string; subtitle: string; description: string; badge: string; features: readonly string[]; works: readonly string[] };
+    t3: { title: string; subtitle: string; description: string; badge: string; features: readonly string[]; works: readonly string[] };
+  };
+  capabilities: readonly { name: string; description: string }[];
+  fullMatrix: string;
+  compatibleDevices: string;
+  capability: string;
+}
+
+// Devices Section
+interface DevicesSectionTranslations {
+  title: string;
+  titleHighlight: string;
+  description: string;
+  sdkAvailable: string;
+  earlyAccess: string;
+  uncertain: string;
+  closed: string;
+  camera: string;
+  hudApi: string;
+  rxSupport: string;
+  battery: string;
+  display: string;
+  dontSeeDevice: string;
+  requestSupport: string;
+}
+
 export interface TranslationKeys {
   nav: NavTranslations;
   hero: HeroTranslations;
@@ -393,6 +441,9 @@ export interface TranslationKeys {
   scriptTemplates: ScriptTemplatesTranslations;
   scriptPreview: ScriptPreviewTranslations;
   exportDialog: ExportDialogTranslations;
+  pipelineSteps: PipelineStepsTranslations;
+  capabilityMatrix: CapabilityMatrixTranslations;
+  devicesSection: DevicesSectionTranslations;
 }
 
 export const translations = {
@@ -758,6 +809,120 @@ export const translations = {
       success: "Scripts exported",
       successDesc: "Downloaded {count} scripts as {format}",
     },
+    // Pipeline Steps
+    pipelineSteps: {
+      capture: {
+        title: "CAPTURE",
+        subtitle: "Input Layer",
+        description: "Camera feed from glasses or phone continuously captures visual context.",
+        details: ["Frame JPEG extraction at 1-10 fps", "Auto-switch between glasses & phone camera", "Configurable resolution & quality", "Battery-optimized capture modes"],
+      },
+      perception: {
+        title: "PERCEPTION",
+        subtitle: "Understanding Layer",
+        description: "AI analyzes the visual feed to understand context, text, and objects.",
+        details: ["Multi-language OCR (Tesseract + Cloud)", "Entity recognition (faces, objects)", "Scene classification (meeting, presentation)", "Context tagging & metadata extraction"],
+      },
+      routing: {
+        title: "ROUTING",
+        subtitle: "Decision Layer",
+        description: "Smart routing matches detected context to your content library.",
+        details: ["Tag-based matching algorithms", "Relevance scoring (0-100)", "Priority queue management", "Top-k candidates selection"],
+      },
+      retrieval: {
+        title: "RETRIEVAL",
+        subtitle: "Memory Layer",
+        description: "Semantic search finds the most relevant scripts from your library.",
+        details: ["Vector embeddings (1536-dim)", "RAG pipeline integration", "Combined ranking (keyword + semantic)", "Context window optimization"],
+      },
+      composer: {
+        title: "COMPOSER",
+        subtitle: "Formatting Layer",
+        description: "Content is formatted optimally for micro-display rendering.",
+        details: ["10-15 line block formatting", "Display adaptation (HUD vs phone)", "Smart scroll management", "Font & contrast optimization"],
+      },
+      renderer: {
+        title: "RENDERER",
+        subtitle: "Output Layer",
+        description: "Pushes formatted content to your device with optimal UX.",
+        details: ["Device-specific adapters (SDK/WebSocket)", "Gesture & input handling", "Phone fallback (notifications/TTS)", "Real-time synchronization"],
+      },
+      features: "Features",
+      techStack: "Tech Stack",
+      performance: "Performance",
+      runDemo: "Run Pipeline Demo",
+      animating: "Animating...",
+      clickHint: "Click on any stage to see details, or run the demo to see the full flow.",
+    },
+    // Capability Matrix
+    capabilityMatrix: {
+      tiers: {
+        t0: {
+          title: "Universal",
+          subtitle: "Phone-Only Fallback",
+          description: "Works with ALL devices. Vision via phone camera, display via notifications or audio TTS.",
+          badge: "Safety Net",
+          features: ["Phone camera capture", "Cloud AI analysis", "Push notifications", "Audio TTS output"],
+          works: ["Any glasses", "Closed ecosystems", "No SDK required"],
+        },
+        t1: {
+          title: "Display via SDK",
+          subtitle: "Native HUD Integration",
+          description: "Push text and images directly to the HUD via official manufacturer SDK.",
+          badge: "Recommended",
+          features: ["Phone camera capture", "Native HUD display", "Smooth prompter UX", "No hacks required"],
+          works: ["Even G2", "Vuzix Z100", "Xreal Air"],
+        },
+        t2: {
+          title: "On-Device Mode",
+          subtitle: "Developer Access",
+          description: "App runs directly on the glasses with potential sensor access.",
+          badge: "Advanced",
+          features: ["On-device compute", "Sensor integration", "Lower latency", "Developer mode"],
+          works: ["Rokid (Dev Program)", "Meta Quest", "HoloLens"],
+        },
+        t3: {
+          title: "Vision + AR",
+          subtitle: "Full Spatial Computing",
+          description: "Spatial overlays with 6DoF tracking. The ultimate AR experience.",
+          badge: "Endgame",
+          features: ["Spatial anchors", "6DoF tracking", "World-locked UI", "Full AR capability"],
+          works: ["Apple Vision Pro", "Magic Leap 2", "Future devices"],
+        },
+      },
+      capabilities: [
+        { name: "Vision Input", description: "Camera access for context capture" },
+        { name: "Display Output", description: "How content is rendered" },
+        { name: "Latency", description: "End-to-end response time" },
+        { name: "Offline Mode", description: "Works without internet" },
+        { name: "Gesture Control", description: "Hand/gesture input support" },
+        { name: "Voice Control", description: "Voice command support" },
+        { name: "Head Tracking", description: "IMU-based orientation" },
+        { name: "Spatial Anchors", description: "World-locked content" },
+        { name: "Multi-User", description: "Shared AR experiences" },
+        { name: "SDK Required", description: "Developer SDK needed" },
+      ],
+      fullMatrix: "Full Capability Matrix",
+      compatibleDevices: "Compatible Devices",
+      capability: "Capability",
+    },
+    // Devices Section
+    devicesSection: {
+      title: "Device",
+      titleHighlight: "Compatibility Matrix",
+      description: "Real capabilities, verified SDKs. We only promise what we can deliver.",
+      sdkAvailable: "SDK Available",
+      earlyAccess: "Early Access",
+      uncertain: "Uncertain",
+      closed: "Closed",
+      camera: "Camera",
+      hudApi: "HUD API",
+      rxSupport: "Rx Support",
+      battery: "battery",
+      display: "Display",
+      dontSeeDevice: "Don't see your device?",
+      requestSupport: "Request Device Support",
+    },
   },
   fr: {
     // Navigation
@@ -1120,6 +1285,120 @@ export const translations = {
       exporting: "Exportation...",
       success: "Scripts exportés",
       successDesc: "{count} scripts téléchargés en {format}",
+    },
+    // Pipeline Steps
+    pipelineSteps: {
+      capture: {
+        title: "CAPTURE",
+        subtitle: "Couche d'entrée",
+        description: "Le flux caméra des lunettes ou du téléphone capture en continu le contexte visuel.",
+        details: ["Extraction JPEG à 1-10 fps", "Bascule auto entre lunettes & téléphone", "Résolution et qualité configurables", "Modes de capture optimisés batterie"],
+      },
+      perception: {
+        title: "PERCEPTION",
+        subtitle: "Couche de compréhension",
+        description: "L'IA analyse le flux visuel pour comprendre le contexte, le texte et les objets.",
+        details: ["OCR multilingue (Tesseract + Cloud)", "Reconnaissance d'entités (visages, objets)", "Classification de scène (réunion, présentation)", "Extraction de tags et métadonnées"],
+      },
+      routing: {
+        title: "ROUTAGE",
+        subtitle: "Couche de décision",
+        description: "Le routage intelligent associe le contexte détecté à votre bibliothèque de contenu.",
+        details: ["Algorithmes de correspondance par tags", "Score de pertinence (0-100)", "Gestion des files de priorité", "Sélection des top-k candidats"],
+      },
+      retrieval: {
+        title: "RÉCUPÉRATION",
+        subtitle: "Couche mémoire",
+        description: "La recherche sémantique trouve les scripts les plus pertinents dans votre bibliothèque.",
+        details: ["Embeddings vectoriels (1536-dim)", "Intégration pipeline RAG", "Classement combiné (mots-clés + sémantique)", "Optimisation de la fenêtre de contexte"],
+      },
+      composer: {
+        title: "COMPOSITEUR",
+        subtitle: "Couche de formatage",
+        description: "Le contenu est formaté de manière optimale pour le rendu sur micro-affichage.",
+        details: ["Formatage en blocs de 10-15 lignes", "Adaptation à l'affichage (HUD vs téléphone)", "Gestion intelligente du défilement", "Optimisation police & contraste"],
+      },
+      renderer: {
+        title: "RENDU",
+        subtitle: "Couche de sortie",
+        description: "Pousse le contenu formaté vers votre appareil avec une UX optimale.",
+        details: ["Adaptateurs spécifiques par appareil (SDK/WebSocket)", "Gestion des gestes & entrées", "Repli téléphone (notifications/TTS)", "Synchronisation temps réel"],
+      },
+      features: "Fonctionnalités",
+      techStack: "Stack technique",
+      performance: "Performance",
+      runDemo: "Lancer la démo",
+      animating: "Animation...",
+      clickHint: "Cliquez sur une étape pour voir les détails, ou lancez la démo pour voir le flux complet.",
+    },
+    // Capability Matrix
+    capabilityMatrix: {
+      tiers: {
+        t0: {
+          title: "Universel",
+          subtitle: "Mode téléphone uniquement",
+          description: "Fonctionne avec TOUS les appareils. Vision via caméra téléphone, affichage via notifications ou audio TTS.",
+          badge: "Filet de sécurité",
+          features: ["Capture caméra téléphone", "Analyse IA cloud", "Notifications push", "Sortie audio TTS"],
+          works: ["Toutes lunettes", "Écosystèmes fermés", "Aucun SDK requis"],
+        },
+        t1: {
+          title: "Affichage via SDK",
+          subtitle: "Intégration HUD native",
+          description: "Poussez texte et images directement sur le HUD via le SDK officiel du fabricant.",
+          badge: "Recommandé",
+          features: ["Capture caméra téléphone", "Affichage HUD natif", "UX prompteur fluide", "Aucun hack requis"],
+          works: ["Even G2", "Vuzix Z100", "Xreal Air"],
+        },
+        t2: {
+          title: "Mode embarqué",
+          subtitle: "Accès développeur",
+          description: "L'app tourne directement sur les lunettes avec accès potentiel aux capteurs.",
+          badge: "Avancé",
+          features: ["Calcul sur l'appareil", "Intégration capteurs", "Latence réduite", "Mode développeur"],
+          works: ["Rokid (Programme Dev)", "Meta Quest", "HoloLens"],
+        },
+        t3: {
+          title: "Vision + AR",
+          subtitle: "Calcul spatial complet",
+          description: "Overlays spatiaux avec tracking 6DoF. L'expérience AR ultime.",
+          badge: "Objectif final",
+          features: ["Ancres spatiales", "Tracking 6DoF", "UI world-locked", "Capacité AR complète"],
+          works: ["Apple Vision Pro", "Magic Leap 2", "Futurs appareils"],
+        },
+      },
+      capabilities: [
+        { name: "Entrée vision", description: "Accès caméra pour capture de contexte" },
+        { name: "Sortie affichage", description: "Mode de rendu du contenu" },
+        { name: "Latence", description: "Temps de réponse bout en bout" },
+        { name: "Mode hors ligne", description: "Fonctionne sans internet" },
+        { name: "Contrôle gestuel", description: "Support entrée main/gestes" },
+        { name: "Contrôle vocal", description: "Support commandes vocales" },
+        { name: "Head Tracking", description: "Orientation basée IMU" },
+        { name: "Ancres spatiales", description: "Contenu verrouillé au monde" },
+        { name: "Multi-utilisateur", description: "Expériences AR partagées" },
+        { name: "SDK requis", description: "SDK développeur nécessaire" },
+      ],
+      fullMatrix: "Matrice complète des capacités",
+      compatibleDevices: "Appareils compatibles",
+      capability: "Capacité",
+    },
+    // Devices Section
+    devicesSection: {
+      title: "Matrice de",
+      titleHighlight: "Compatibilité",
+      description: "Capacités réelles, SDKs vérifiés. Nous ne promettons que ce que nous pouvons livrer.",
+      sdkAvailable: "SDK disponible",
+      earlyAccess: "Accès anticipé",
+      uncertain: "Incertain",
+      closed: "Fermé",
+      camera: "Caméra",
+      hudApi: "API HUD",
+      rxSupport: "Support Rx",
+      battery: "batterie",
+      display: "Affichage",
+      dontSeeDevice: "Vous ne voyez pas votre appareil ?",
+      requestSupport: "Demander le support",
     },
   },
 } as const;

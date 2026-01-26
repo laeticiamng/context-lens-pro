@@ -85,31 +85,31 @@ const devices: DeviceCapability[] = [
   },
 ];
 
-const StatusBadge = ({ status }: { status: DeviceCapability["sdk_status"] }) => {
-  const styles = {
-    available: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
-    early_access: "bg-primary/10 text-primary border-primary/30",
-    uncertain: "bg-amber-500/10 text-amber-400 border-amber-500/30",
-    closed: "bg-destructive/10 text-destructive border-destructive/30",
+const DevicesSection = () => {
+  const { t } = useLanguage();
+
+  const statusLabels = {
+    available: t.devicesSection.sdkAvailable,
+    early_access: t.devicesSection.earlyAccess,
+    uncertain: t.devicesSection.uncertain,
+    closed: t.devicesSection.closed,
   };
   
-  const labels = {
-    available: "SDK Available",
-    early_access: "Early Access",
-    uncertain: "Uncertain",
-    closed: "Closed",
+  const StatusBadge = ({ status }: { status: DeviceCapability["sdk_status"] }) => {
+    const styles = {
+      available: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+      early_access: "bg-primary/10 text-primary border-primary/30",
+      uncertain: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+      closed: "bg-destructive/10 text-destructive border-destructive/30",
+    };
+
+    return (
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs border ${styles[status]}`}>
+        {status === "uncertain" && <AlertCircle className="h-3 w-3" />}
+        {statusLabels[status]}
+      </span>
+    );
   };
-
-  return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs border ${styles[status]}`}>
-      {status === "uncertain" && <AlertCircle className="h-3 w-3" />}
-      {labels[status]}
-    </span>
-  );
-};
-
-const DevicesSection = () => {
-  const { language } = useLanguage();
   
   return (
     <section id="devices" className="py-24 md:py-32 bg-secondary/20">
@@ -117,13 +117,11 @@ const DevicesSection = () => {
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            {language === "fr" ? "Matrice de " : "Device "}
-            <span className="text-gradient">{language === "fr" ? "Compatibilité" : "Compatibility Matrix"}</span>
+            {t.devicesSection.title}{" "}
+            <span className="text-gradient">{t.devicesSection.titleHighlight}</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            {language === "fr" 
-              ? "Capacités réelles, SDKs vérifiés. Nous ne promettons que ce que nous pouvons livrer."
-              : "Real capabilities, verified SDKs. We only promise what we can deliver."}
+            {t.devicesSection.description}
           </p>
         </div>
 
@@ -158,7 +156,7 @@ const DevicesSection = () => {
                       <X className="h-4 w-4 text-muted-foreground" />
                     )}
                     <span className={device.has_camera ? "text-foreground" : "text-muted-foreground"}>
-                      Camera
+                      {t.devicesSection.camera}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -168,7 +166,7 @@ const DevicesSection = () => {
                       <X className="h-4 w-4 text-muted-foreground" />
                     )}
                     <span className={device.has_hud_api ? "text-foreground" : "text-muted-foreground"}>
-                      HUD API
+                      {t.devicesSection.hudApi}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -178,17 +176,17 @@ const DevicesSection = () => {
                       <X className="h-4 w-4 text-muted-foreground" />
                     )}
                     <span className={device.prescription_support ? "text-foreground" : "text-muted-foreground"}>
-                      Rx Support
+                      {t.devicesSection.rxSupport}
                     </span>
                   </div>
                   <div className="text-muted-foreground">
-                    <span className="text-foreground font-medium">{device.battery_hours}h</span> battery
+                    <span className="text-foreground font-medium">{device.battery_hours}h</span> {t.devicesSection.battery}
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-border/50">
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    <span className="font-medium text-foreground/80">Display:</span> {device.display_type}
+                    <span className="font-medium text-foreground/80">{t.devicesSection.display}:</span> {device.display_type}
                   </p>
                   {device.notes && (
                     <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
@@ -204,10 +202,10 @@ const DevicesSection = () => {
         {/* CTA */}
         <div className="text-center mt-12">
           <p className="text-muted-foreground mb-4">
-            {language === "fr" ? "Vous ne voyez pas votre appareil ?" : "Don't see your device?"}
+            {t.devicesSection.dontSeeDevice}
           </p>
           <Button variant="glass">
-            {language === "fr" ? "Demander le support" : "Request Device Support"}
+            {t.devicesSection.requestSupport}
             <ExternalLink className="h-4 w-4 ml-1" />
           </Button>
         </div>
