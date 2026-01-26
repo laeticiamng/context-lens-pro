@@ -20,7 +20,11 @@ import {
   Trash2,
   LogOut,
   Settings,
-  ChevronRight
+  ChevronRight,
+  Download,
+  Filter,
+  Power,
+  PowerOff
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +32,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -37,9 +42,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import ScriptEditor from "@/components/dashboard/ScriptEditor";
 import AnalyticsCharts from "@/components/dashboard/AnalyticsCharts";
 import AddDeviceDialog from "@/components/dashboard/AddDeviceDialog";
+import ExportScriptsDialog from "@/components/dashboard/ExportScriptsDialog";
 import type { User } from "@supabase/supabase-js";
 
 interface Script {
@@ -72,6 +85,7 @@ const Dashboard = () => {
   const [scripts, setScripts] = useState<Script[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [tagFilter, setTagFilter] = useState<string>("all");
   const [editingScript, setEditingScript] = useState<Script | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
@@ -263,10 +277,15 @@ const Dashboard = () => {
     }
   };
 
-  const filteredScripts = scripts.filter(s => 
-    s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.content.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Get all unique tags for filter
+  const allTags = [...new Set(scripts.flatMap(s => s.tags))].filter(Boolean);
+
+  const filteredScripts = scripts.filter(s => {
+    const matchesSearch = s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.content.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTag = tagFilter === "all" || s.tags.includes(tagFilter);
+    return matchesSearch && matchesTag;
+  });
 
   // Analytics
   const totalUsage = scripts.reduce((sum, s) => sum + s.usage_count, 0);
@@ -404,16 +423,36 @@ const Dashboard = () => {
               </TabsTrigger>
             </TabsList>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search scripts..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 w-64"
+                  className="pl-9 w-48 lg:w-64"
                 />
               </div>
+              
+              {allTags.length > 0 && (
+                <Select value={tagFilter} onValueChange={setTagFilter}>
+                  <SelectTrigger className="w-36">
+                    <Filter className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Filter by tag" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tags</SelectItem>
+                    {allTags.map((tag) => (
+                      <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              
+              {scripts.length > 0 && (
+                <ExportScriptsDialog scripts={scripts} />
+              )}
+              
               <Button variant="hero" onClick={handleNewScript}>
                 <Plus className="h-4 w-4 mr-2" />
                 New Script
