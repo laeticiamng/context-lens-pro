@@ -1,7 +1,10 @@
 import { forwardRef } from "react";
 import WaitlistForm from "@/components/sections/WaitlistForm";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const CTASection = forwardRef<HTMLElement>((_, ref) => {
+  const { t } = useLanguage();
+
   return (
     <section ref={ref} className="py-24 md:py-32 relative overflow-hidden">
       {/* Background effects */}
@@ -22,18 +25,17 @@ const CTASection = forwardRef<HTMLElement>((_, ref) => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
-            <span>Early Access Now Open</span>
+            <span>{t.cta.badge}</span>
           </div>
 
           {/* Headline */}
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Ready to transform your{" "}
-            <span className="text-gradient">smart glasses</span>?
+            {t.cta.title}{" "}
+            <span className="text-gradient">{t.cta.titleHighlight}</span> ?
           </h2>
 
           <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-            Join the waitlist for early access. Be among the first to experience 
-            contextual prompter technology.
+            {t.cta.description}
           </p>
 
           {/* Waitlist Form */}
