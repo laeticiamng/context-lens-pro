@@ -19,9 +19,11 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { contactSchema } from "@/lib/validations";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const Contact = () => {
   const { toast } = useToast();
+  const { language } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -63,8 +65,10 @@ const Contact = () => {
     
     if (error) {
       toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
+        title: language === "fr" ? "Erreur" : "Error",
+        description: language === "fr" 
+          ? "Échec de l'envoi. Veuillez réessayer."
+          : "Failed to send message. Please try again.",
         variant: "destructive",
       });
       setLoading(false);
@@ -72,8 +76,10 @@ const Contact = () => {
     }
     
     toast({
-      title: "Message sent!",
-      description: "We'll get back to you within 24 hours.",
+      title: language === "fr" ? "Message envoyé !" : "Message sent!",
+      description: language === "fr" 
+        ? "Nous vous répondrons dans les 24 heures."
+        : "We'll get back to you within 24 hours.",
     });
     
     setSubmitted(true);
@@ -83,22 +89,22 @@ const Contact = () => {
   const contactOptions = [
     {
       icon: Mail,
-      title: "Email",
-      description: "For general inquiries",
+      title: language === "fr" ? "Email" : "Email",
+      description: language === "fr" ? "Pour les demandes générales" : "For general inquiries",
       value: "hello@contextlens.io",
       action: "mailto:hello@contextlens.io",
     },
     {
       icon: Building2,
-      title: "Sales",
-      description: "Enterprise & custom pricing",
+      title: language === "fr" ? "Ventes" : "Sales",
+      description: language === "fr" ? "Entreprise & tarification sur mesure" : "Enterprise & custom pricing",
       value: "sales@contextlens.io",
       action: "mailto:sales@contextlens.io",
     },
     {
       icon: MessageSquare,
       title: "Support",
-      description: "Technical assistance",
+      description: language === "fr" ? "Assistance technique" : "Technical assistance",
       value: "support@contextlens.io",
       action: "mailto:support@contextlens.io",
     },
@@ -112,11 +118,13 @@ const Contact = () => {
           {/* Hero */}
           <div className="max-w-3xl mx-auto text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Get in <span className="text-gradient">Touch</span>
+              {language === "fr" ? "Contactez" : "Get in"}{" "}
+              <span className="text-gradient">{language === "fr" ? "Nous" : "Touch"}</span>
             </h1>
             <p className="text-lg text-muted-foreground">
-              Have a question, feedback, or want to learn more about ContextLens? 
-              We'd love to hear from you.
+              {language === "fr" 
+                ? "Une question, un retour, ou vous voulez en savoir plus sur ContextLens ? Nous serions ravis de vous entendre."
+                : "Have a question, feedback, or want to learn more about ContextLens? We'd love to hear from you."}
             </p>
           </div>
 
@@ -149,10 +157,10 @@ const Contact = () => {
                       <MapPin className="h-5 w-5 text-accent" />
                     </div>
                     <div>
-                      <h3 className="font-medium">Location</h3>
+                      <h3 className="font-medium">{language === "fr" ? "Localisation" : "Location"}</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Berlin, Germany<br />
-                        EU-based, GDPR compliant
+                        Berlin, {language === "fr" ? "Allemagne" : "Germany"}<br />
+                        {language === "fr" ? "Basé en UE, conforme RGPD" : "EU-based, GDPR compliant"}
                       </p>
                     </div>
                   </div>
@@ -164,10 +172,10 @@ const Contact = () => {
                       <Clock className="h-5 w-5 text-accent" />
                     </div>
                     <div>
-                      <h3 className="font-medium">Response Time</h3>
+                      <h3 className="font-medium">{language === "fr" ? "Temps de réponse" : "Response Time"}</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Usually within 24 hours<br />
-                        Mon-Fri, 9AM-6PM CET
+                        {language === "fr" ? "Généralement sous 24 heures" : "Usually within 24 hours"}<br />
+                        {language === "fr" ? "Lun-Ven, 9h-18h CET" : "Mon-Fri, 9AM-6PM CET"}
                       </p>
                     </div>
                   </div>
@@ -178,9 +186,11 @@ const Contact = () => {
               <div className="lg:col-span-2">
                 <Card className="glass-card border-border/50">
                   <CardHeader>
-                    <CardTitle>Send us a message</CardTitle>
+                    <CardTitle>{language === "fr" ? "Envoyez-nous un message" : "Send us a message"}</CardTitle>
                     <CardDescription>
-                      Fill out the form below and we'll get back to you soon.
+                      {language === "fr" 
+                        ? "Remplissez le formulaire ci-dessous et nous vous répondrons rapidement."
+                        : "Fill out the form below and we'll get back to you soon."}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -189,9 +199,13 @@ const Contact = () => {
                         <div className="w-16 h-16 rounded-full bg-accent/10 mx-auto mb-4 flex items-center justify-center">
                           <Check className="h-8 w-8 text-accent" />
                         </div>
-                        <h3 className="text-xl font-semibold mb-2">Thank you!</h3>
+                        <h3 className="text-xl font-semibold mb-2">
+                          {language === "fr" ? "Merci !" : "Thank you!"}
+                        </h3>
                         <p className="text-muted-foreground">
-                          Your message has been received. We'll be in touch soon.
+                          {language === "fr" 
+                            ? "Votre message a été reçu. Nous vous contacterons bientôt."
+                            : "Your message has been received. We'll be in touch soon."}
                         </p>
                         <Button 
                           variant="ghost" 
@@ -201,17 +215,17 @@ const Contact = () => {
                             setFormData({ name: "", email: "", subject: "", message: "" });
                           }}
                         >
-                          Send another message
+                          {language === "fr" ? "Envoyer un autre message" : "Send another message"}
                         </Button>
                       </div>
                     ) : (
                       <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid sm:grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name">{language === "fr" ? "Nom" : "Name"}</Label>
                             <Input
                               id="name"
-                              placeholder="Your name"
+                              placeholder={language === "fr" ? "Votre nom" : "Your name"}
                               value={formData.name}
                               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                               className={errors.name ? "border-destructive" : ""}
@@ -245,10 +259,10 @@ const Contact = () => {
                         </div>
                         
                         <div className="space-y-2">
-                          <Label htmlFor="subject">Subject</Label>
+                          <Label htmlFor="subject">{language === "fr" ? "Sujet" : "Subject"}</Label>
                           <Input
                             id="subject"
-                            placeholder="What's this about?"
+                            placeholder={language === "fr" ? "De quoi s'agit-il ?" : "What's this about?"}
                             value={formData.subject}
                             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                             className={errors.subject ? "border-destructive" : ""}
@@ -266,7 +280,7 @@ const Contact = () => {
                           <Label htmlFor="message">Message</Label>
                           <Textarea
                             id="message"
-                            placeholder="Tell us more..."
+                            placeholder={language === "fr" ? "Dites-nous en plus..." : "Tell us more..."}
                             rows={5}
                             value={formData.message}
                             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
@@ -283,7 +297,9 @@ const Contact = () => {
 
                         <Button type="submit" variant="hero" className="w-full" disabled={loading}>
                           <Send className="h-4 w-4 mr-2" />
-                          {loading ? "Sending..." : "Send Message"}
+                          {loading 
+                            ? (language === "fr" ? "Envoi..." : "Sending...") 
+                            : (language === "fr" ? "Envoyer le message" : "Send Message")}
                         </Button>
                       </form>
                     )}

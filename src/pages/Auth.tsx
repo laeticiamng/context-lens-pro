@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Glasses, Mail, Lock, ArrowLeft, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 import ForgotPasswordDialog from "@/components/auth/ForgotPasswordDialog";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
 import { signUpSchema, signInSchema } from "@/lib/validations";
@@ -23,6 +24,7 @@ const Auth = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t, language } = useLanguage();
   
   const isResetFlow = searchParams.get("reset") === "true";
 
@@ -70,7 +72,10 @@ const Auth = () => {
           password,
         });
         if (error) throw error;
-        toast({ title: "Welcome back!", description: "You've been signed in successfully." });
+        toast({ 
+          title: language === "fr" ? "Bon retour !" : "Welcome back!", 
+          description: language === "fr" ? "Vous êtes connecté." : "You've been signed in successfully." 
+        });
       } else {
         const { error } = await supabase.auth.signUp({
           email: email.trim(),
@@ -80,16 +85,23 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        toast({ title: "Account created!", description: "Welcome to ContextLens." });
+        toast({ 
+          title: language === "fr" ? "Compte créé !" : "Account created!", 
+          description: language === "fr" ? "Bienvenue sur ContextLens." : "Welcome to ContextLens." 
+        });
       }
     } catch (error: any) {
       let message = error.message;
       if (error.message.includes("User already registered")) {
-        message = "This email is already registered. Try signing in instead.";
+        message = language === "fr" 
+          ? "Cet email est déjà enregistré. Essayez de vous connecter."
+          : "This email is already registered. Try signing in instead.";
       } else if (error.message.includes("Invalid login credentials")) {
-        message = "Invalid email or password. Please try again.";
+        message = language === "fr"
+          ? "Email ou mot de passe invalide. Veuillez réessayer."
+          : "Invalid email or password. Please try again.";
       }
-      toast({ title: "Error", description: message, variant: "destructive" });
+      toast({ title: t.common.error, description: message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -106,7 +118,7 @@ const Auth = () => {
           onClick={() => navigate("/")}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Home
+          {t.auth.backToHome}
         </Button>
 
         <Card className="glass-card border-border/50">
@@ -115,18 +127,16 @@ const Auth = () => {
               <Glasses className="h-6 w-6 text-primary-foreground" />
             </div>
             <CardTitle className="text-2xl">
-              {isLogin ? "Welcome back" : "Create account"}
+              {isLogin ? t.auth.welcomeBack : t.auth.createAccount}
             </CardTitle>
             <CardDescription>
-              {isLogin
-                ? "Sign in to access your dashboard"
-                : "Get started with ContextLens"}
+              {isLogin ? t.auth.signInDesc : t.auth.signUpDesc}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t.auth.email}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -148,7 +158,7 @@ const Auth = () => {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t.auth.password}</Label>
                   {isLogin && <ForgotPasswordDialog />}
                 </div>
                 <div className="relative">
@@ -191,26 +201,30 @@ const Auth = () => {
                     htmlFor="remember"
                     className="text-sm text-muted-foreground cursor-pointer"
                   >
-                    Remember me for 30 days
+                    {t.auth.rememberMe}
                   </Label>
                 </div>
               )}
               
               <Button type="submit" variant="hero" className="w-full" disabled={loading}>
-                {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
+                {loading 
+                  ? (language === "fr" ? "Patientez..." : "Please wait...") 
+                  : isLogin ? t.auth.signIn : t.auth.signUp}
               </Button>
             </form>
 
             <div className="mt-6 text-center text-sm">
               <span className="text-muted-foreground">
-                {isLogin ? "Don't have an account? " : "Already have an account? "}
+                {isLogin ? t.auth.noAccount : t.auth.haveAccount}{" "}
               </span>
               <button
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
                 className="text-primary hover:underline font-medium"
               >
-                {isLogin ? "Sign up" : "Sign in"}
+                {isLogin 
+                  ? (language === "fr" ? "S'inscrire" : "Sign up") 
+                  : (language === "fr" ? "Se connecter" : "Sign in")}
               </button>
             </div>
           </CardContent>

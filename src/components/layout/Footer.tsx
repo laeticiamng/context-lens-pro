@@ -1,35 +1,38 @@
 import { forwardRef } from "react";
 import { Link } from "react-router-dom";
 import { Glasses, Github, Twitter, Linkedin } from "lucide-react";
-
-const footerLinks = {
-  product: [
-    { label: "Features", href: "#features" },
-    { label: "Devices", href: "#devices" },
-    { label: "Pipeline", href: "#pipeline" },
-    { label: "Pricing", href: "#pricing" },
-  ],
-  resources: [
-    { label: "Documentation", href: "/docs" },
-    { label: "API Reference", href: "/docs" },
-    { label: "SDK Guide", href: "/docs" },
-    { label: "Blog", href: "#" },
-  ],
-  company: [
-    { label: "About", href: "#" },
-    { label: "Contact", href: "/contact" },
-    { label: "Careers", href: "#" },
-    { label: "Press Kit", href: "#" },
-  ],
-  legal: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-    { label: "GDPR", href: "/privacy" },
-    { label: "Cookie Policy", href: "/privacy" },
-  ],
-};
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const Footer = forwardRef<HTMLElement>((_, ref) => {
+  const { t, language } = useLanguage();
+
+  const footerLinks = {
+    product: [
+      { label: language === "fr" ? "Fonctionnalités" : "Features", href: "#features" },
+      { label: language === "fr" ? "Appareils" : "Devices", href: "#devices" },
+      { label: "Pipeline", href: "#pipeline" },
+      { label: language === "fr" ? "Tarifs" : "Pricing", href: "#pricing" },
+    ],
+    resources: [
+      { label: "Documentation", href: "/docs" },
+      { label: language === "fr" ? "Référence API" : "API Reference", href: "/docs" },
+      { label: language === "fr" ? "Guide SDK" : "SDK Guide", href: "/docs" },
+      { label: "Blog", href: "#" },
+    ],
+    company: [
+      { label: language === "fr" ? "À propos" : "About", href: "#" },
+      { label: "Contact", href: "/contact" },
+      { label: language === "fr" ? "Carrières" : "Careers", href: "#" },
+      { label: language === "fr" ? "Kit presse" : "Press Kit", href: "#" },
+    ],
+    legal: [
+      { label: language === "fr" ? "Politique de confidentialité" : "Privacy Policy", href: "/privacy" },
+      { label: language === "fr" ? "Conditions d'utilisation" : "Terms of Service", href: "/terms" },
+      { label: "RGPD", href: "/privacy" },
+      { label: "Cookies", href: "/privacy" },
+    ],
+  };
+
   return (
     <footer ref={ref} className="border-t border-border/50 bg-card/50">
       <div className="container px-4 py-16">
@@ -45,8 +48,9 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
               </span>
             </Link>
             <p className="text-sm text-muted-foreground mb-6 max-w-xs">
-              Transform any smart glasses into a contextual prompter. 
-              AI-powered, privacy-first, universal.
+              {language === "fr" 
+                ? "Transformez n'importe quelles lunettes connectées en prompteur contextuel. IA, privacy-first, universel."
+                : "Transform any smart glasses into a contextual prompter. AI-powered, privacy-first, universal."}
             </p>
             <div className="flex gap-4">
               <a 
@@ -78,7 +82,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
 
           {/* Links */}
           <div>
-            <h4 className="font-semibold mb-4 text-sm">Product</h4>
+            <h4 className="font-semibold mb-4 text-sm">{t.footer.product}</h4>
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
@@ -94,7 +98,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4 text-sm">Resources</h4>
+            <h4 className="font-semibold mb-4 text-sm">{t.footer.resources}</h4>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
@@ -119,7 +123,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4 text-sm">Company</h4>
+            <h4 className="font-semibold mb-4 text-sm">{t.footer.company}</h4>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
@@ -144,7 +148,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4 text-sm">Legal</h4>
+            <h4 className="font-semibold mb-4 text-sm">{t.footer.legal}</h4>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.label}>
@@ -163,12 +167,12 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
         {/* Bottom */}
         <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2026 ContextLens. All rights reserved.
+            © 2026 ContextLens. {t.footer.copyright}
           </p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span>🇪🇺 EU Privacy Compliant</span>
+            <span>🇪🇺 {language === "fr" ? "Conforme UE" : "EU Privacy Compliant"}</span>
             <span>•</span>
-            <span>GDPR Ready</span>
+            <span>{language === "fr" ? "Compatible RGPD" : "GDPR Ready"}</span>
           </div>
         </div>
       </div>
