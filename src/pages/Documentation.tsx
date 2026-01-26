@@ -28,6 +28,7 @@ import DocSearch from "@/components/docs/DocSearch";
 import TableOfContents from "@/components/docs/TableOfContents";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import ErrorBoundary from "@/components/ui/error-boundary";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const CodeBlock = ({ code, language = "typescript" }: { code: string; language?: string }) => {
   const [copied, setCopied] = useState(false);
@@ -233,7 +234,22 @@ await contextLens.displayPrompt({
 ];
 
 const Documentation = () => {
+  const { language } = useLanguage();
   const [activeTier, setActiveTier] = useState<number | null>(null);
+
+  const t = {
+    developerDocs: language === "fr" ? "Documentation développeur" : "Developer Documentation",
+    sdkIntegration: language === "fr" ? "Guides d'intégration" : "SDK Integration",
+    guides: language === "fr" ? "SDK" : "Guides",
+    heroDescription: language === "fr"
+      ? "Guides complets pour intégrer ContextLens avec les lunettes connectées à tous les niveaux. Du mode téléphone au calcul spatial AR complet."
+      : "Comprehensive guides for integrating ContextLens with smart glasses at every tier level. From phone fallback to full AR spatial computing.",
+    compatibleDevices: language === "fr" ? "Appareils compatibles" : "Compatible Devices",
+    features: language === "fr" ? "Fonctionnalités" : "Features",
+    quickStart: language === "fr" ? "Démarrage rapide" : "Quick Start",
+    deviceSpecificSDKs: language === "fr" ? "Guides SDK par appareil" : "Device-Specific SDK Guides",
+    apiReference: language === "fr" ? "Référence API" : "API Reference",
+  };
 
   const handleSearchResultClick = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -244,12 +260,12 @@ const Documentation = () => {
 
   // TOC items for sidebar
   const tocItems = [
-    { id: "tier-0", title: "Tier 0 — Universal Fallback", level: 1 },
-    { id: "tier-1", title: "Tier 1 — Display via SDK", level: 1 },
-    { id: "tier-2", title: "Tier 2 — On-Device Mode", level: 1 },
+    { id: "tier-0", title: language === "fr" ? "Tier 0 — Mode Universel" : "Tier 0 — Universal Fallback", level: 1 },
+    { id: "tier-1", title: language === "fr" ? "Tier 1 — Affichage SDK" : "Tier 1 — Display via SDK", level: 1 },
+    { id: "tier-2", title: language === "fr" ? "Tier 2 — Mode Embarqué" : "Tier 2 — On-Device Mode", level: 1 },
     { id: "tier-3", title: "Tier 3 — Vision + AR", level: 1 },
-    { id: "device-sdks", title: "Device-Specific SDKs", level: 1 },
-    { id: "api-reference", title: "API Reference", level: 1 },
+    { id: "device-sdks", title: language === "fr" ? "SDKs par appareil" : "Device-Specific SDKs", level: 1 },
+    { id: "api-reference", title: t.apiReference, level: 1 },
   ];
 
   return (
@@ -264,14 +280,13 @@ const Documentation = () => {
             <div className="max-w-4xl mx-auto text-center mb-16">
               <Badge variant="outline" className="mb-4 border-primary/30 text-primary">
                 <BookOpen className="h-3 w-3 mr-1" />
-                Developer Documentation
+                {t.developerDocs}
               </Badge>
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                SDK Integration <span className="text-gradient">Guides</span>
+                {t.sdkIntegration} <span className="text-gradient">{t.guides}</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-                Comprehensive guides for integrating ContextLens with smart glasses at every tier level.
-                From phone fallback to full AR spatial computing.
+                {t.heroDescription}
               </p>
 
               {/* Search */}

@@ -14,6 +14,7 @@ import {
   RefreshCw,
   Glasses
 } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface Device {
   id: string;
@@ -30,15 +31,41 @@ interface DeviceHealthCheckProps {
 
 interface HealthMetric {
   name: string;
+  nameKey: string;
   status: "good" | "warning" | "error";
   value: string;
+  valueKey: string;
   icon: React.ElementType;
 }
 
 const DeviceHealthCheck = ({ device, onClose }: DeviceHealthCheckProps) => {
+  const { language } = useLanguage();
   const [checking, setChecking] = useState(false);
   const [progress, setProgress] = useState(0);
   const [metrics, setMetrics] = useState<HealthMetric[] | null>(null);
+
+  const t = {
+    healthCheck: language === "fr" ? "Diagnostic" : "Health Check",
+    runningDiagnostics: language === "fr" ? "Exécution des diagnostics..." : "Running diagnostics...",
+    runHealthCheckDesc: language === "fr" 
+      ? "Lancez un diagnostic pour vérifier l'état de l'appareil" 
+      : "Run a health check to diagnose device status",
+    close: language === "fr" ? "Fermer" : "Close",
+    runHealthCheck: language === "fr" ? "Lancer le diagnostic" : "Run Health Check",
+    rerunCheck: language === "fr" ? "Relancer" : "Re-run Check",
+    healthy: language === "fr" ? "OK" : "Healthy",
+    warnings: language === "fr" ? "Avertissements" : "Warnings",
+    issuesFound: language === "fr" ? "Problèmes détectés" : "Issues Found",
+    connection: language === "fr" ? "Connexion" : "Connection",
+    battery: language === "fr" ? "Batterie" : "Battery",
+    sdkResponse: language === "fr" ? "Réponse SDK" : "SDK Response",
+    firmware: language === "fr" ? "Firmware" : "Firmware",
+    stable: language === "fr" ? "Stable" : "Stable",
+    offline: language === "fr" ? "Hors ligne" : "Offline",
+    unknown: language === "fr" ? "Inconnu" : "Unknown",
+    timeout: language === "fr" ? "Timeout" : "Timeout",
+    unableToCheck: language === "fr" ? "Vérification impossible" : "Unable to check",
+  };
 
   const runHealthCheck = async () => {
     setChecking(true);
@@ -55,16 +82,16 @@ const DeviceHealthCheck = ({ device, onClose }: DeviceHealthCheckProps) => {
     // Simulate results based on connection status
     const simulatedMetrics: HealthMetric[] = device.is_connected
       ? [
-          { name: "Connection", status: "good", value: "Stable", icon: Wifi },
-          { name: "Battery", status: "good", value: "85%", icon: Battery },
-          { name: "SDK Response", status: "good", value: "42ms", icon: Activity },
-          { name: "Firmware", status: "good", value: "v2.1.3", icon: Cpu },
+          { name: t.connection, nameKey: "connection", status: "good", value: t.stable, valueKey: "stable", icon: Wifi },
+          { name: t.battery, nameKey: "battery", status: "good", value: "85%", valueKey: "85", icon: Battery },
+          { name: t.sdkResponse, nameKey: "sdkResponse", status: "good", value: "42ms", valueKey: "42ms", icon: Activity },
+          { name: t.firmware, nameKey: "firmware", status: "good", value: "v2.1.3", valueKey: "v2.1.3", icon: Cpu },
         ]
       : [
-          { name: "Connection", status: "error", value: "Offline", icon: Wifi },
-          { name: "Battery", status: "warning", value: "Unknown", icon: Battery },
-          { name: "SDK Response", status: "error", value: "Timeout", icon: Activity },
-          { name: "Firmware", status: "warning", value: "Unable to check", icon: Cpu },
+          { name: t.connection, nameKey: "connection", status: "error", value: t.offline, valueKey: "offline", icon: Wifi },
+          { name: t.battery, nameKey: "battery", status: "warning", value: t.unknown, valueKey: "unknown", icon: Battery },
+          { name: t.sdkResponse, nameKey: "sdkResponse", status: "error", value: t.timeout, valueKey: "timeout", icon: Activity },
+          { name: t.firmware, nameKey: "firmware", status: "warning", value: t.unableToCheck, valueKey: "unableToCheck", icon: Cpu },
         ];
 
     setMetrics(simulatedMetrics);
@@ -110,13 +137,13 @@ const DeviceHealthCheck = ({ device, onClose }: DeviceHealthCheckProps) => {
           </div>
           <div className="flex-1">
             <CardTitle className="text-base">{device.device_name}</CardTitle>
-            <CardDescription>Tier {device.tier} • Health Check</CardDescription>
+            <CardDescription>Tier {device.tier} • {t.healthCheck}</CardDescription>
           </div>
           {overallStatus && (
             <Badge className={getStatusColor(overallStatus)}>
-              {overallStatus === "good" && "Healthy"}
-              {overallStatus === "warning" && "Warnings"}
-              {overallStatus === "error" && "Issues Found"}
+              {overallStatus === "good" && t.healthy}
+              {overallStatus === "warning" && t.warnings}
+              {overallStatus === "error" && t.issuesFound}
             </Badge>
           )}
         </div>
@@ -125,7 +152,7 @@ const DeviceHealthCheck = ({ device, onClose }: DeviceHealthCheckProps) => {
         {checking ? (
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Running diagnostics...</span>
+              <span className="text-muted-foreground">{t.runningDiagnostics}</span>
               <span className="font-mono">{progress}%</span>
             </div>
             <Progress value={progress} className="h-2" />
@@ -134,7 +161,7 @@ const DeviceHealthCheck = ({ device, onClose }: DeviceHealthCheckProps) => {
           <div className="grid grid-cols-2 gap-3">
             {metrics.map((metric) => (
               <div
-                key={metric.name}
+                key={metric.nameKey}
                 className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30"
               >
                 <metric.icon className="h-4 w-4 text-muted-foreground" />
@@ -150,14 +177,14 @@ const DeviceHealthCheck = ({ device, onClose }: DeviceHealthCheckProps) => {
           <div className="text-center py-4">
             <Activity className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
             <p className="text-sm text-muted-foreground">
-              Run a health check to diagnose device status
+              {t.runHealthCheckDesc}
             </p>
           </div>
         )}
 
         <div className="flex gap-3">
           <Button variant="ghost" className="flex-1" onClick={onClose}>
-            Close
+            {t.close}
           </Button>
           <Button
             variant="hero"
@@ -166,7 +193,7 @@ const DeviceHealthCheck = ({ device, onClose }: DeviceHealthCheckProps) => {
             disabled={checking}
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${checking ? "animate-spin" : ""}`} />
-            {metrics ? "Re-run Check" : "Run Health Check"}
+            {metrics ? t.rerunCheck : t.runHealthCheck}
           </Button>
         </div>
       </CardContent>

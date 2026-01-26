@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/popover";
 import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
 import { format, subDays, startOfWeek, startOfMonth, subMonths } from "date-fns";
+import { fr, enUS } from "date-fns/locale";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type DateRange = {
   from: Date;
@@ -21,16 +23,23 @@ interface DateRangeFilterProps {
   onChange: (range: DateRange) => void;
 }
 
-const presets: { key: PresetKey; label: string }[] = [
-  { key: "7d", label: "Last 7 days" },
-  { key: "30d", label: "Last 30 days" },
-  { key: "90d", label: "Last 90 days" },
-  { key: "custom", label: "Custom range" },
-];
-
 const DateRangeFilter = ({ value, onChange }: DateRangeFilterProps) => {
+  const { language } = useLanguage();
   const [activePreset, setActivePreset] = useState<PresetKey>("7d");
   const [isOpen, setIsOpen] = useState(false);
+
+  const locale = language === "fr" ? fr : enUS;
+
+  const presets: { key: PresetKey; label: string }[] = [
+    { key: "7d", label: language === "fr" ? "7 derniers jours" : "Last 7 days" },
+    { key: "30d", label: language === "fr" ? "30 derniers jours" : "Last 30 days" },
+    { key: "90d", label: language === "fr" ? "90 derniers jours" : "Last 90 days" },
+    { key: "custom", label: language === "fr" ? "Période personnalisée" : "Custom range" },
+  ];
+
+  const t = {
+    apply: language === "fr" ? "Appliquer" : "Apply",
+  };
 
   const handlePresetClick = (key: PresetKey) => {
     setActivePreset(key);
@@ -59,7 +68,7 @@ const DateRangeFilter = ({ value, onChange }: DateRangeFilterProps) => {
     if (activePreset !== "custom") {
       return presets.find((p) => p.key === activePreset)?.label;
     }
-    return `${format(value.from, "MMM d")} - ${format(value.to, "MMM d, yyyy")}`;
+    return `${format(value.from, "d MMM", { locale })} - ${format(value.to, "d MMM yyyy", { locale })}`;
   };
 
   return (
@@ -103,10 +112,11 @@ const DateRangeFilter = ({ value, onChange }: DateRangeFilterProps) => {
                 }}
                 numberOfMonths={2}
                 disabled={{ after: new Date() }}
+                locale={locale}
               />
               <div className="flex justify-end mt-2">
                 <Button size="sm" onClick={() => setIsOpen(false)}>
-                  Apply
+                  {t.apply}
                 </Button>
               </div>
             </div>

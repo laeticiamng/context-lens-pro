@@ -2,49 +2,78 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { LucideIcon, Plus, FileText, Glasses, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface EmptyStateProps {
   type: "scripts" | "devices" | "analytics";
   onAction?: () => void;
 }
 
-const emptyStates = {
-  scripts: {
-    icon: FileText,
-    title: "No scripts yet",
-    description: "Create your first script to start using ContextLens with your smart glasses.",
-    actionLabel: "Create Script",
-    tips: [
-      "Scripts can be meeting notes, sales pitches, or checklists",
-      "Each line becomes a separate prompt block",
-      "Use tags to organize and filter your scripts",
-    ],
-  },
-  devices: {
-    icon: Glasses,
-    title: "No devices connected",
-    description: "Connect your first smart glasses or use phone fallback mode.",
-    actionLabel: "Add Device",
-    tips: [
-      "Supports Even G2, Vuzix Z100, and more",
-      "Phone fallback works with any glasses",
-      "Bluetooth and WiFi pairing available",
-    ],
-  },
-  analytics: {
-    icon: BarChart3,
-    title: "No usage data yet",
-    description: "Start using your scripts to see analytics and usage patterns.",
-    actionLabel: null,
-    tips: [
-      "Track script usage over time",
-      "See which prompts are most effective",
-      "Monitor device connection stats",
-    ],
-  },
-};
-
 const EmptyState = ({ type, onAction }: EmptyStateProps) => {
+  const { language } = useLanguage();
+
+  const emptyStates = {
+    scripts: {
+      icon: FileText,
+      title: language === "fr" ? "Aucun script" : "No scripts yet",
+      description: language === "fr" 
+        ? "Créez votre premier script pour commencer à utiliser ContextLens avec vos lunettes."
+        : "Create your first script to start using ContextLens with your smart glasses.",
+      actionLabel: language === "fr" ? "Créer un script" : "Create Script",
+      tips: language === "fr" 
+        ? [
+            "Les scripts peuvent être des notes de réunion, des pitchs ou des checklists",
+            "Chaque ligne devient un bloc de prompt séparé",
+            "Utilisez les tags pour organiser et filtrer vos scripts",
+          ]
+        : [
+            "Scripts can be meeting notes, sales pitches, or checklists",
+            "Each line becomes a separate prompt block",
+            "Use tags to organize and filter your scripts",
+          ],
+    },
+    devices: {
+      icon: Glasses,
+      title: language === "fr" ? "Aucun appareil connecté" : "No devices connected",
+      description: language === "fr"
+        ? "Connectez vos premières lunettes ou utilisez le mode téléphone."
+        : "Connect your first smart glasses or use phone fallback mode.",
+      actionLabel: language === "fr" ? "Ajouter un appareil" : "Add Device",
+      tips: language === "fr"
+        ? [
+            "Compatible Even G2, Vuzix Z100 et plus",
+            "Le mode téléphone fonctionne avec toutes les lunettes",
+            "Appairage Bluetooth et WiFi disponible",
+          ]
+        : [
+            "Supports Even G2, Vuzix Z100, and more",
+            "Phone fallback works with any glasses",
+            "Bluetooth and WiFi pairing available",
+          ],
+    },
+    analytics: {
+      icon: BarChart3,
+      title: language === "fr" ? "Aucune donnée d'utilisation" : "No usage data yet",
+      description: language === "fr"
+        ? "Commencez à utiliser vos scripts pour voir les statistiques."
+        : "Start using your scripts to see analytics and usage patterns.",
+      actionLabel: null,
+      tips: language === "fr"
+        ? [
+            "Suivez l'utilisation des scripts dans le temps",
+            "Voyez quels prompts sont les plus efficaces",
+            "Surveillez les stats de connexion des appareils",
+          ]
+        : [
+            "Track script usage over time",
+            "See which prompts are most effective",
+            "Monitor device connection stats",
+          ],
+    },
+  };
+
+  const quickTipsLabel = language === "fr" ? "Astuces :" : "Quick tips:";
+
   const state = emptyStates[type];
   const Icon = state.icon;
 
@@ -80,7 +109,7 @@ const EmptyState = ({ type, onAction }: EmptyStateProps) => {
           )}
 
           <div className="pt-4">
-            <p className="text-xs text-muted-foreground mb-3">Quick tips:</p>
+            <p className="text-xs text-muted-foreground mb-3">{quickTipsLabel}</p>
             <ul className="space-y-2 text-sm text-muted-foreground max-w-sm mx-auto">
               {state.tips.map((tip, i) => (
                 <motion.li

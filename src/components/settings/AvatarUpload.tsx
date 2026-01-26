@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Camera, Upload, Trash2, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface AvatarUploadProps {
   currentUrl: string | null;
@@ -15,9 +16,29 @@ interface AvatarUploadProps {
 
 const AvatarUpload = ({ currentUrl, userId, displayName, onUpload }: AvatarUploadProps) => {
   const { toast } = useToast();
+  const { language } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const t = {
+    profilePicture: language === "fr" ? "Photo de profil" : "Profile Picture",
+    invalidFile: language === "fr" ? "Fichier invalide" : "Invalid File",
+    selectImageFile: language === "fr" ? "Veuillez sélectionner une image" : "Please select an image file",
+    fileTooLarge: language === "fr" ? "Fichier trop volumineux" : "File Too Large",
+    selectUnder5MB: language === "fr" ? "Veuillez sélectionner une image de moins de 5 Mo" : "Please select an image under 5MB",
+    avatarUpdated: language === "fr" ? "Avatar mis à jour" : "Avatar Updated",
+    avatarUpdatedDesc: language === "fr" ? "Votre photo de profil a été mise à jour." : "Your profile picture has been updated.",
+    uploadFailed: language === "fr" ? "Échec du téléchargement" : "Upload Failed",
+    couldNotUpload: language === "fr" ? "Impossible de télécharger l'avatar" : "Could not upload avatar",
+    avatarRemoved: language === "fr" ? "Avatar supprimé" : "Avatar Removed",
+    avatarRemovedDesc: language === "fr" ? "Votre photo de profil a été supprimée." : "Your profile picture has been removed.",
+    error: language === "fr" ? "Erreur" : "Error",
+    couldNotRemove: language === "fr" ? "Impossible de supprimer l'avatar" : "Could not remove avatar",
+    upload: language === "fr" ? "Télécharger" : "Upload",
+    uploading: language === "fr" ? "Téléchargement..." : "Uploading...",
+    fileHint: language === "fr" ? "JPG, PNG ou GIF. Max 5 Mo." : "JPG, PNG or GIF. Max 5MB.",
+  };
 
   const getInitials = () => {
     if (displayName) {
@@ -33,8 +54,8 @@ const AvatarUpload = ({ currentUrl, userId, displayName, onUpload }: AvatarUploa
     // Validate file
     if (!file.type.startsWith("image/")) {
       toast({
-        title: "Invalid File",
-        description: "Please select an image file",
+        title: t.invalidFile,
+        description: t.selectImageFile,
         variant: "destructive",
       });
       return;
@@ -42,8 +63,8 @@ const AvatarUpload = ({ currentUrl, userId, displayName, onUpload }: AvatarUploa
 
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: "File Too Large",
-        description: "Please select an image under 5MB",
+        title: t.fileTooLarge,
+        description: t.selectUnder5MB,
         variant: "destructive",
       });
       return;
@@ -80,13 +101,13 @@ const AvatarUpload = ({ currentUrl, userId, displayName, onUpload }: AvatarUploa
 
       onUpload(dataUrl);
       toast({
-        title: "Avatar Updated",
-        description: "Your profile picture has been updated.",
+        title: t.avatarUpdated,
+        description: t.avatarUpdatedDesc,
       });
     } catch (error: any) {
       toast({
-        title: "Upload Failed",
-        description: error.message || "Could not upload avatar",
+        title: t.uploadFailed,
+        description: error.message || t.couldNotUpload,
         variant: "destructive",
       });
       setPreviewUrl(null);
@@ -111,13 +132,13 @@ const AvatarUpload = ({ currentUrl, userId, displayName, onUpload }: AvatarUploa
       setPreviewUrl(null);
       onUpload("");
       toast({
-        title: "Avatar Removed",
-        description: "Your profile picture has been removed.",
+        title: t.avatarRemoved,
+        description: t.avatarRemovedDesc,
       });
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: "Could not remove avatar",
+        title: t.error,
+        description: t.couldNotRemove,
         variant: "destructive",
       });
     } finally {
@@ -129,7 +150,7 @@ const AvatarUpload = ({ currentUrl, userId, displayName, onUpload }: AvatarUploa
 
   return (
     <div className="space-y-4">
-      <Label>Profile Picture</Label>
+      <Label>{t.profilePicture}</Label>
       
       <div className="flex items-center gap-4">
         <div className="relative group">
@@ -160,7 +181,7 @@ const AvatarUpload = ({ currentUrl, userId, displayName, onUpload }: AvatarUploa
               disabled={uploading}
             >
               <Upload className="h-4 w-4 mr-2" />
-              {uploading ? "Uploading..." : "Upload"}
+              {uploading ? t.uploading : t.upload}
             </Button>
             
             {displayUrl && (
@@ -177,7 +198,7 @@ const AvatarUpload = ({ currentUrl, userId, displayName, onUpload }: AvatarUploa
           </div>
           
           <p className="text-xs text-muted-foreground">
-            JPG, PNG or GIF. Max 5MB.
+            {t.fileHint}
           </p>
         </div>
       </div>

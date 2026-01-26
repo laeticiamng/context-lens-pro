@@ -30,6 +30,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface DeviceSpec {
   id: string;
@@ -71,6 +72,7 @@ interface AddDeviceDialogProps {
 }
 
 const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogProps) => {
+  const { language } = useLanguage();
   const [step, setStep] = useState<Step>("select");
   const [connectionType, setConnectionType] = useState<"bluetooth" | "wifi">("bluetooth");
   const [discoveredDevices, setDiscoveredDevices] = useState<DiscoveredDevice[]>([]);
@@ -78,6 +80,39 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
   const [detectedSpec, setDetectedSpec] = useState<DeviceSpec | null>(null);
   const [manualDevice, setManualDevice] = useState({ name: "", type: "", manufacturer: "" });
   const [pairingProgress, setPairingProgress] = useState(0);
+
+  const t = {
+    addDevice: language === "fr" ? "Ajouter un appareil" : "Add Device",
+    connectVia: language === "fr" ? "Connectez vos lunettes via Bluetooth ou WiFi" : "Connect your smart glasses via Bluetooth or WiFi",
+    manualSetup: language === "fr" ? "Configuration manuelle" : "Manual Setup",
+    scanForDevices: language === "fr" ? "Rechercher" : "Scan for Devices",
+    scanning: language === "fr" ? "Recherche d'appareils..." : "Scanning for devices...",
+    makeSureOn: language === "fr" ? "Assurez-vous que vos lunettes sont allumées" : "Make sure your glasses are powered on",
+    foundDevices: (count: number) => language === "fr" 
+      ? `${count} appareil${count !== 1 ? "s" : ""} trouvé${count !== 1 ? "s" : ""}` 
+      : `Found ${count} device${count !== 1 ? "s" : ""}`,
+    scanAgain: language === "fr" ? "Relancer la recherche" : "Scan Again",
+    pairingWith: language === "fr" ? "Appairage avec" : "Pairing with",
+    pleaseWait: language === "fr" ? "Veuillez patienter..." : "Please wait...",
+    detectingCapabilities: language === "fr" ? "Détection des capacités..." : "Detecting device capabilities...",
+    analyzingSDK: language === "fr" ? "Analyse de la compatibilité SDK et des fonctionnalités" : "Analyzing SDK compatibility & features",
+    deviceDetected: language === "fr" ? "Appareil détecté !" : "Device Detected!",
+    device: language === "fr" ? "Appareil" : "Device",
+    manufacturer: language === "fr" ? "Fabricant" : "Manufacturer",
+    tier: "Tier",
+    camera: language === "fr" ? "Caméra" : "Camera",
+    hudApi: "HUD API",
+    fallbackWarning: language === "fr" 
+      ? "Cet appareil utilisera le mode téléphone (notifications/TTS) car il n'a pas de SDK ouvert."
+      : "This device will use phone fallback mode (notifications/TTS) as it doesn't have an open SDK.",
+    cancel: language === "fr" ? "Annuler" : "Cancel",
+    deviceName: language === "fr" ? "Nom de l'appareil" : "Device Name",
+    deviceNamePlaceholder: language === "fr" ? "ex: Mes Even G2" : "e.g., My Even G2",
+    deviceType: language === "fr" ? "Type d'appareil" : "Device Type",
+    selectDeviceType: language === "fr" ? "Sélectionner un type" : "Select device type",
+    otherUnknown: language === "fr" ? "Autre / Inconnu" : "Other / Unknown",
+    back: language === "fr" ? "Retour" : "Back",
+  };
 
   // Reset on open
   useEffect(() => {
@@ -201,10 +236,10 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Glasses className="h-5 w-5 text-primary" />
-            Add Device
+            {t.addDevice}
           </DialogTitle>
           <DialogDescription>
-            Connect your smart glasses via Bluetooth or WiFi
+            {t.connectVia}
           </DialogDescription>
         </DialogHeader>
 
@@ -247,11 +282,11 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
 
               <div className="flex gap-3">
                 <Button variant="ghost" className="flex-1" onClick={() => setStep("manual")}>
-                  Manual Setup
+                  {t.manualSetup}
                 </Button>
                 <Button variant="hero" className="flex-1" onClick={startScanning}>
                   <Search className="h-4 w-4 mr-2" />
-                  Scan for Devices
+                  {t.scanForDevices}
                 </Button>
               </div>
             </motion.div>
@@ -275,8 +310,8 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
                   <Wifi className="absolute inset-0 m-auto h-10 w-10 text-primary" />
                 )}
               </div>
-              <p className="font-medium">Scanning for devices...</p>
-              <p className="text-sm text-muted-foreground">Make sure your glasses are powered on</p>
+              <p className="font-medium">{t.scanning}</p>
+              <p className="text-sm text-muted-foreground">{t.makeSureOn}</p>
 
               {discoveredDevices.length > 0 && (
                 <div className="mt-4 space-y-2">
@@ -306,7 +341,7 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
               className="space-y-3"
             >
               <p className="text-sm text-muted-foreground">
-                Found {discoveredDevices.length} device{discoveredDevices.length !== 1 ? "s" : ""}
+                {t.foundDevices(discoveredDevices.length)}
               </p>
 
               {discoveredDevices.map((device) => (
@@ -347,7 +382,7 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
               ))}
 
               <Button variant="ghost" className="w-full" onClick={startScanning}>
-                Scan Again
+                {t.scanAgain}
               </Button>
             </motion.div>
           )}
@@ -386,8 +421,8 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
                   {pairingProgress}%
                 </span>
               </div>
-              <p className="font-medium">Pairing with {selectedDevice?.name}</p>
-              <p className="text-sm text-muted-foreground">Please wait...</p>
+              <p className="font-medium">{t.pairingWith} {selectedDevice?.name}</p>
+              <p className="text-sm text-muted-foreground">{t.pleaseWait}</p>
             </motion.div>
           )}
 
@@ -401,8 +436,8 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
               className="py-8 text-center"
             >
               <Loader2 className="h-12 w-12 mx-auto mb-4 text-primary animate-spin" />
-              <p className="font-medium">Detecting device capabilities...</p>
-              <p className="text-sm text-muted-foreground">Analyzing SDK compatibility & features</p>
+              <p className="font-medium">{t.detectingCapabilities}</p>
+              <p className="text-sm text-muted-foreground">{t.analyzingSDK}</p>
             </motion.div>
           )}
 
@@ -419,26 +454,26 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
                 <div className="w-16 h-16 rounded-full bg-accent/10 mx-auto mb-4 flex items-center justify-center">
                   <Check className="h-8 w-8 text-accent" />
                 </div>
-                <p className="text-lg font-semibold">Device Detected!</p>
+                <p className="text-lg font-semibold">{t.deviceDetected}</p>
               </div>
 
               <div className="p-4 rounded-xl bg-secondary/50 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Device</span>
+                  <span className="text-muted-foreground">{t.device}</span>
                   <span className="font-medium">{selectedDevice?.name}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Manufacturer</span>
+                  <span className="text-muted-foreground">{t.manufacturer}</span>
                   <span className="font-medium">{detectedSpec.manufacturer}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Tier</span>
+                  <span className="text-muted-foreground">{t.tier}</span>
                   <Badge className={`tier-badge tier-${detectedSpec.tier}`}>
                     Tier {detectedSpec.tier}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Camera</span>
+                  <span className="text-muted-foreground">{t.camera}</span>
                   {detectedSpec.hasCamera ? (
                     <Check className="h-4 w-4 text-accent" />
                   ) : (
@@ -446,7 +481,7 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
                   )}
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">HUD API</span>
+                  <span className="text-muted-foreground">{t.hudApi}</span>
                   {detectedSpec.hasHudApi ? (
                     <Check className="h-4 w-4 text-accent" />
                   ) : (
@@ -459,17 +494,17 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
                 <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
                   <AlertCircle className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />
                   <p className="text-xs text-amber-200">
-                    This device will use phone fallback mode (notifications/TTS) as it doesn't have an open SDK.
+                    {t.fallbackWarning}
                   </p>
                 </div>
               )}
 
               <div className="flex gap-3">
                 <Button variant="ghost" className="flex-1" onClick={() => onOpenChange(false)}>
-                  Cancel
+                  {t.cancel}
                 </Button>
                 <Button variant="hero" className="flex-1" onClick={handleConfirm}>
-                  Add Device
+                  {t.addDevice}
                 </Button>
               </div>
             </motion.div>
@@ -486,23 +521,23 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
             >
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <Label htmlFor="device-name">Device Name</Label>
+                  <Label htmlFor="device-name">{t.deviceName}</Label>
                   <Input
                     id="device-name"
-                    placeholder="e.g., My Even G2"
+                    placeholder={t.deviceNamePlaceholder}
                     value={manualDevice.name}
                     onChange={(e) => setManualDevice({ ...manualDevice, name: e.target.value })}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="device-type">Device Type</Label>
+                  <Label htmlFor="device-type">{t.deviceType}</Label>
                   <Select
                     value={manualDevice.type}
                     onValueChange={(value) => setManualDevice({ ...manualDevice, type: value })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select device type" />
+                      <SelectValue placeholder={t.selectDeviceType} />
                     </SelectTrigger>
                     <SelectContent>
                       {knownDevices.map((device) => (
@@ -513,14 +548,14 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
                           </div>
                         </SelectItem>
                       ))}
-                      <SelectItem value="other">Other / Unknown</SelectItem>
+                      <SelectItem value="other">{t.otherUnknown}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 {manualDevice.type === "other" && (
                   <div className="space-y-2">
-                    <Label htmlFor="manufacturer">Manufacturer</Label>
+                    <Label htmlFor="manufacturer">{t.manufacturer}</Label>
                     <Input
                       id="manufacturer"
                       placeholder="e.g., Acme Corp"
@@ -533,7 +568,7 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
 
               <div className="flex gap-3">
                 <Button variant="ghost" className="flex-1" onClick={() => setStep("select")}>
-                  Back
+                  {t.back}
                 </Button>
                 <Button 
                   variant="hero" 
@@ -541,7 +576,7 @@ const AddDeviceDialog = ({ open, onOpenChange, onDeviceAdded }: AddDeviceDialogP
                   onClick={handleManualAdd}
                   disabled={!manualDevice.name || !manualDevice.type}
                 >
-                  Add Device
+                  {t.addDevice}
                 </Button>
               </div>
             </motion.div>
