@@ -16,6 +16,8 @@ import {
   ScanStatsCard,
   ProtocolSelector,
   CabinetSetupForm,
+  SubscriptionPlans,
+  AddMRIDeviceDialog,
 } from '@/components/cabinet';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,6 +30,8 @@ import {
   HelpCircle,
   Play,
   ArrowRight,
+  Plus,
+  CreditCard,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { User } from '@supabase/supabase-js';
@@ -37,6 +41,8 @@ function LunettesIRMContent() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [showAddDevice, setShowAddDevice] = useState(false);
+  const [showPlans, setShowPlans] = useState(false);
 
   const {
     cabinet,
@@ -47,6 +53,7 @@ function LunettesIRMContent() {
     protocols,
     isLoading,
     createCabinet,
+    addDevice,
   } = useCabinet();
 
   // Auth check
@@ -79,8 +86,26 @@ function LunettesIRMContent() {
         ? `Démarrage du protocole: ${protocol.name}` 
         : `Starting protocol: ${protocol.name}`
     );
-    // Navigate to Vision IRM with protocol
     navigate(`/vision-irm?protocol=${protocol.id}`);
+  };
+
+  const handleAddDevice = async (deviceData: {
+    manufacturer: string;
+    model: string;
+    serial_number: string;
+    device_type: string;
+    ip_address?: string;
+  }) => {
+    if (addDevice) {
+      await addDevice.mutateAsync({
+        manufacturer: deviceData.manufacturer,
+        model: deviceData.model,
+        serial_number: deviceData.serial_number,
+        device_type: deviceData.device_type,
+        ip_address: deviceData.ip_address,
+      });
+      setShowAddDevice(false);
+    }
   };
 
   if (isCheckingAuth || isLoading) {
@@ -109,8 +134,35 @@ function LunettesIRMContent() {
 
   const mainDevice = devices[0] || null;
 
+  // Show subscription plans selection if no subscription
+  if (!subscription && showPlans) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Button variant="ghost" onClick={() => setShowPlans(false)} className="mb-6">
+          ← {language === 'fr' ? 'Retour' : 'Back'}
+        </Button>
+        <SubscriptionPlans 
+          onSelectPlan={(planId) => {
+            toast.info(
+              language === 'fr' 
+                ? `Plan ${planId} sélectionné - Stripe bientôt disponible` 
+                : `Plan ${planId} selected - Stripe coming soon`
+            );
+          }} 
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Add Device Dialog */}
+      <AddMRIDeviceDialog
+        open={showAddDevice}
+        onOpenChange={setShowAddDevice}
+        onAddDevice={handleAddDevice}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -123,6 +175,10 @@ function LunettesIRMContent() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowAddDevice(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            {language === 'fr' ? 'Ajouter appareil' : 'Add Device'}
+          </Button>
           <Button variant="outline" onClick={() => navigate('/settings')}>
             <Settings className="h-4 w-4 mr-2" />
             {language === 'fr' ? 'Paramètres' : 'Settings'}
@@ -157,6 +213,35 @@ function LunettesIRMContent() {
             </div>
             <Button onClick={() => navigate('/vision-irm')}>
               {language === 'fr' ? 'Lancer un scan' : 'Start scan'}
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* No subscription banner */}
+      {!subscription && (
+        <Card className="mb-6 border-accent/30 bg-accent/5">
+          <CardContent className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-accent/20 rounded-full">
+                <CreditCard className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <p className="font-medium">
+                  {language === 'fr' 
+                    ? 'Aucun abonnement actif' 
+                    : 'No active subscription'}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {language === 'fr' 
+                    ? 'Choisissez un forfait pour commencer les scans' 
+                    : 'Choose a plan to start scanning'}
+                </p>
+              </div>
+            </div>
+            <Button onClick={() => setShowPlans(true)}>
+              {language === 'fr' ? 'Voir les forfaits' : 'View Plans'}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </CardContent>

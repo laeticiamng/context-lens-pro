@@ -28,10 +28,10 @@ export function ScanStatsCard({ todayScans, monthlyStats }: ScanStatsCardProps) 
   // Protocol icons
   const protocolIcons: Record<string, React.ReactNode> = {
     checkup_complet: <Activity className="h-4 w-4" />,
-    cardio: <Heart className="h-4 w-4 text-red-500" />,
-    neuro: <Brain className="h-4 w-4 text-pink-500" />,
-    abdominal: <Activity className="h-4 w-4 text-amber-500" />,
-    osteo: <Activity className="h-4 w-4 text-blue-500" />,
+    cardio: <Heart className="h-4 w-4 text-destructive" />,
+    neuro: <Brain className="h-4 w-4 text-primary" />,
+    abdominal: <Activity className="h-4 w-4 text-accent" />,
+    osteo: <Activity className="h-4 w-4 text-primary" />,
   };
 
   // Count scans by status
@@ -59,14 +59,14 @@ export function ScanStatsCard({ todayScans, monthlyStats }: ScanStatsCardProps) 
                 {language === 'fr' ? 'Total' : 'Total'}
               </p>
             </div>
-            <div className="text-center p-3 bg-emerald-500/10 rounded-lg">
-              <p className="text-2xl font-bold text-emerald-600">{completedToday}</p>
+            <div className="text-center p-3 bg-accent/10 rounded-lg">
+              <p className="text-2xl font-bold text-accent">{completedToday}</p>
               <p className="text-xs text-muted-foreground">
                 {language === 'fr' ? 'Terminés' : 'Completed'}
               </p>
             </div>
-            <div className="text-center p-3 bg-blue-500/10 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">{inProgressToday}</p>
+            <div className="text-center p-3 bg-primary/10 rounded-lg">
+              <p className="text-2xl font-bold text-primary">{inProgressToday}</p>
               <p className="text-xs text-muted-foreground">
                 {language === 'fr' ? 'En cours' : 'In Progress'}
               </p>
@@ -89,10 +89,10 @@ export function ScanStatsCard({ todayScans, monthlyStats }: ScanStatsCardProps) 
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-sm">
-                <AlertCircle className="h-4 w-4 text-amber-500" />
+                <AlertCircle className="h-4 w-4 text-destructive" />
                 {language === 'fr' ? 'Anomalies détectées' : 'Anomalies detected'}
               </span>
-              <span className="font-bold text-amber-600">{monthlyStats.anomaliesDetected}</span>
+              <span className="font-bold text-destructive">{monthlyStats.anomaliesDetected}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-sm">
@@ -124,8 +124,8 @@ export function ScanStatsCard({ todayScans, monthlyStats }: ScanStatsCardProps) 
                   </div>
                   <span className={`text-xs px-2 py-0.5 rounded ${
                     scan.status === 'completed' 
-                      ? 'bg-emerald-500/20 text-emerald-600' 
-                      : 'bg-blue-500/20 text-blue-600'
+                      ? 'bg-accent/20 text-accent' 
+                      : 'bg-primary/20 text-primary'
                   }`}>
                     {scan.status === 'completed' 
                       ? (language === 'fr' ? 'Terminé' : 'Completed')

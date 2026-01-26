@@ -246,7 +246,14 @@ export function useCabinet() {
 
   // Add device mutation
   const addDevice = useMutation({
-    mutationFn: async (deviceData: { serial_number: string; manufacturer: string; model: string; device_type?: string; firmware_version?: string }) => {
+    mutationFn: async (deviceData: { 
+      serial_number: string; 
+      manufacturer: string; 
+      model: string; 
+      device_type?: string; 
+      firmware_version?: string;
+      ip_address?: string;
+    }) => {
       if (!cabinet) throw new Error('No cabinet found');
 
       const insertData = {
@@ -256,6 +263,7 @@ export function useCabinet() {
         model: deviceData.model,
         device_type: deviceData.device_type || 'chipiron_squid',
         firmware_version: deviceData.firmware_version,
+        ip_address: deviceData.ip_address,
       };
 
       const { data, error } = await supabase
