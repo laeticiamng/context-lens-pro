@@ -698,15 +698,17 @@ const Dashboard = () => {
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditScript(script); }}>
                                     <Edit className="h-4 w-4 mr-2" />
-                                    Edit
+                                    {language === "fr" ? "Modifier" : "Edit"}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem onClick={(e) => { e.stopPropagation(); duplicateScript(script); }}>
                                     <Copy className="h-4 w-4 mr-2" />
-                                    Duplicate
+                                    {language === "fr" ? "Dupliquer" : "Duplicate"}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleToggleActive(script.id, !script.is_active); }}>
                                     <Eye className="h-4 w-4 mr-2" />
-                                    {script.is_active ? "Deactivate" : "Activate"}
+                                    {script.is_active 
+                                      ? (language === "fr" ? "Désactiver" : "Deactivate") 
+                                      : (language === "fr" ? "Activer" : "Activate")}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
                                     <Share2 className="h-4 w-4 mr-2" />
@@ -724,7 +726,7 @@ const Dashboard = () => {
                                     onClick={(e) => { e.stopPropagation(); setDeleteConfirm({ type: "script", id: script.id, name: script.title }); }}
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete
+                                    {language === "fr" ? "Supprimer" : "Delete"}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -740,14 +742,14 @@ const Dashboard = () => {
                               {script.is_active && (
                                 <Badge className="bg-accent/10 text-accent border-accent/20 text-xs">
                                   <Sparkles className="h-3 w-3 mr-1" />
-                                  Active
+                                  {language === "fr" ? "Actif" : "Active"}
                                 </Badge>
                               )}
                             </div>
                             <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <Eye className="h-3 w-3" />
-                                {script.usage_count} uses
+                                {script.usage_count} {language === "fr" ? "utilisations" : "uses"}
                               </span>
                               <span className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
@@ -809,12 +811,12 @@ const Dashboard = () => {
                                   {device.is_connected ? (
                                     <>
                                       <WifiOff className="h-4 w-4 mr-2" />
-                                      Disconnect
+                                      {language === "fr" ? "Déconnecter" : "Disconnect"}
                                     </>
                                   ) : (
                                     <>
                                       <Wifi className="h-4 w-4 mr-2" />
-                                      Reconnect
+                                      {language === "fr" ? "Reconnecter" : "Reconnect"}
                                     </>
                                   )}
                                 </DropdownMenuItem>
@@ -828,7 +830,7 @@ const Dashboard = () => {
                                   onClick={() => setDeleteConfirm({ type: "device", id: device.id, name: device.device_name })}
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
-                                  Remove
+                                  {language === "fr" ? "Supprimer" : "Remove"}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -844,7 +846,9 @@ const Dashboard = () => {
                       <CardContent className="p-4 flex items-center justify-center h-full min-h-[80px]">
                         <div className="text-center">
                           <Plus className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
-                          <span className="text-sm text-muted-foreground">Add Device</span>
+                          <span className="text-sm text-muted-foreground">
+                            {language === "fr" ? "Ajouter un appareil" : "Add Device"}
+                          </span>
                         </div>
                       </CardContent>
                     </Card>

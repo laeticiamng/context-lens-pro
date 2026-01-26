@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Glasses, Home, ArrowLeft, Search } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import SEOHead from "@/components/layout/SEOHead";
 
 const NotFound = () => {
   const location = useLocation();
@@ -27,6 +28,11 @@ const NotFound = () => {
   };
 
   return (
+    <>
+      <SEOHead
+        title={language === "fr" ? "Page Non Trouvée - ContextLens" : "Page Not Found - ContextLens"}
+        description={language === "fr" ? "Cette page n'existe pas" : "This page does not exist"}
+      />
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
       {/* Background effects */}
       <div 
@@ -94,6 +100,7 @@ const NotFound = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

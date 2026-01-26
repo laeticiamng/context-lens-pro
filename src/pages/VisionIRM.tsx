@@ -1,9 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, User, Search } from 'lucide-react';
+import { ArrowLeft, User, Search, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AnatomyARView } from '@/components/ar/anatomy';
 import SEOHead from '@/components/layout/SEOHead';
 import ErrorBoundary from '@/components/ui/error-boundary';
@@ -19,17 +20,32 @@ export default function VisionIRM() {
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(patientIdFromUrl);
   const [selectedPatientName, setSelectedPatientName] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [networkError, setNetworkError] = useState<string | null>(null);
   
-  const { results: patients, isLoading: isSearching } = usePatientSearch(searchQuery);
+  const { results: patients, isLoading: isSearching, error: searchError } = usePatientSearch(searchQuery);
+
+  // Handle network errors
+  useEffect(() => {
+    if (searchError) {
+      setNetworkError(language === 'fr' 
+        ? 'Erreur de connexion au serveur. Mode démo activé.'
+        : 'Server connection error. Demo mode activated.');
+    }
+  }, [searchError, language]);
 
   const handleSelectPatient = useCallback((id: string, name: string) => {
     setSelectedPatientId(id);
     setSelectedPatientName(name);
+    setNetworkError(null);
   }, []);
 
   const handleEndSession = useCallback(() => {
     setSelectedPatientId(null);
     setSelectedPatientName('');
+  }, []);
+
+  const handleDismissError = useCallback(() => {
+    setNetworkError(null);
   }, []);
 
   const t = {
@@ -43,6 +59,8 @@ export default function VisionIRM() {
     back: language === 'fr' ? 'Retour' : 'Back',
     demo: language === 'fr' ? 'Mode Démo' : 'Demo Mode',
     startDemo: language === 'fr' ? 'Démarrer la démo' : 'Start Demo',
+    networkErrorTitle: language === 'fr' ? 'Mode hors-ligne' : 'Offline Mode',
+    retry: language === 'fr' ? 'Réessayer' : 'Retry',
   };
 
   // If patient is selected, show AR view
@@ -84,6 +102,27 @@ export default function VisionIRM() {
             <div className="w-24" /> {/* Spacer */}
           </div>
         </header>
+
+        {/* Network Error Alert */}
+        {networkError && (
+          <div className="container mx-auto px-4 py-4">
+            <Alert variant="default" className="border-accent/30 bg-accent/5">
+              <AlertCircle className="h-4 w-4 text-accent" />
+              <AlertDescription className="flex items-center justify-between">
+                <span>{networkError}</span>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" onClick={handleDismissError}>
+                    {language === 'fr' ? 'Fermer' : 'Dismiss'}
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+                    <RefreshCw className="w-3 h-3 mr-1" />
+                    {t.retry}
+                  </Button>
+                </div>
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
 
         {/* Main Content */}
         <main className="container mx-auto px-4 py-12">
