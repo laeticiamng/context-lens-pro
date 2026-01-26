@@ -34,6 +34,7 @@ import { useRealtimeDevices } from "@/hooks/useRealtimeDevices";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { useScriptActions } from "@/hooks/useScriptActions";
 import { useKeyboardShortcuts } from "@/components/dashboard/KeyboardShortcuts";
+import { useLanguage } from "@/i18n/LanguageContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -88,6 +89,7 @@ interface Script {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t, language } = useLanguage();
   
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -393,7 +395,7 @@ const Dashboard = () => {
                 </span>
               </a>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Dashboard</span>
+              <span className="text-muted-foreground">{t.dashboard.title}</span>
             </div>
             
             <div className="flex items-center gap-3">
@@ -401,7 +403,7 @@ const Dashboard = () => {
                 variant="ghost" 
                 size="icon" 
                 onClick={() => setShowShortcuts(true)}
-                title="Keyboard shortcuts (⌘/)"
+                title={language === "fr" ? "Raccourcis clavier (⌘/)" : "Keyboard shortcuts (⌘/)"}
               >
                 <Keyboard className="h-5 w-5" />
               </Button>
@@ -424,7 +426,7 @@ const Dashboard = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
+                    {language === "fr" ? "Déconnexion" : "Sign Out"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -444,7 +446,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{scripts.length}</p>
-                  <p className="text-xs text-muted-foreground">Total Scripts</p>
+                  <p className="text-xs text-muted-foreground">{t.dashboard.totalScripts}</p>
                 </div>
               </div>
             </CardContent>
@@ -457,7 +459,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{activeScripts}</p>
-                  <p className="text-xs text-muted-foreground">Active Scripts</p>
+                  <p className="text-xs text-muted-foreground">{t.dashboard.activeScripts}</p>
                 </div>
               </div>
             </CardContent>
@@ -470,7 +472,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{connectedDevices}</p>
-                  <p className="text-xs text-muted-foreground">Connected Devices</p>
+                  <p className="text-xs text-muted-foreground">{t.dashboard.connectedDevices}</p>
                 </div>
               </div>
             </CardContent>
@@ -483,7 +485,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{totalUsage}</p>
-                  <p className="text-xs text-muted-foreground">Total Usage</p>
+                  <p className="text-xs text-muted-foreground">{t.dashboard.totalUsage}</p>
                 </div>
               </div>
             </CardContent>
@@ -512,15 +514,15 @@ const Dashboard = () => {
                 <TabsList>
                   <TabsTrigger value="scripts" className="gap-2">
                     <FileText className="h-4 w-4" />
-                    Scripts
+                    {t.dashboard.scripts}
                   </TabsTrigger>
                   <TabsTrigger value="devices" className="gap-2">
                     <Glasses className="h-4 w-4" />
-                    Devices
+                    {t.dashboard.devices}
                   </TabsTrigger>
                   <TabsTrigger value="analytics" className="gap-2">
                     <BarChart3 className="h-4 w-4" />
-                    Analytics
+                    {t.dashboard.analytics}
                   </TabsTrigger>
                 </TabsList>
                 
@@ -528,7 +530,7 @@ const Dashboard = () => {
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search scripts..."
+                      placeholder={t.dashboard.searchScripts}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-9 w-48 lg:w-64"
@@ -539,10 +541,10 @@ const Dashboard = () => {
                     <Select value={tagFilter} onValueChange={setTagFilter}>
                       <SelectTrigger className="w-36">
                         <Filter className="h-4 w-4 mr-2" />
-                        <SelectValue placeholder="Filter by tag" />
+                        <SelectValue placeholder={language === "fr" ? "Filtrer" : "Filter by tag"} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All Tags</SelectItem>
+                        <SelectItem value="all">{language === "fr" ? "Tous les tags" : "All Tags"}</SelectItem>
                         {allTags.map((tag) => (
                           <SelectItem key={tag} value={tag}>{tag}</SelectItem>
                         ))}
@@ -558,7 +560,7 @@ const Dashboard = () => {
                   
                   <Button variant="hero" onClick={handleNewScript}>
                     <Plus className="h-4 w-4 mr-2" />
-                    New Script
+                    {t.dashboard.newScript}
                   </Button>
                 </div>
               </div>
@@ -571,9 +573,11 @@ const Dashboard = () => {
                   <Card className="glass-card border-border/50">
                     <CardContent className="py-12 text-center">
                       <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium mb-2">No matching scripts</h3>
+                      <h3 className="text-lg font-medium mb-2">
+                        {language === "fr" ? "Aucun script correspondant" : "No matching scripts"}
+                      </h3>
                       <p className="text-muted-foreground">
-                        Try adjusting your search or filter criteria.
+                        {language === "fr" ? "Essayez d'ajuster votre recherche ou vos filtres." : "Try adjusting your search or filter criteria."}
                       </p>
                     </CardContent>
                   </Card>

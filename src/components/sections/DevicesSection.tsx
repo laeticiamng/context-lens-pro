@@ -1,5 +1,6 @@
 import { Check, X, ExternalLink, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface DeviceCapability {
   device_id: string;
@@ -108,16 +109,21 @@ const StatusBadge = ({ status }: { status: DeviceCapability["sdk_status"] }) => 
 };
 
 const DevicesSection = () => {
+  const { language } = useLanguage();
+  
   return (
     <section id="devices" className="py-24 md:py-32 bg-secondary/20">
       <div className="container px-4">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Device <span className="text-gradient">Compatibility Matrix</span>
+            {language === "fr" ? "Matrice de " : "Device "}
+            <span className="text-gradient">{language === "fr" ? "Compatibilité" : "Compatibility Matrix"}</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Real capabilities, verified SDKs. We only promise what we can deliver.
+            {language === "fr" 
+              ? "Capacités réelles, SDKs vérifiés. Nous ne promettons que ce que nous pouvons livrer."
+              : "Real capabilities, verified SDKs. We only promise what we can deliver."}
           </p>
         </div>
 
@@ -197,9 +203,11 @@ const DevicesSection = () => {
 
         {/* CTA */}
         <div className="text-center mt-12">
-          <p className="text-muted-foreground mb-4">Don't see your device?</p>
+          <p className="text-muted-foreground mb-4">
+            {language === "fr" ? "Vous ne voyez pas votre appareil ?" : "Don't see your device?"}
+          </p>
           <Button variant="glass">
-            Request Device Support
+            {language === "fr" ? "Demander le support" : "Request Device Support"}
             <ExternalLink className="h-4 w-4 ml-1" />
           </Button>
         </div>
