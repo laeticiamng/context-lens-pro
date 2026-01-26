@@ -14,6 +14,7 @@ import Settings from "./pages/Settings";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
+import ClinicalAR from "./pages/ClinicalAR";
 import OfflineIndicator from "./components/OfflineIndicator";
 
 const queryClient = new QueryClient({
@@ -43,6 +44,8 @@ const App = () => (
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/clinical-ar" element={<ClinicalAR />} />
+              <Route path="/clinical-ar/:patientId" element={<ClinicalAR />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
