@@ -26,7 +26,8 @@ import {
   Sparkles,
   Copy,
   Command,
-  Upload
+  Upload,
+  Brain
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -498,7 +499,7 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <div className="grid lg:grid-cols-4 gap-6">
-          {/* Left Column - Usage Limits */}
+          {/* Left Column - Usage Limits + AR Access */}
           <div className="lg:col-span-1 space-y-6">
             <UsageLimits
               scriptsCount={scripts.length}
@@ -509,6 +510,36 @@ const Dashboard = () => {
               devicesLimit={3}
               plan="free"
             />
+            
+            {/* Clinical AR Access Card */}
+            <Card className="glass-card border-border/50 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5" />
+              <CardContent className="p-4 relative">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                    <Brain className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">{t.clinicalAR.title}</h3>
+                    <p className="text-xs text-muted-foreground">
+                      {language === "fr" ? "Module AR Médical" : "Medical AR Module"}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  {t.clinicalAR.description}
+                </p>
+                <Button 
+                  variant="hero" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => navigate("/clinical-ar")}
+                >
+                  <Glasses className="h-4 w-4 mr-2" />
+                  {t.clinicalAR.startSession}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right Column - Main Content */}

@@ -410,6 +410,47 @@ interface DevicesSectionTranslations {
   requestSupport: string;
 }
 
+// Clinical AR Module
+interface ClinicalARTranslations {
+  title: string;
+  description: string;
+  startSession: string;
+  selectPatient: string;
+  recentPatients: string;
+  voiceHint: string;
+  backToDashboard: string;
+  exitAR: string;
+  loading: string;
+  deviceDetected: string;
+  micListening: string;
+  micOff: string;
+  screenshot: string;
+  report: string;
+  realTimeActive: string;
+  demoMode: string;
+  commands: string;
+  emotions: string;
+  vitals: string;
+  heartRate: string;
+  stress: string;
+  patient: string;
+  lastSession: string;
+  years: string;
+  dominant: string;
+  anxiety: string;
+  joy: string;
+  sadness: string;
+  anger: string;
+  disgust: string;
+  highStress: string;
+  patientLoaded: string;
+  patientNotFound: string;
+  captureSaved: string;
+  generatingReport: string;
+  reportGenerated: string;
+  reportNotAvailable: string;
+}
+
 export interface TranslationKeys {
   nav: NavTranslations;
   hero: HeroTranslations;
@@ -444,6 +485,7 @@ export interface TranslationKeys {
   pipelineSteps: PipelineStepsTranslations;
   capabilityMatrix: CapabilityMatrixTranslations;
   devicesSection: DevicesSectionTranslations;
+  clinicalAR: ClinicalARTranslations;
 }
 
 export const translations = {
@@ -923,6 +965,46 @@ export const translations = {
       dontSeeDevice: "Don't see your device?",
       requestSupport: "Request Device Support",
     },
+    // Clinical AR Module
+    clinicalAR: {
+      title: "Clinical AR Session",
+      description: "Visualize brain data in augmented reality",
+      startSession: "Start AR Session",
+      selectPatient: "Select a patient to begin",
+      recentPatients: "Recent Patients",
+      voiceHint: 'Or say "Patient [name]" to load a file',
+      backToDashboard: "Back to dashboard",
+      exitAR: "Exit AR",
+      loading: "Initializing AR session...",
+      deviceDetected: "Device detected",
+      micListening: "Listening...",
+      micOff: "Mic off",
+      screenshot: "Screenshot",
+      report: "Report",
+      realTimeActive: "Real-time active",
+      demoMode: "Demo mode",
+      commands: 'Commands: "Zoom [region]" • "View axial" • "Note: [text]" • "Reset"',
+      emotions: "Emotions",
+      vitals: "Vitals",
+      heartRate: "HR",
+      stress: "Stress",
+      patient: "Patient",
+      lastSession: "Last session",
+      years: "y/o",
+      dominant: "Dominant",
+      anxiety: "Anxiety",
+      joy: "Joy",
+      sadness: "Sadness",
+      anger: "Anger",
+      disgust: "Disgust",
+      highStress: "High stress detected",
+      patientLoaded: "Patient loaded",
+      patientNotFound: "Patient not found",
+      captureSaved: "Screenshot saved",
+      generatingReport: "Generating report...",
+      reportGenerated: "Report generated",
+      reportNotAvailable: "Report generation not available in demo mode",
+    },
   },
   fr: {
     // Navigation
@@ -1399,6 +1481,46 @@ export const translations = {
       display: "Affichage",
       dontSeeDevice: "Vous ne voyez pas votre appareil ?",
       requestSupport: "Demander le support",
+    },
+    // Clinical AR Module
+    clinicalAR: {
+      title: "Session AR Clinique",
+      description: "Visualisez les données cérébrales en réalité augmentée",
+      startSession: "Démarrer la session AR",
+      selectPatient: "Sélectionnez un patient pour commencer",
+      recentPatients: "Patients récents",
+      voiceHint: 'Ou dites "Patient [nom]" pour charger un dossier',
+      backToDashboard: "Retour au tableau de bord",
+      exitAR: "Quitter AR",
+      loading: "Initialisation de la session AR...",
+      deviceDetected: "Appareil détecté",
+      micListening: "Écoute...",
+      micOff: "Micro désactivé",
+      screenshot: "Capture",
+      report: "Rapport",
+      realTimeActive: "Temps réel actif",
+      demoMode: "Mode démo",
+      commands: 'Commandes: "Zoom [région]" • "Vue axiale" • "Note: [texte]" • "Reset"',
+      emotions: "Émotions",
+      vitals: "Signes Vitaux",
+      heartRate: "FC",
+      stress: "Stress",
+      patient: "Patient",
+      lastSession: "Dernière session",
+      years: "ans",
+      dominant: "Dominante",
+      anxiety: "Anxiété",
+      joy: "Joie",
+      sadness: "Tristesse",
+      anger: "Colère",
+      disgust: "Dégoût",
+      highStress: "Stress élevé détecté",
+      patientLoaded: "Patient chargé",
+      patientNotFound: "Patient non trouvé",
+      captureSaved: "Capture enregistrée",
+      generatingReport: "Génération du rapport...",
+      reportGenerated: "Rapport généré",
+      reportNotAvailable: "Génération de rapport non disponible en mode démo",
     },
   },
 } as const;
