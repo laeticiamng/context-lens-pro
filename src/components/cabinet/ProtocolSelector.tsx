@@ -31,10 +31,10 @@ export function ProtocolSelector({
   const getProtocolIcon = (id: string) => {
     const icons: Record<string, React.ReactNode> = {
       checkup_complet: <Scan className="h-6 w-6 text-primary" />,
-      cardio: <Heart className="h-6 w-6 text-red-500" />,
-      neuro: <Brain className="h-6 w-6 text-pink-500" />,
-      abdominal: <Activity className="h-6 w-6 text-amber-500" />,
-      osteo: <Activity className="h-6 w-6 text-blue-500" />,
+      cardio: <Heart className="h-6 w-6 text-destructive" />,
+      neuro: <Brain className="h-6 w-6 text-primary" />,
+      abdominal: <Activity className="h-6 w-6 text-accent" />,
+      osteo: <Activity className="h-6 w-6 text-primary" />,
     };
     return icons[id] || <Scan className="h-6 w-6" />;
   };
@@ -42,10 +42,10 @@ export function ProtocolSelector({
   const getProtocolColor = (id: string) => {
     const colors: Record<string, string> = {
       checkup_complet: 'border-primary/20 hover:border-primary/50 hover:bg-primary/5',
-      cardio: 'border-red-500/20 hover:border-red-500/50 hover:bg-red-500/5',
-      neuro: 'border-pink-500/20 hover:border-pink-500/50 hover:bg-pink-500/5',
-      abdominal: 'border-amber-500/20 hover:border-amber-500/50 hover:bg-amber-500/5',
-      osteo: 'border-blue-500/20 hover:border-blue-500/50 hover:bg-blue-500/5',
+      cardio: 'border-destructive/20 hover:border-destructive/50 hover:bg-destructive/5',
+      neuro: 'border-primary/20 hover:border-primary/50 hover:bg-primary/5',
+      abdominal: 'border-accent/20 hover:border-accent/50 hover:bg-accent/5',
+      osteo: 'border-primary/20 hover:border-primary/50 hover:bg-primary/5',
     };
     return colors[id] || '';
   };

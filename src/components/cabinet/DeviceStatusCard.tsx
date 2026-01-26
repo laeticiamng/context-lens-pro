@@ -133,7 +133,7 @@ export function DeviceStatusCard({
 
         {/* Cryostat Temperature (simulated) */}
         <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-          <Thermometer className="h-5 w-5 text-cyan-500" />
+          <Thermometer className="h-5 w-5 text-primary" />
           <div>
             <span className="text-sm text-muted-foreground">
               {language === 'fr' ? 'Température cryostat' : 'Cryostat Temperature'}

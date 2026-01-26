@@ -87,8 +87,12 @@ export function SubscriptionCard({
       <CardContent className="space-y-4">
         {/* Price */}
         <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-bold">{plan.price.toLocaleString()} €</span>
-          <span className="text-muted-foreground">/mois</span>
+          <span className="text-3xl font-bold">
+            {plan.price.toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US')} €
+          </span>
+          <span className="text-muted-foreground">
+            /{language === 'fr' ? 'mois' : 'month'}
+          </span>
         </div>
 
         {/* Scans Usage */}
