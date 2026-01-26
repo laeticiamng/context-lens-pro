@@ -551,6 +551,40 @@ const Dashboard = () => {
                 </Button>
               </CardContent>
             </Card>
+            
+            {/* Vision IRM Access Card */}
+            <Card className="glass-card border-border/50 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-secondary/30 to-primary/5" />
+              <CardContent className="p-4 relative">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-secondary-foreground/80 to-primary flex items-center justify-center">
+                    <Activity className="h-5 w-5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">
+                      {language === "fr" ? "Vision IRM" : "MRI Vision"}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {language === "fr" ? "Anatomie 3D AR" : "3D AR Anatomy"}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  {language === "fr" 
+                    ? "Visualisation anatomique corps entier en réalité augmentée"
+                    : "Full body anatomical visualization in augmented reality"}
+                </p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => navigate("/vision-irm")}
+                >
+                  <Activity className="h-4 w-4 mr-2" />
+                  {language === "fr" ? "Ouvrir Vision IRM" : "Open MRI Vision"}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right Column - Main Content */}
@@ -824,6 +858,24 @@ const Dashboard = () => {
               </TabsContent>
             </Tabs>
           </div>
+        </div>
+        
+        {/* Bottom Row - Additional Widgets */}
+        <div className="grid lg:grid-cols-3 gap-6 mt-8">
+          {/* Getting Started */}
+          <GettingStarted
+            scriptsCount={scripts.length}
+            devicesCount={devices.length}
+            hasConnectedDevice={connectedDevices > 0}
+            onAddScript={handleNewScript}
+            onAddDevice={() => setIsAddDeviceOpen(true)}
+          />
+          
+          {/* Tip of the Day */}
+          <TipOfTheDayCard />
+          
+          {/* Help Center */}
+          <HelpCenter />
         </div>
       </main>
 

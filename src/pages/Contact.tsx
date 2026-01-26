@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import SEOHead from "@/components/layout/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -112,6 +113,10 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SEOHead 
+        title={language === "fr" ? "Contact - ContextLens" : "Contact - ContextLens"}
+        description={language === "fr" ? "Contactez l'équipe ContextLens" : "Contact the ContextLens team"}
+      />
       <Header />
       <main className="pt-24 pb-16">
         <div className="container px-4">

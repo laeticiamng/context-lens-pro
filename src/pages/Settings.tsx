@@ -34,6 +34,7 @@ import AvatarUpload from "@/components/settings/AvatarUpload";
 import SettingsSkeleton from "@/components/settings/SettingsSkeleton";
 import APIKeyManager from "@/components/settings/APIKeyManager";
 import BillingTab from "@/components/settings/BillingTab";
+import GDPRCompliancePanel from "@/components/settings/GDPRCompliancePanel";
 import ErrorBoundary from "@/components/ui/error-boundary";
 
 const Settings = () => {
@@ -247,6 +248,7 @@ const Settings = () => {
   }
 
   return (
+    <ErrorBoundary>
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
@@ -366,6 +368,14 @@ const Settings = () => {
 
             <SessionManagement />
             
+            {user && (
+              <GDPRCompliancePanel
+                userId={user.id}
+                onExportData={handleExportData}
+                onDeleteData={handleDeleteData}
+              />
+            )}
+            
             <PrivacyControls 
               onExportData={handleExportData}
               onDeleteData={handleDeleteData}
@@ -447,6 +457,7 @@ const Settings = () => {
         onOpenChange={setShowPasswordDialog} 
       />
     </div>
+    </ErrorBoundary>
   );
 };
 

@@ -26,6 +26,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import APIEndpointsDocs from "@/components/docs/APIEndpointsDocs";
 import DocSearch from "@/components/docs/DocSearch";
 import TableOfContents from "@/components/docs/TableOfContents";
+import TroubleshootingSection from "@/components/docs/TroubleshootingSection";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import ErrorBoundary from "@/components/ui/error-boundary";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -266,6 +267,7 @@ const Documentation = () => {
     { id: "tier-3", title: "Tier 3 — Vision + AR", level: 1 },
     { id: "device-sdks", title: language === "fr" ? "SDKs par appareil" : "Device-Specific SDKs", level: 1 },
     { id: "api-reference", title: t.apiReference, level: 1 },
+    { id: "troubleshooting", title: language === "fr" ? "Dépannage" : "Troubleshooting", level: 1 },
   ];
 
   return (
@@ -678,7 +680,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-12 rounded-xl bg-violet-500/10 flex items-center justify-center">
-                        <Cpu className="h-6 w-6 text-violet-400" />
+                        <Cpu className="h-6 w-6 text-violet-500" />
                       </div>
                       <div>
                         <CardTitle>Rokid Integration</CardTitle>
@@ -688,7 +690,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                      <p className="text-sm text-amber-200">
+                      <p className="text-sm text-amber-600 dark:text-amber-400">
                         <strong>Note:</strong> Rokid SDK access requires joining the Developer Program.
                         Contact Rokid directly for access.
                       </p>
@@ -924,6 +926,9 @@ await contextLens.startSession({
                 </div>
               </CardContent>
             </Card>
+            
+            {/* Troubleshooting Section */}
+            <TroubleshootingSection />
             </div>
             </div>
           </div>
