@@ -1,19 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail } from "lucide-react";
-import { useState } from "react";
+import { useState, forwardRef } from "react";
+import { useWaitlist } from "@/hooks/useWaitlist";
 
-const CTASection = () => {
+const CTASection = forwardRef<HTMLElement>((_, ref) => {
   const [email, setEmail] = useState("");
+  const { joinWaitlist, loading } = useWaitlist();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle early access signup
-    console.log("Early access request:", email);
-    setEmail("");
+    const success = await joinWaitlist(email);
+    if (success) {
+      setEmail("");
+    }
   };
 
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden">
+    <section ref={ref} className="py-24 md:py-32 relative overflow-hidden">
       {/* Background effects */}
       <div 
         className="absolute inset-0"
@@ -62,8 +65,8 @@ const CTASection = () => {
                 className="w-full h-12 pl-12 pr-4 rounded-xl bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
               />
             </div>
-            <Button type="submit" variant="hero" size="lg">
-              Get Early Access
+            <Button type="submit" variant="hero" size="lg" disabled={loading}>
+              {loading ? "Joining..." : "Get Early Access"}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </form>
@@ -76,6 +79,8 @@ const CTASection = () => {
       </div>
     </section>
   );
-};
+});
+
+CTASection.displayName = "CTASection";
 
 export default CTASection;

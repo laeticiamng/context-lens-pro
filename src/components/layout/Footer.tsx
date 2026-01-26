@@ -1,3 +1,5 @@
+import { forwardRef } from "react";
+import { Link } from "react-router-dom";
 import { Glasses, Github, Twitter, Linkedin } from "lucide-react";
 
 const footerLinks = {
@@ -8,9 +10,9 @@ const footerLinks = {
     { label: "Pricing", href: "#pricing" },
   ],
   resources: [
-    { label: "Documentation", href: "#" },
-    { label: "API Reference", href: "#" },
-    { label: "SDK Guide", href: "#" },
+    { label: "Documentation", href: "/docs" },
+    { label: "API Reference", href: "/docs" },
+    { label: "SDK Guide", href: "/docs" },
     { label: "Blog", href: "#" },
   ],
   company: [
@@ -27,21 +29,21 @@ const footerLinks = {
   ],
 };
 
-const Footer = () => {
+const Footer = forwardRef<HTMLElement>((_, ref) => {
   return (
-    <footer className="border-t border-border/50 bg-card/50">
+    <footer ref={ref} className="border-t border-border/50 bg-card/50">
       <div className="container px-4 py-16">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-2">
-            <a href="/" className="flex items-center gap-2.5 mb-4">
+            <Link to="/" className="flex items-center gap-2.5 mb-4">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
                 <Glasses className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold tracking-tight">
                 Context<span className="text-gradient">Lens</span>
               </span>
-            </a>
+            </Link>
             <p className="text-sm text-muted-foreground mb-6 max-w-xs">
               Transform any smart glasses into a contextual prompter. 
               AI-powered, privacy-first, universal.
@@ -90,12 +92,21 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
-                  <a 
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </a>
+                  {link.href.startsWith("/") ? (
+                    <Link 
+                      to={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a 
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -148,6 +159,8 @@ const Footer = () => {
       </div>
     </footer>
   );
-};
+});
+
+Footer.displayName = "Footer";
 
 export default Footer;

@@ -6,6 +6,7 @@ import DevicesSection from "@/components/sections/DevicesSection";
 import PipelineSection from "@/components/sections/PipelineSection";
 import PricingSection from "@/components/sections/PricingSection";
 import CTASection from "@/components/sections/CTASection";
+import DemoSection from "@/components/sections/DemoSection";
 
 const Index = () => {
   return (
@@ -13,6 +14,7 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <DemoSection />
         <TierSection />
         <DevicesSection />
         <PipelineSection />
