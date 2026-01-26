@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dialog";
 import ScriptEditor from "@/components/dashboard/ScriptEditor";
 import AnalyticsCharts from "@/components/dashboard/AnalyticsCharts";
+import AddDeviceDialog from "@/components/dashboard/AddDeviceDialog";
 import type { User } from "@supabase/supabase-js";
 
 interface Script {
@@ -73,6 +74,7 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [editingScript, setEditingScript] = useState<Script | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Auth state
@@ -198,6 +200,29 @@ const Dashboard = () => {
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
+  };
+
+  const handleAddDevice = async (deviceData: {
+    device_name: string;
+    device_type: string;
+    manufacturer: string;
+    tier: number;
+  }) => {
+    const { error } = await supabase.from("connected_devices").insert({
+      user_id: user?.id as string,
+      device_name: deviceData.device_name,
+      device_type: deviceData.device_type,
+      manufacturer: deviceData.manufacturer,
+      tier: deviceData.tier,
+      is_connected: true,
+    });
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to add device", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: "Device added successfully" });
+      fetchDevices();
+    }
   };
 
   const filteredScripts = scripts.filter(s => 
@@ -447,7 +472,7 @@ const Dashboard = () => {
                   <p className="text-muted-foreground mb-4">
                     Connect your smart glasses to start using ContextLens.
                   </p>
-                  <Button variant="hero">
+                  <Button variant="hero" onClick={() => setIsAddDeviceOpen(true)}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Device
                   </Button>
@@ -481,6 +506,18 @@ const Dashboard = () => {
                     </CardContent>
                   </Card>
                 ))}
+                {/* Add device button */}
+                <Card 
+                  className="glass-card border-border/50 border-dashed hover:border-primary/50 cursor-pointer transition-colors"
+                  onClick={() => setIsAddDeviceOpen(true)}
+                >
+                  <CardContent className="p-4 flex items-center justify-center h-full min-h-[80px]">
+                    <div className="text-center">
+                      <Plus className="h-6 w-6 mx-auto text-muted-foreground mb-1" />
+                      <span className="text-sm text-muted-foreground">Add Device</span>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </TabsContent>
@@ -511,6 +548,13 @@ const Dashboard = () => {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Add Device Dialog */}
+      <AddDeviceDialog
+        open={isAddDeviceOpen}
+        onOpenChange={setIsAddDeviceOpen}
+        onDeviceAdded={handleAddDevice}
+      />
     </div>
   );
 };
