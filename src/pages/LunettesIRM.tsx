@@ -183,7 +183,17 @@ function LunettesIRMContent() {
             <Settings className="h-4 w-4 mr-2" />
             {language === 'fr' ? 'Paramètres' : 'Settings'}
           </Button>
-          <Button variant="outline">
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              toast.info(
+                language === 'fr'
+                  ? 'Documentation et support disponibles sur /docs'
+                  : 'Documentation and support available at /docs'
+              );
+              navigate('/docs');
+            }}
+          >
             <HelpCircle className="h-4 w-4 mr-2" />
             {language === 'fr' ? 'Aide' : 'Help'}
           </Button>

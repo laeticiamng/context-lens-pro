@@ -60,7 +60,7 @@ const SharedScript = () => {
   useEffect(() => {
     const fetchScript = async () => {
       if (!scriptId) {
-        setError(t.notFound);
+        setError(language === "fr" ? "Script introuvable" : "Script not found");
         setLoading(false);
         return;
       }
@@ -78,9 +78,11 @@ const SharedScript = () => {
           // Show demo content for demonstration
           setScript({
             id: scriptId,
-            title: "Demo Shared Script",
-            content: "This is a demonstration of the script sharing feature.\n\nIn production, shared scripts would be publicly accessible with proper RLS policies.\n\nKey features:\n- Read-only access\n- Copy to clipboard\n- SEO-friendly metadata\n- Quick sign-up CTA",
-            tags: ["demo", "shared", "example"],
+            title: language === "fr" ? "Script Partagé Démo" : "Demo Shared Script",
+            content: language === "fr"
+              ? "Ceci est une démonstration de la fonctionnalité de partage de scripts.\n\nEn production, les scripts partagés seraient accessibles publiquement avec des politiques RLS appropriées.\n\nFonctionnalités clés :\n- Accès en lecture seule\n- Copier dans le presse-papiers\n- Métadonnées SEO-friendly\n- CTA d'inscription rapide"
+              : "This is a demonstration of the script sharing feature.\n\nIn production, shared scripts would be publicly accessible with proper RLS policies.\n\nKey features:\n- Read-only access\n- Copy to clipboard\n- SEO-friendly metadata\n- Quick sign-up CTA",
+            tags: ["demo", language === "fr" ? "partagé" : "shared", language === "fr" ? "exemple" : "example"],
             created_at: new Date().toISOString(),
             usage_count: 42,
           });
@@ -88,14 +90,14 @@ const SharedScript = () => {
           setScript(data);
         }
       } catch {
-        setError(t.notFound);
+        setError(language === "fr" ? "Script introuvable" : "Script not found");
       } finally {
         setLoading(false);
       }
     };
 
     fetchScript();
-  }, [scriptId]);
+  }, [scriptId, language]);
 
   const handleCopy = async () => {
     if (!script) return;

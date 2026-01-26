@@ -83,6 +83,7 @@ import TipOfTheDayCard from "@/components/dashboard/TipOfTheDayCard";
 import HelpCenter from "@/components/dashboard/HelpCenter";
 import HighlightText from "@/components/ui/highlight-text";
 import ErrorBoundary from "@/components/ui/error-boundary";
+import SEOHead from "@/components/layout/SEOHead";
 import type { User } from "@supabase/supabase-js";
 
 interface Script {
@@ -354,6 +355,11 @@ const Dashboard = () => {
   }
 
   return (
+    <>
+      <SEOHead
+        title={language === "fr" ? "Tableau de bord - ContextLens" : "Dashboard - ContextLens"}
+        description={language === "fr" ? "Gérez vos scripts et appareils connectés" : "Manage your scripts and connected devices"}
+      />
     <div className="min-h-screen bg-background">
       {/* Onboarding Flow */}
       {showOnboarding && (
@@ -924,6 +930,7 @@ const Dashboard = () => {
         </Dialog>
       )}
     </div>
+    </>
   );
 };
 
