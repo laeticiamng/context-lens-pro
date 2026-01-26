@@ -3,104 +3,20 @@ import { Check, X, Minus, Smartphone, Monitor, Cpu, Layers, ChevronDown, Info } 
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-const tiers = [
-  {
-    tier: 0,
-    title: "Universal",
-    subtitle: "Phone-Only Fallback",
-    icon: Smartphone,
-    description: "Works with ALL devices. Vision via phone camera, display via notifications or audio TTS.",
-    badge: "Safety Net",
-    color: "emerald",
-    features: ["Phone camera capture", "Cloud AI analysis", "Push notifications", "Audio TTS output"],
-    works: ["Any glasses", "Closed ecosystems", "No SDK required"],
-  },
-  {
-    tier: 1,
-    title: "Display via SDK",
-    subtitle: "Native HUD Integration",
-    icon: Monitor,
-    description: "Push text and images directly to the HUD via official manufacturer SDK.",
-    badge: "Recommended",
-    color: "primary",
-    features: ["Phone camera capture", "Native HUD display", "Smooth prompter UX", "No hacks required"],
-    works: ["Even G2", "Vuzix Z100", "Xreal Air"],
-  },
-  {
-    tier: 2,
-    title: "On-Device Mode",
-    subtitle: "Developer Access",
-    icon: Cpu,
-    description: "App runs directly on the glasses with potential sensor access.",
-    badge: "Advanced",
-    color: "violet",
-    features: ["On-device compute", "Sensor integration", "Lower latency", "Developer mode"],
-    works: ["Rokid (Dev Program)", "Meta Quest", "HoloLens"],
-  },
-  {
-    tier: 3,
-    title: "Vision + AR",
-    subtitle: "Full Spatial Computing",
-    icon: Layers,
-    description: "Spatial overlays with 6DoF tracking. The ultimate AR experience.",
-    badge: "Endgame",
-    color: "amber",
-    features: ["Spatial anchors", "6DoF tracking", "World-locked UI", "Full AR capability"],
-    works: ["Apple Vision Pro", "Magic Leap 2", "Future devices"],
-  },
-];
+const tierIcons = [Smartphone, Monitor, Cpu, Layers];
+const tierColors = ["emerald", "primary", "violet", "amber"];
 
-const capabilities = [
-  { 
-    name: "Vision Input",
-    description: "Camera access for context capture",
-    values: ["Phone Only", "Phone Only", "Native Cam", "Native + Depth"]
-  },
-  { 
-    name: "Display Output",
-    description: "How content is rendered",
-    values: ["Notif/TTS", "HUD SDK", "Native App", "Spatial UI"]
-  },
-  { 
-    name: "Latency",
-    description: "End-to-end response time",
-    values: ["500-1000ms", "200-500ms", "100-200ms", "<100ms"]
-  },
-  { 
-    name: "Offline Mode",
-    description: "Works without internet",
-    values: [false, false, "Partial", true]
-  },
-  { 
-    name: "Gesture Control",
-    description: "Hand/gesture input support",
-    values: [false, "Basic", true, "Full 3D"]
-  },
-  { 
-    name: "Voice Control",
-    description: "Voice command support",
-    values: ["Phone Mic", "Phone Mic", "Native Mic", "Native Mic"]
-  },
-  { 
-    name: "Head Tracking",
-    description: "IMU-based orientation",
-    values: [false, false, "3DoF", "6DoF"]
-  },
-  { 
-    name: "Spatial Anchors",
-    description: "World-locked content",
-    values: [false, false, false, true]
-  },
-  { 
-    name: "Multi-User",
-    description: "Shared AR experiences",
-    values: [false, false, false, true]
-  },
-  { 
-    name: "SDK Required",
-    description: "Developer SDK needed",
-    values: [false, true, true, true]
-  },
+const capabilityValues = [
+  ["Phone Only", "Phone Only", "Native Cam", "Native + Depth"],
+  ["Notif/TTS", "HUD SDK", "Native App", "Spatial UI"],
+  ["500-1000ms", "200-500ms", "100-200ms", "<100ms"],
+  [false, false, "Partial", true],
+  [false, "Basic", true, "Full 3D"],
+  ["Phone Mic", "Phone Mic", "Native Mic", "Native Mic"],
+  [false, false, "3DoF", "6DoF"],
+  [false, false, false, true],
+  [false, false, false, true],
+  [false, true, true, true],
 ];
 
 const devices = [
@@ -125,10 +41,17 @@ const getColorClass = (tier: number, type: 'bg' | 'text' | 'border') => {
 };
 
 const CapabilityMatrix = () => {
-  const { language } = useLanguage();
+  const { t } = useLanguage();
   const [selectedTier, setSelectedTier] = useState<number | null>(null);
   const [showMatrix, setShowMatrix] = useState(false);
   const [showDevices, setShowDevices] = useState(false);
+
+  const tiers = [
+    { tier: 0, icon: tierIcons[0], colorClass: "emerald", ...t.capabilityMatrix.tiers.t0 },
+    { tier: 1, icon: tierIcons[1], colorClass: "primary", ...t.capabilityMatrix.tiers.t1 },
+    { tier: 2, icon: tierIcons[2], colorClass: "violet", ...t.capabilityMatrix.tiers.t2 },
+    { tier: 3, icon: tierIcons[3], colorClass: "amber", ...t.capabilityMatrix.tiers.t3 },
+  ];
 
   const renderValue = (value: string | boolean) => {
     if (value === true) return <Check className="h-4 w-4 text-emerald-400" />;
@@ -148,13 +71,11 @@ const CapabilityMatrix = () => {
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            {language === "fr" ? "Architecture par niveaux pour " : "Tiered Architecture for "}
-            <span className="text-gradient">{language === "fr" ? "Tous les appareils" : "Every Device"}</span>
+            {t.capabilities.title}{" "}
+            <span className="text-gradient">{t.capabilities.titleHighlight}</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            {language === "fr" 
-              ? "Du mode téléphone de secours à l'ancrage AR complet — ContextLens s'adapte aux capacités de vos lunettes."
-              : "From basic phone-only fallback to full AR anchoring — ContextLens adapts to what your glasses can do."}
+            {t.capabilities.description}
           </p>
         </div>
 
@@ -167,14 +88,14 @@ const CapabilityMatrix = () => {
               <motion.button
                 key={tier.tier}
                 onClick={() => setSelectedTier(isSelected ? null : tier.tier)}
-                className={`relative text-left p-6 rounded-2xl border-2 transition-all ${
+              className={`relative text-left p-6 rounded-2xl border-2 transition-all ${
                   isSelected 
-                    ? `border-${tier.color === 'primary' ? 'primary' : tier.color + '-500'} bg-${tier.color === 'primary' ? 'primary' : tier.color + '-500'}/10`
+                    ? "border-primary bg-primary/10"
                     : "glass-card border-border/50 hover:border-primary/30"
                 }`}
                 style={{
-                  borderColor: isSelected ? `hsl(var(--${tier.color === 'primary' ? 'primary' : tier.color}))` : undefined,
-                  backgroundColor: isSelected ? `hsl(var(--${tier.color === 'primary' ? 'primary' : tier.color}) / 0.1)` : undefined
+                  borderColor: isSelected && tier.colorClass !== 'primary' ? `hsl(var(--${tier.colorClass}))` : undefined,
+                  backgroundColor: isSelected && tier.colorClass !== 'primary' ? `hsl(var(--${tier.colorClass}) / 0.1)` : undefined
                 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -188,10 +109,10 @@ const CapabilityMatrix = () => {
                 {/* Icon */}
                 <div className="flex items-center gap-3 mb-3">
                   <div 
-                    className={`p-2.5 rounded-xl`}
+                    className="p-2.5 rounded-xl bg-primary/15 text-primary"
                     style={{ 
-                      backgroundColor: `hsl(var(--${tier.color === 'primary' ? 'primary' : tier.color}) / 0.15)`,
-                      color: `hsl(var(--${tier.color === 'primary' ? 'primary' : tier.color}))`
+                      backgroundColor: tier.colorClass !== 'primary' ? `hsl(var(--${tier.colorClass}) / 0.15)` : undefined,
+                      color: tier.colorClass !== 'primary' ? `hsl(var(--${tier.colorClass}))` : undefined
                     }}
                   >
                     <tier.icon className="h-5 w-5" />
@@ -235,7 +156,7 @@ const CapabilityMatrix = () => {
           >
             <div className="flex items-center gap-3">
               <Info className="h-5 w-5 text-primary" />
-              <span className="font-medium">{language === "fr" ? "Matrice complète des capacités" : "Full Capability Matrix"}</span>
+              <span className="font-medium">{t.capabilityMatrix.fullMatrix}</span>
             </div>
             <ChevronDown className={`h-5 w-5 transition-transform ${showMatrix ? "rotate-180" : ""}`} />
           </button>
@@ -252,7 +173,7 @@ const CapabilityMatrix = () => {
                   <table className="w-full min-w-[600px]">
                     <thead>
                       <tr className="border-b border-border/50">
-                        <th className="text-left p-4 font-medium text-sm">{language === "fr" ? "Capacité" : "Capability"}</th>
+                        <th className="text-left p-4 font-medium text-sm">{t.capabilityMatrix.capability}</th>
                         {tiers.map((tier) => (
                           <th key={tier.tier} className="p-4 text-center">
                             <span className={`tier-badge tier-${tier.tier}`}>T{tier.tier}</span>
@@ -261,13 +182,13 @@ const CapabilityMatrix = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {capabilities.map((cap, i) => (
+                      {t.capabilityMatrix.capabilities.map((cap, i) => (
                         <tr key={cap.name} className={i % 2 === 0 ? "bg-secondary/20" : ""}>
                           <td className="p-4">
                             <div className="font-medium text-sm">{cap.name}</div>
                             <div className="text-xs text-muted-foreground">{cap.description}</div>
                           </td>
-                          {cap.values.map((value, j) => (
+                          {capabilityValues[i]?.map((value, j) => (
                             <td key={j} className="p-4 text-center">
                               {renderValue(value)}
                             </td>
@@ -288,7 +209,7 @@ const CapabilityMatrix = () => {
           >
             <div className="flex items-center gap-3">
               <Monitor className="h-5 w-5 text-accent" />
-              <span className="font-medium">{language === "fr" ? "Appareils compatibles" : "Compatible Devices"}</span>
+              <span className="font-medium">{t.capabilityMatrix.compatibleDevices}</span>
             </div>
             <ChevronDown className={`h-5 w-5 transition-transform ${showDevices ? "rotate-180" : ""}`} />
           </button>
