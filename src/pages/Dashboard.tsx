@@ -36,11 +36,9 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import ScriptEditor from "@/components/dashboard/ScriptEditor";
+import AnalyticsCharts from "@/components/dashboard/AnalyticsCharts";
 import type { User } from "@supabase/supabase-js";
 
 interface Script {
@@ -73,8 +71,8 @@ const Dashboard = () => {
   const [scripts, setScripts] = useState<Script[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [newScript, setNewScript] = useState({ title: "", content: "", tags: "" });
+  const [editingScript, setEditingScript] = useState<Script | null>(null);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Auth state
@@ -138,26 +136,42 @@ const Dashboard = () => {
     }
   };
 
-  const handleCreateScript = async () => {
-    if (!newScript.title.trim()) {
-      toast({ title: "Error", description: "Title is required", variant: "destructive" });
-      return;
-    }
+  const handleSaveScript = async (scriptData: Partial<Script>) => {
+    if (editingScript) {
+      // Update existing
+      const { error } = await supabase
+        .from("scripts")
+        .update({
+          title: scriptData.title,
+          content: scriptData.content,
+          tags: scriptData.tags,
+        })
+        .eq("id", editingScript.id);
 
-    const { error } = await supabase.from("scripts").insert({
-      user_id: user?.id,
-      title: newScript.title,
-      content: newScript.content,
-      tags: newScript.tags.split(",").map(t => t.trim()).filter(Boolean),
-    });
-
-    if (error) {
-      toast({ title: "Error", description: "Failed to create script", variant: "destructive" });
+      if (error) {
+        toast({ title: "Error", description: "Failed to update script", variant: "destructive" });
+      } else {
+        toast({ title: "Success", description: "Script updated" });
+        setIsEditorOpen(false);
+        setEditingScript(null);
+        fetchScripts();
+      }
     } else {
-      toast({ title: "Success", description: "Script created successfully" });
-      setNewScript({ title: "", content: "", tags: "" });
-      setIsCreateOpen(false);
-      fetchScripts();
+      // Create new
+      const { error } = await supabase.from("scripts").insert({
+        user_id: user?.id as string,
+        title: scriptData.title || "",
+        content: scriptData.content || "",
+        tags: scriptData.tags || [],
+      });
+
+      if (error) {
+        toast({ title: "Error", description: "Failed to create script", variant: "destructive" });
+      } else {
+        toast({ title: "Success", description: "Script created" });
+        setIsEditorOpen(false);
+        fetchScripts();
+      }
     }
   };
 
@@ -169,6 +183,16 @@ const Dashboard = () => {
       toast({ title: "Deleted", description: "Script removed" });
       fetchScripts();
     }
+  };
+
+  const handleEditScript = (script: Script) => {
+    setEditingScript(script);
+    setIsEditorOpen(true);
+  };
+
+  const handleNewScript = () => {
+    setEditingScript(null);
+    setIsEditorOpen(true);
   };
 
   const handleSignOut = async () => {
@@ -327,60 +351,10 @@ const Dashboard = () => {
                   className="pl-9 w-64"
                 />
               </div>
-              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="hero">
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Script
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Create New Script</DialogTitle>
-                    <DialogDescription>
-                      Add a new script to your prompter library.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="title">Title</Label>
-                      <Input
-                        id="title"
-                        placeholder="e.g., Sales Pitch"
-                        value={newScript.title}
-                        onChange={(e) => setNewScript({ ...newScript, title: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="content">Content</Label>
-                      <Textarea
-                        id="content"
-                        placeholder="Enter your script content..."
-                        rows={6}
-                        value={newScript.content}
-                        onChange={(e) => setNewScript({ ...newScript, content: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="tags">Tags (comma-separated)</Label>
-                      <Input
-                        id="tags"
-                        placeholder="e.g., sales, meeting, pitch"
-                        value={newScript.tags}
-                        onChange={(e) => setNewScript({ ...newScript, tags: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button variant="ghost" onClick={() => setIsCreateOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button variant="hero" onClick={handleCreateScript}>
-                      Create Script
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+              <Button variant="hero" onClick={handleNewScript}>
+                <Plus className="h-4 w-4 mr-2" />
+                New Script
+              </Button>
             </div>
           </div>
 
@@ -394,7 +368,7 @@ const Dashboard = () => {
                   <p className="text-muted-foreground mb-4">
                     Create your first script to get started with contextual prompting.
                   </p>
-                  <Button variant="hero" onClick={() => setIsCreateOpen(true)}>
+                  <Button variant="hero" onClick={handleNewScript}>
                     <Plus className="h-4 w-4 mr-2" />
                     Create Script
                   </Button>
@@ -403,7 +377,11 @@ const Dashboard = () => {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredScripts.map((script) => (
-                  <Card key={script.id} className="glass-card border-border/50 hover:border-primary/30 transition-colors">
+                  <Card 
+                    key={script.id} 
+                    className="glass-card border-border/50 hover:border-primary/30 transition-colors cursor-pointer"
+                    onClick={() => handleEditScript(script)}
+                  >
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div>
@@ -413,19 +391,19 @@ const Dashboard = () => {
                           </CardDescription>
                         </div>
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                             <Button variant="ghost" size="icon" className="h-8 w-8">
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditScript(script); }}>
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               className="text-destructive"
-                              onClick={() => handleDeleteScript(script.id)}
+                              onClick={(e) => { e.stopPropagation(); handleDeleteScript(script.id); }}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete
@@ -509,27 +487,30 @@ const Dashboard = () => {
 
           {/* Analytics Tab */}
           <TabsContent value="analytics">
-            <Card className="glass-card border-border/50">
-              <CardHeader>
-                <CardTitle>Usage Analytics</CardTitle>
-                <CardDescription>
-                  Track your prompter usage and performance metrics.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-center justify-center border border-dashed border-border rounded-lg">
-                  <div className="text-center">
-                    <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">
-                      Analytics charts will appear here as you use ContextLens.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <AnalyticsCharts scripts={scripts} devices={devices} />
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Script Editor Dialog */}
+      <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{editingScript ? "Edit Script" : "New Script"}</DialogTitle>
+            <DialogDescription>
+              {editingScript ? "Edit your script content and settings." : "Create a new script for your prompter."}
+            </DialogDescription>
+          </DialogHeader>
+          <ScriptEditor
+            script={editingScript}
+            onSave={handleSaveScript}
+            onClose={() => {
+              setIsEditorOpen(false);
+              setEditingScript(null);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

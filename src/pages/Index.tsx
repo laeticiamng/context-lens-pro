@@ -1,9 +1,9 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/sections/HeroSection";
-import TierSection from "@/components/sections/TierSection";
+import CapabilityMatrix from "@/components/sections/CapabilityMatrix";
 import DevicesSection from "@/components/sections/DevicesSection";
-import PipelineSection from "@/components/sections/PipelineSection";
+import InteractivePipeline from "@/components/sections/InteractivePipeline";
 import PricingSection from "@/components/sections/PricingSection";
 import CTASection from "@/components/sections/CTASection";
 import DemoSection from "@/components/sections/DemoSection";
@@ -15,9 +15,9 @@ const Index = () => {
       <main>
         <HeroSection />
         <DemoSection />
-        <TierSection />
+        <CapabilityMatrix />
         <DevicesSection />
-        <PipelineSection />
+        <InteractivePipeline />
         <PricingSection />
         <CTASection />
       </main>
