@@ -21,6 +21,7 @@ import {
   Square
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface BulkActionsProps {
   selectedIds: string[];
@@ -44,7 +45,26 @@ const BulkActions = ({
   onBulkExport,
 }: BulkActionsProps) => {
   const { toast } = useToast();
+  const { language } = useLanguage();
   const [loading, setLoading] = useState(false);
+
+  const t = {
+    selectAll: language === "fr" ? "Tout sélectionner" : "Select All",
+    selected: language === "fr" ? "sélectionné(s)" : "selected",
+    activate: language === "fr" ? "Activer" : "Activate",
+    deactivate: language === "fr" ? "Désactiver" : "Deactivate",
+    duplicate: language === "fr" ? "Dupliquer" : "Duplicate",
+    exportSelected: language === "fr" ? "Exporter la sélection" : "Export Selected",
+    deleteSelected: language === "fr" ? "Supprimer la sélection" : "Delete Selected",
+    clear: language === "fr" ? "Effacer" : "Clear",
+    success: language === "fr" ? "Succès" : "Success",
+    error: language === "fr" ? "Erreur" : "Error",
+    actionFailed: language === "fr" ? "Action échouée" : "Action failed",
+    scriptsActivated: language === "fr" ? "Scripts activés" : "Scripts activated",
+    scriptsDeactivated: language === "fr" ? "Scripts désactivés" : "Scripts deactivated",
+    scriptsDuplicated: language === "fr" ? "Scripts dupliqués" : "Scripts duplicated",
+    scriptsDeleted: language === "fr" ? "Scripts supprimés" : "Scripts deleted",
+  };
 
   const hasSelection = selectedIds.length > 0;
   const allSelected = selectedIds.length === totalCount && totalCount > 0;
@@ -53,10 +73,10 @@ const BulkActions = ({
     setLoading(true);
     try {
       await action();
-      toast({ title: "Success", description: successMessage });
+      toast({ title: t.success, description: successMessage });
       onClearSelection();
     } catch (error) {
-      toast({ title: "Error", description: "Action failed", variant: "destructive" });
+      toast({ title: t.error, description: t.actionFailed, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -73,7 +93,7 @@ const BulkActions = ({
           disabled={totalCount === 0}
         >
           <Square className="h-4 w-4 mr-2" />
-          Select All
+          {t.selectAll}
         </Button>
       </div>
     );
@@ -87,7 +107,7 @@ const BulkActions = ({
           onCheckedChange={(checked) => checked ? onSelectAll() : onClearSelection()}
         />
         <Badge variant="secondary" className="font-normal">
-          {selectedIds.length} selected
+          {selectedIds.length} {t.selected}
         </Badge>
       </div>
 
@@ -97,31 +117,31 @@ const BulkActions = ({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => handleAction(() => onBulkActivate(selectedIds, true), "Scripts activated")}
+          onClick={() => handleAction(() => onBulkActivate(selectedIds, true), t.scriptsActivated)}
           disabled={loading}
         >
           <Eye className="h-4 w-4 mr-1" />
-          Activate
+          {t.activate}
         </Button>
 
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => handleAction(() => onBulkActivate(selectedIds, false), "Scripts deactivated")}
+          onClick={() => handleAction(() => onBulkActivate(selectedIds, false), t.scriptsDeactivated)}
           disabled={loading}
         >
           <EyeOff className="h-4 w-4 mr-1" />
-          Deactivate
+          {t.deactivate}
         </Button>
 
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => handleAction(() => onBulkDuplicate(selectedIds), "Scripts duplicated")}
+          onClick={() => handleAction(() => onBulkDuplicate(selectedIds), t.scriptsDuplicated)}
           disabled={loading}
         >
           <Copy className="h-4 w-4 mr-1" />
-          Duplicate
+          {t.duplicate}
         </Button>
 
         <DropdownMenu>
@@ -133,15 +153,15 @@ const BulkActions = ({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onBulkExport(selectedIds)}>
               <Download className="h-4 w-4 mr-2" />
-              Export Selected
+              {t.exportSelected}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               className="text-destructive focus:text-destructive"
-              onClick={() => handleAction(() => onBulkDelete(selectedIds), "Scripts deleted")}
+              onClick={() => handleAction(() => onBulkDelete(selectedIds), t.scriptsDeleted)}
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Delete Selected
+              {t.deleteSelected}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -155,7 +175,7 @@ const BulkActions = ({
         onClick={onClearSelection}
         className="text-muted-foreground"
       >
-        Clear
+        {t.clear}
       </Button>
     </div>
   );

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Keyboard } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface ShortcutGroup {
   title: string;
@@ -17,64 +18,79 @@ interface ShortcutGroup {
   }[];
 }
 
-const shortcutGroups: ShortcutGroup[] = [
-  {
-    title: "Navigation",
-    shortcuts: [
-      { keys: ["⌘", "K"], description: "Open command palette" },
-      { keys: ["⌘", "/"], description: "Show keyboard shortcuts" },
-      { keys: ["⌘", "1"], description: "Go to Scripts" },
-      { keys: ["⌘", "2"], description: "Go to Devices" },
-      { keys: ["⌘", "3"], description: "Go to Analytics" },
-    ],
-  },
-  {
-    title: "Scripts",
-    shortcuts: [
-      { keys: ["⌘", "N"], description: "Create new script" },
-      { keys: ["⌘", "S"], description: "Save current script" },
-      { keys: ["⌘", "D"], description: "Duplicate script" },
-      { keys: ["Delete"], description: "Delete selected script" },
-      { keys: ["⌘", "F"], description: "Search scripts" },
-    ],
-  },
-  {
-    title: "Preview",
-    shortcuts: [
-      { keys: ["↑"], description: "Previous line" },
-      { keys: ["↓"], description: "Next line" },
-      { keys: ["+"], description: "Increase font size" },
-      { keys: ["-"], description: "Decrease font size" },
-      { keys: ["Space"], description: "Toggle preview mode" },
-    ],
-  },
-  {
-    title: "General",
-    shortcuts: [
-      { keys: ["Esc"], description: "Close dialog / Cancel" },
-      { keys: ["⌘", "Z"], description: "Undo" },
-      { keys: ["⌘", "⇧", "Z"], description: "Redo" },
-      { keys: ["⌘", "E"], description: "Export scripts" },
-    ],
-  },
-];
-
 interface KeyboardShortcutsProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 const KeyboardShortcuts = ({ open, onOpenChange }: KeyboardShortcutsProps) => {
+  const { language } = useLanguage();
+
+  const t = {
+    title: language === "fr" ? "Raccourcis clavier" : "Keyboard Shortcuts",
+    description: language === "fr" 
+      ? "Accélérez votre workflow avec ces raccourcis" 
+      : "Speed up your workflow with these keyboard shortcuts",
+    pressAnytime: language === "fr"
+      ? "Appuyez sur"
+      : "Press",
+    toShow: language === "fr"
+      ? "à tout moment pour afficher cette fenêtre"
+      : "anytime to show this dialog",
+  };
+
+  const shortcutGroups: ShortcutGroup[] = [
+    {
+      title: "Navigation",
+      shortcuts: [
+        { keys: ["⌘", "K"], description: language === "fr" ? "Ouvrir la palette de commandes" : "Open command palette" },
+        { keys: ["⌘", "/"], description: language === "fr" ? "Afficher les raccourcis" : "Show keyboard shortcuts" },
+        { keys: ["⌘", "1"], description: language === "fr" ? "Aller aux Scripts" : "Go to Scripts" },
+        { keys: ["⌘", "2"], description: language === "fr" ? "Aller aux Appareils" : "Go to Devices" },
+        { keys: ["⌘", "3"], description: language === "fr" ? "Aller aux Analytiques" : "Go to Analytics" },
+      ],
+    },
+    {
+      title: "Scripts",
+      shortcuts: [
+        { keys: ["⌘", "N"], description: language === "fr" ? "Créer un nouveau script" : "Create new script" },
+        { keys: ["⌘", "S"], description: language === "fr" ? "Sauvegarder le script" : "Save current script" },
+        { keys: ["⌘", "D"], description: language === "fr" ? "Dupliquer le script" : "Duplicate script" },
+        { keys: ["Delete"], description: language === "fr" ? "Supprimer le script sélectionné" : "Delete selected script" },
+        { keys: ["⌘", "F"], description: language === "fr" ? "Rechercher des scripts" : "Search scripts" },
+      ],
+    },
+    {
+      title: language === "fr" ? "Prévisualisation" : "Preview",
+      shortcuts: [
+        { keys: ["↑"], description: language === "fr" ? "Ligne précédente" : "Previous line" },
+        { keys: ["↓"], description: language === "fr" ? "Ligne suivante" : "Next line" },
+        { keys: ["+"], description: language === "fr" ? "Augmenter la taille" : "Increase font size" },
+        { keys: ["-"], description: language === "fr" ? "Diminuer la taille" : "Decrease font size" },
+        { keys: ["Space"], description: language === "fr" ? "Basculer le mode aperçu" : "Toggle preview mode" },
+      ],
+    },
+    {
+      title: language === "fr" ? "Général" : "General",
+      shortcuts: [
+        { keys: ["Esc"], description: language === "fr" ? "Fermer / Annuler" : "Close dialog / Cancel" },
+        { keys: ["⌘", "Z"], description: language === "fr" ? "Annuler" : "Undo" },
+        { keys: ["⌘", "⇧", "Z"], description: language === "fr" ? "Rétablir" : "Redo" },
+        { keys: ["⌘", "E"], description: language === "fr" ? "Exporter les scripts" : "Export scripts" },
+      ],
+    },
+  ];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Keyboard className="h-5 w-5 text-primary" />
-            Keyboard Shortcuts
+            {t.title}
           </DialogTitle>
           <DialogDescription>
-            Speed up your workflow with these keyboard shortcuts
+            {t.description}
           </DialogDescription>
         </DialogHeader>
 
@@ -110,7 +126,7 @@ const KeyboardShortcuts = ({ open, onOpenChange }: KeyboardShortcutsProps) => {
 
         <div className="mt-4 p-3 rounded-lg bg-secondary/50 text-center">
           <p className="text-xs text-muted-foreground">
-            Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-background rounded border">⌘</kbd> + <kbd className="px-1.5 py-0.5 text-xs font-mono bg-background rounded border">/</kbd> anytime to show this dialog
+            {t.pressAnytime} <kbd className="px-1.5 py-0.5 text-xs font-mono bg-background rounded border">⌘</kbd> + <kbd className="px-1.5 py-0.5 text-xs font-mono bg-background rounded border">/</kbd> {t.toShow}
           </p>
         </div>
       </DialogContent>

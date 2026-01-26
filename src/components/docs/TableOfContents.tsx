@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface TOCItem {
   id: string;
@@ -12,7 +13,12 @@ interface TableOfContentsProps {
 }
 
 const TableOfContents = ({ items }: TableOfContentsProps) => {
+  const { language } = useLanguage();
   const [activeId, setActiveId] = useState<string>("");
+
+  const t = {
+    onThisPage: language === "fr" ? "Sur cette page" : "On this page",
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -51,7 +57,7 @@ const TableOfContents = ({ items }: TableOfContentsProps) => {
   return (
     <nav className="sticky top-24 space-y-1">
       <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4">
-        On this page
+        {t.onThisPage}
       </p>
       <ul className="space-y-1">
         {items.map((item) => (

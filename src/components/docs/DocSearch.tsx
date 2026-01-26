@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Search, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface SearchResult {
   id: string;
@@ -16,64 +17,86 @@ interface DocSearchProps {
   onResultClick: (sectionId: string) => void;
 }
 
-const searchableContent: SearchResult[] = [
-  {
-    id: "tier-0",
-    title: "Tier 0 — Universal Fallback",
-    section: "Tier Documentation",
-    content: "Works with ANY device. Uses phone camera for vision and push notifications or TTS for output. Ray-Ban Meta, Any glasses without SDK.",
-    tier: 0,
-  },
-  {
-    id: "tier-1",
-    title: "Tier 1 — Display via SDK",
-    section: "Tier Documentation",
-    content: "Push text and images directly to the HUD via official manufacturer SDK. Even G2, Vuzix Z100, Xreal Air 2.",
-    tier: 1,
-  },
-  {
-    id: "tier-2",
-    title: "Tier 2 — On-Device Mode",
-    section: "Tier Documentation",
-    content: "App runs directly on the glasses with native sensor access and lower latency. Rokid, Meta Quest 3, HoloLens 2.",
-    tier: 2,
-  },
-  {
-    id: "tier-3",
-    title: "Tier 3 — Vision + AR",
-    section: "Tier Documentation",
-    content: "Full spatial computing with 6DoF tracking and world-locked AR overlays. Apple Vision Pro, Magic Leap 2.",
-    tier: 3,
-  },
-  {
-    id: "even-g2",
-    title: "Even G2 Integration",
-    section: "Device SDK",
-    content: "Flutter SDK integration for Even G2 glasses. 48h battery, 640×350 resolution, 27.5° FOV, prescription compatible.",
-  },
-  {
-    id: "vuzix-z100",
-    title: "Vuzix Z100 Integration",
-    section: "Device SDK",
-    content: "Blade 2.0 SDK for Vuzix Z100. Android-based, MicroOLED display, gesture recognition.",
-  },
-  {
-    id: "api-endpoints",
-    title: "REST API Endpoints",
-    section: "API Reference",
-    content: "Complete REST API documentation including authentication, scripts CRUD, devices management, and analytics.",
-  },
-  {
-    id: "authentication",
-    title: "Authentication",
-    section: "Getting Started",
-    content: "API key authentication, Bearer token usage, secure key storage best practices.",
-  },
-];
-
 const DocSearch = ({ onResultClick }: DocSearchProps) => {
+  const { language } = useLanguage();
   const [query, setQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+
+  const t = {
+    searchPlaceholder: language === "fr" ? "Rechercher dans la documentation..." : "Search documentation...",
+    noResults: language === "fr" ? "Aucun résultat pour" : "No results found for",
+  };
+
+  const searchableContent: SearchResult[] = useMemo(() => [
+    {
+      id: "tier-0",
+      title: language === "fr" ? "Tier 0 — Mode Universel" : "Tier 0 — Universal Fallback",
+      section: language === "fr" ? "Documentation Tier" : "Tier Documentation",
+      content: language === "fr" 
+        ? "Fonctionne avec TOUS les appareils. Utilise la caméra du téléphone et les notifications push ou TTS. Ray-Ban Meta, lunettes sans SDK."
+        : "Works with ANY device. Uses phone camera for vision and push notifications or TTS for output. Ray-Ban Meta, Any glasses without SDK.",
+      tier: 0,
+    },
+    {
+      id: "tier-1",
+      title: language === "fr" ? "Tier 1 — Affichage SDK" : "Tier 1 — Display via SDK",
+      section: language === "fr" ? "Documentation Tier" : "Tier Documentation",
+      content: language === "fr"
+        ? "Affichage de texte et images sur le HUD via SDK officiel. Even G2, Vuzix Z100, Xreal Air 2."
+        : "Push text and images directly to the HUD via official manufacturer SDK. Even G2, Vuzix Z100, Xreal Air 2.",
+      tier: 1,
+    },
+    {
+      id: "tier-2",
+      title: language === "fr" ? "Tier 2 — Mode Embarqué" : "Tier 2 — On-Device Mode",
+      section: language === "fr" ? "Documentation Tier" : "Tier Documentation",
+      content: language === "fr"
+        ? "L'app tourne directement sur les lunettes avec accès aux capteurs et latence réduite. Rokid, Meta Quest 3, HoloLens 2."
+        : "App runs directly on the glasses with native sensor access and lower latency. Rokid, Meta Quest 3, HoloLens 2.",
+      tier: 2,
+    },
+    {
+      id: "tier-3",
+      title: "Tier 3 — Vision + AR",
+      section: language === "fr" ? "Documentation Tier" : "Tier Documentation",
+      content: language === "fr"
+        ? "Calcul spatial complet avec suivi 6DoF et overlays AR ancrés. Apple Vision Pro, Magic Leap 2."
+        : "Full spatial computing with 6DoF tracking and world-locked AR overlays. Apple Vision Pro, Magic Leap 2.",
+      tier: 3,
+    },
+    {
+      id: "even-g2",
+      title: language === "fr" ? "Intégration Even G2" : "Even G2 Integration",
+      section: "SDK",
+      content: language === "fr"
+        ? "Intégration Flutter SDK pour lunettes Even G2. Batterie 48h, résolution 640×350, FOV 27.5°, compatible prescription."
+        : "Flutter SDK integration for Even G2 glasses. 48h battery, 640×350 resolution, 27.5° FOV, prescription compatible.",
+    },
+    {
+      id: "vuzix-z100",
+      title: language === "fr" ? "Intégration Vuzix Z100" : "Vuzix Z100 Integration",
+      section: "SDK",
+      content: language === "fr"
+        ? "SDK Blade 2.0 pour Vuzix Z100. Basé Android, écran MicroOLED, reconnaissance gestuelle."
+        : "Blade 2.0 SDK for Vuzix Z100. Android-based, MicroOLED display, gesture recognition.",
+    },
+    {
+      id: "api-endpoints",
+      title: language === "fr" ? "Endpoints API REST" : "REST API Endpoints",
+      section: language === "fr" ? "Référence API" : "API Reference",
+      content: language === "fr"
+        ? "Documentation complète de l'API REST incluant authentification, CRUD scripts, gestion appareils et analytique."
+        : "Complete REST API documentation including authentication, scripts CRUD, devices management, and analytics.",
+    },
+    {
+      id: "authentication",
+      title: language === "fr" ? "Authentification" : "Authentication",
+      section: language === "fr" ? "Démarrage" : "Getting Started",
+      content: language === "fr"
+        ? "Authentification par clé API, utilisation du Bearer token, bonnes pratiques de stockage sécurisé."
+        : "API key authentication, Bearer token usage, secure key storage best practices.",
+    },
+  ], [language]);
 
   const results = useMemo(() => {
     if (!query.trim()) return [];
@@ -85,7 +108,7 @@ const DocSearch = ({ onResultClick }: DocSearchProps) => {
         item.content.toLowerCase().includes(lowerQuery) ||
         item.section.toLowerCase().includes(lowerQuery)
     ).slice(0, 5);
-  }, [query]);
+  }, [query, searchableContent]);
 
   const handleResultClick = useCallback((result: SearchResult) => {
     onResultClick(result.id);
@@ -114,7 +137,7 @@ const DocSearch = ({ onResultClick }: DocSearchProps) => {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Search documentation..."
+          placeholder={t.searchPlaceholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsFocused(true)}
@@ -180,7 +203,7 @@ const DocSearch = ({ onResultClick }: DocSearchProps) => {
           className="absolute top-full mt-2 left-0 right-0 z-50 bg-card border border-border rounded-xl shadow-lg p-4"
         >
           <p className="text-sm text-muted-foreground text-center">
-            No results found for "{query}"
+            {t.noResults} "{query}"
           </p>
         </motion.div>
       )}

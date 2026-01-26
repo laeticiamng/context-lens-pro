@@ -12,6 +12,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface QuickAction {
   id: string;
@@ -35,16 +36,35 @@ const QuickActionsBar = ({
   onNewScript,
   onAddDevice,
 }: QuickActionsBarProps) => {
+  const { language } = useLanguage();
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
+  const t = {
+    searchActions: language === "fr" ? "Rechercher des actions..." : "Search actions...",
+    noActionsFound: language === "fr" ? "Aucune action trouvée pour" : "No actions found for",
+    navigate: language === "fr" ? "Naviguer" : "Navigate",
+    select: language === "fr" ? "Sélectionner" : "Select",
+    close: language === "fr" ? "Fermer" : "Close",
+    newScript: language === "fr" ? "Nouveau script" : "New Script",
+    newScriptDesc: language === "fr" ? "Créer un nouveau script de prompts" : "Create a new prompt script",
+    addDevice: language === "fr" ? "Ajouter un appareil" : "Add Device",
+    addDeviceDesc: language === "fr" ? "Connecter de nouvelles lunettes" : "Connect new smart glasses",
+    viewScripts: language === "fr" ? "Voir les scripts" : "View Scripts",
+    viewScriptsDesc: language === "fr" ? "Parcourir tous vos scripts" : "Browse all your scripts",
+    analytics: language === "fr" ? "Analytique" : "Analytics",
+    analyticsDesc: language === "fr" ? "Voir les statistiques d'utilisation" : "View usage statistics",
+    settings: language === "fr" ? "Paramètres" : "Settings",
+    settingsDesc: language === "fr" ? "Compte & préférences" : "Account & preferences",
+  };
+
   const actions: QuickAction[] = [
     {
       id: "new-script",
-      label: "New Script",
-      description: "Create a new prompt script",
+      label: t.newScript,
+      description: t.newScriptDesc,
       icon: Plus,
       shortcut: "⌘N",
       action: () => {
@@ -54,8 +74,8 @@ const QuickActionsBar = ({
     },
     {
       id: "add-device",
-      label: "Add Device",
-      description: "Connect new smart glasses",
+      label: t.addDevice,
+      description: t.addDeviceDesc,
       icon: Glasses,
       shortcut: "⌘D",
       action: () => {
@@ -65,8 +85,8 @@ const QuickActionsBar = ({
     },
     {
       id: "scripts",
-      label: "View Scripts",
-      description: "Browse all your scripts",
+      label: t.viewScripts,
+      description: t.viewScriptsDesc,
       icon: FileText,
       action: () => {
         // Trigger scripts tab
@@ -75,8 +95,8 @@ const QuickActionsBar = ({
     },
     {
       id: "analytics",
-      label: "Analytics",
-      description: "View usage statistics",
+      label: t.analytics,
+      description: t.analyticsDesc,
       icon: BarChart3,
       action: () => {
         // Trigger analytics tab
@@ -85,8 +105,8 @@ const QuickActionsBar = ({
     },
     {
       id: "settings",
-      label: "Settings",
-      description: "Account & preferences",
+      label: t.settings,
+      description: t.settingsDesc,
       icon: Settings,
       shortcut: "⌘,",
       action: () => {
@@ -156,7 +176,7 @@ const QuickActionsBar = ({
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
-            placeholder="Search actions..."
+            placeholder={t.searchActions}
             className="border-0 focus-visible:ring-0 bg-transparent h-12"
           />
           <Badge variant="secondary" className="text-xs font-mono">
@@ -168,7 +188,7 @@ const QuickActionsBar = ({
         <div className="max-h-72 overflow-y-auto py-2">
           {filteredActions.length === 0 ? (
             <div className="px-4 py-8 text-center text-muted-foreground">
-              No actions found for "{query}"
+              {t.noActionsFound} "{query}"
             </div>
           ) : (
             filteredActions.map((action, index) => (
@@ -214,13 +234,13 @@ const QuickActionsBar = ({
         {/* Footer hint */}
         <div className="px-4 py-2 border-t border-border/50 text-xs text-muted-foreground flex items-center gap-4">
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 rounded bg-secondary">↑↓</kbd> Navigate
+            <kbd className="px-1.5 py-0.5 rounded bg-secondary">↑↓</kbd> {t.navigate}
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 rounded bg-secondary">↵</kbd> Select
+            <kbd className="px-1.5 py-0.5 rounded bg-secondary">↵</kbd> {t.select}
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 rounded bg-secondary">Esc</kbd> Close
+            <kbd className="px-1.5 py-0.5 rounded bg-secondary">Esc</kbd> {t.close}
           </span>
         </div>
       </div>
