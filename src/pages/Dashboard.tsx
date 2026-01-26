@@ -76,6 +76,11 @@ import Pagination from "@/components/dashboard/Pagination";
 import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 import ShareButton from "@/components/dashboard/ShareButton";
 import DeviceHealthCheck from "@/components/dashboard/DeviceHealthCheck";
+import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
+import RealtimeStats from "@/components/dashboard/RealtimeStats";
+import GettingStarted from "@/components/dashboard/GettingStarted";
+import TipOfTheDayCard from "@/components/dashboard/TipOfTheDayCard";
+import HelpCenter from "@/components/dashboard/HelpCenter";
 import HighlightText from "@/components/ui/highlight-text";
 import ErrorBoundary from "@/components/ui/error-boundary";
 import type { User } from "@supabase/supabase-js";
@@ -408,7 +413,8 @@ const Dashboard = () => {
               <span className="text-muted-foreground">{t.dashboard.title}</span>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <NotificationsDropdown />
               <Button 
                 variant="ghost" 
                 size="icon" 
