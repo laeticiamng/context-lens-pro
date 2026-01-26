@@ -11,11 +11,14 @@ import {
   Briefcase,
   Factory
 } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface MarketplaceScript {
   id: string;
-  title: string;
-  description: string;
+  titleEn: string;
+  titleFr: string;
+  descriptionEn: string;
+  descriptionFr: string;
   author: string;
   category: string;
   price: number | "free";
@@ -27,8 +30,10 @@ interface MarketplaceScript {
 const marketplaceScripts: MarketplaceScript[] = [
   {
     id: "1",
-    title: "Medical Consultation Pack",
-    description: "Complete set of prompts for patient consultations, diagnoses, and follow-ups.",
+    titleEn: "Medical Consultation Pack",
+    titleFr: "Pack Consultation Médicale",
+    descriptionEn: "Complete set of prompts for patient consultations, diagnoses, and follow-ups.",
+    descriptionFr: "Ensemble complet de prompts pour les consultations patients, diagnostics et suivis.",
     author: "HealthTech Pro",
     category: "Healthcare",
     price: 29.99,
@@ -38,8 +43,10 @@ const marketplaceScripts: MarketplaceScript[] = [
   },
   {
     id: "2",
-    title: "Sales Mastery Bundle",
-    description: "Enterprise sales scripts for demos, negotiations, and closing deals.",
+    titleEn: "Sales Mastery Bundle",
+    titleFr: "Pack Maîtrise Commerciale",
+    descriptionEn: "Enterprise sales scripts for demos, negotiations, and closing deals.",
+    descriptionFr: "Scripts de vente entreprise pour démos, négociations et closing.",
     author: "SalesForce Guru",
     category: "Business",
     price: 19.99,
@@ -49,8 +56,10 @@ const marketplaceScripts: MarketplaceScript[] = [
   },
   {
     id: "3",
-    title: "Technical Training Essentials",
-    description: "Step-by-step procedures for equipment operation and safety protocols.",
+    titleEn: "Technical Training Essentials",
+    titleFr: "Essentiels Formation Technique",
+    descriptionEn: "Step-by-step procedures for equipment operation and safety protocols.",
+    descriptionFr: "Procédures étape par étape pour l'utilisation des équipements et protocoles de sécurité.",
     author: "TrainRight",
     category: "Training",
     price: "free",
@@ -60,8 +69,10 @@ const marketplaceScripts: MarketplaceScript[] = [
   },
   {
     id: "4",
-    title: "Manufacturing SOPs",
-    description: "Standard operating procedures for quality control and assembly lines.",
+    titleEn: "Manufacturing SOPs",
+    titleFr: "SOPs Fabrication",
+    descriptionEn: "Standard operating procedures for quality control and assembly lines.",
+    descriptionFr: "Procédures opérationnelles standard pour le contrôle qualité et les lignes d'assemblage.",
     author: "IndustrialEdge",
     category: "Industry",
     price: 49.99,
@@ -87,6 +98,8 @@ const getCategoryIcon = (category: string) => {
 };
 
 const MarketplacePreview = () => {
+  const { t, language } = useLanguage();
+
   return (
     <Card className="glass-card border-border/50">
       <CardHeader>
@@ -94,11 +107,11 @@ const MarketplacePreview = () => {
           <div>
             <CardTitle className="text-base flex items-center gap-2">
               <Store className="h-5 w-5 text-primary" />
-              Script Marketplace
-              <Badge variant="secondary" className="ml-2">Coming Soon</Badge>
+              {t.marketplace.title}
+              <Badge variant="secondary" className="ml-2">{t.marketplace.comingSoon}</Badge>
             </CardTitle>
             <CardDescription>
-              Discover and share professional script packs
+              {t.marketplace.description}
             </CardDescription>
           </div>
         </div>
@@ -107,6 +120,8 @@ const MarketplacePreview = () => {
         <div className="grid sm:grid-cols-2 gap-3">
           {marketplaceScripts.map((script) => {
             const CategoryIcon = getCategoryIcon(script.category);
+            const title = language === "fr" ? script.titleFr : script.titleEn;
+            const description = language === "fr" ? script.descriptionFr : script.descriptionEn;
             
             return (
               <div
@@ -118,9 +133,9 @@ const MarketplacePreview = () => {
                     <CategoryIcon className="h-4 w-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm mb-0.5 truncate">{script.title}</h4>
+                    <h4 className="font-medium text-sm mb-0.5 truncate">{title}</h4>
                     <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                      {script.description}
+                      {description}
                     </p>
                     
                     <div className="flex items-center justify-between">
@@ -138,7 +153,7 @@ const MarketplacePreview = () => {
                         variant={script.price === "free" ? "secondary" : "default"}
                         className="text-xs"
                       >
-                        {script.price === "free" ? "Free" : `€${script.price}`}
+                        {script.price === "free" ? t.marketplace.free : `€${script.price}`}
                       </Badge>
                     </div>
                   </div>
@@ -150,8 +165,8 @@ const MarketplacePreview = () => {
 
         <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/20 text-center">
           <p className="text-sm text-muted-foreground">
-            <span className="font-medium text-primary">Creator Program</span> — 
-            Publish your scripts and earn 70% of each sale.
+            <span className="font-medium text-primary">{t.marketplace.creatorProgram}</span> — 
+            {t.marketplace.creatorProgramDesc}
           </p>
         </div>
       </CardContent>

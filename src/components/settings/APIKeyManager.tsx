@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Copy, Check, Eye, EyeOff, RefreshCw, Key, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface APIKeyManagerProps {
   userId: string;
@@ -22,6 +23,7 @@ interface APIKeyManagerProps {
 
 const APIKeyManager = ({ userId }: APIKeyManagerProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [showKey, setShowKey] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false);
@@ -35,7 +37,7 @@ const APIKeyManager = ({ userId }: APIKeyManagerProps) => {
     await navigator.clipboard.writeText(apiKey);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    toast({ title: "Copied", description: "API key copied to clipboard" });
+    toast({ title: t.apiKey.copied, description: t.apiKey.copiedDesc });
   };
 
   const handleRegenerate = async () => {
@@ -49,8 +51,8 @@ const APIKeyManager = ({ userId }: APIKeyManagerProps) => {
     setRegenerating(false);
     
     toast({
-      title: "API Key Regenerated",
-      description: "Your old key will stop working immediately. Update your integrations.",
+      title: t.apiKey.regenerated,
+      description: t.apiKey.regeneratedDesc,
     });
   };
 
@@ -60,15 +62,15 @@ const APIKeyManager = ({ userId }: APIKeyManagerProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Key className="h-5 w-5" />
-            API Access
+            {t.apiKey.title}
           </CardTitle>
           <CardDescription>
-            Manage your API keys for SDK integration
+            {t.apiKey.description}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label>Your API Key</Label>
+            <Label>{t.apiKey.yourApiKey}</Label>
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Input
@@ -95,12 +97,12 @@ const APIKeyManager = ({ userId }: APIKeyManagerProps) => {
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Keep this key secret. Use it in your SDK integration.
+              {t.apiKey.keepSecret}
             </p>
           </div>
 
           <div className="p-4 rounded-lg bg-secondary/50">
-            <h4 className="font-medium mb-2">Quick Start</h4>
+            <h4 className="font-medium mb-2">{t.apiKey.quickStart}</h4>
             <pre className="text-xs text-muted-foreground overflow-x-auto">
 {`const contextLens = new ContextLens({
   apiKey: '${showKey ? apiKey : "YOUR_API_KEY"}',
@@ -114,7 +116,7 @@ const APIKeyManager = ({ userId }: APIKeyManagerProps) => {
               onClick={() => setShowRegenerateDialog(true)}
             >
               <RefreshCw className="h-4 w-4 mr-2" />
-              Regenerate Key
+              {t.apiKey.regenerateKey}
             </Button>
           </div>
 
@@ -122,10 +124,9 @@ const APIKeyManager = ({ userId }: APIKeyManagerProps) => {
             <div className="flex items-start gap-3">
               <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium text-amber-500">Security Notice</p>
+                <p className="font-medium text-amber-500">{t.apiKey.securityNotice}</p>
                 <p className="text-muted-foreground mt-1">
-                  Never expose your API key in client-side code or public repositories.
-                  Use environment variables and server-side calls for production apps.
+                  {t.apiKey.securityNoticeDesc}
                 </p>
               </div>
             </div>
@@ -136,20 +137,19 @@ const APIKeyManager = ({ userId }: APIKeyManagerProps) => {
       <AlertDialog open={showRegenerateDialog} onOpenChange={setShowRegenerateDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Regenerate API Key?</AlertDialogTitle>
+            <AlertDialogTitle>{t.apiKey.regenerateTitle}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will immediately invalidate your current API key. All applications
-              using the old key will stop working until you update them with the new key.
+              {t.apiKey.regenerateDesc}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRegenerate}
               disabled={regenerating}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {regenerating ? "Regenerating..." : "Regenerate"}
+              {regenerating ? t.apiKey.regenerating : t.apiKey.regenerateKey}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
