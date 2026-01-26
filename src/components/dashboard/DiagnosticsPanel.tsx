@@ -86,8 +86,10 @@ export function DiagnosticsPanel() {
     runDiagnostics();
   }, []);
 
-  // Only show in development
-  if (import.meta.env.PROD && !window.location.search.includes('debug=true')) {
+  // Only show in development or with ?debug=true query param
+  const isDebugMode = import.meta.env.DEV || window.location.search.includes('debug=true');
+  
+  if (!isDebugMode) {
     return null;
   }
 

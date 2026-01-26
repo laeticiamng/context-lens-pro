@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface PaginationProps {
   currentPage: number;
@@ -16,10 +17,17 @@ const Pagination = ({
   pageSize = 10,
   totalItems,
 }: PaginationProps) => {
+  const { language } = useLanguage();
+  
   if (totalPages <= 1) return null;
 
   const startItem = (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalItems || currentPage * pageSize);
+
+  const t = {
+    showing: language === "fr" ? "Affichage" : "Showing",
+    of: language === "fr" ? "sur" : "of",
+  };
 
   const getPageNumbers = () => {
     const pages: (number | "ellipsis")[] = [];
@@ -57,7 +65,7 @@ const Pagination = ({
     <div className="flex items-center justify-between gap-4 py-4">
       {totalItems && (
         <p className="text-sm text-muted-foreground">
-          Showing {startItem}-{endItem} of {totalItems}
+          {t.showing} {startItem}-{endItem} {t.of} {totalItems}
         </p>
       )}
       

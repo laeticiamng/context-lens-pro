@@ -5,7 +5,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const scrollToDemo = () => {
     const demoSection = document.getElementById("demo");
@@ -59,7 +59,9 @@ const HeroSection = () => {
 
           {/* Device compatibility hint */}
           <div className="animate-fade-up delay-400 flex flex-col items-center gap-4">
-            <p className="text-sm text-muted-foreground">{t.partners.compatible.split(" ").slice(0, 2).join(" ")}</p>
+            <p className="text-sm text-muted-foreground">
+              {t.partners.compatible.split(" ").slice(0, 2).join(" ")}
+            </p>
             <div className="flex items-center gap-6 text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Glasses className="h-5 w-5" />
@@ -73,7 +75,9 @@ const HeroSection = () => {
               <div className="h-4 w-px bg-border" />
               <div className="flex items-center gap-2">
                 <Smartphone className="h-5 w-5" />
-                <span className="text-sm">Any Phone</span>
+                <span className="text-sm">
+                  {language === "fr" ? "Tout téléphone" : "Any Phone"}
+                </span>
               </div>
             </div>
           </div>

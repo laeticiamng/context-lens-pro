@@ -233,6 +233,22 @@ const Auth = () => {
                   : (language === "fr" ? "Se connecter" : "Sign in")}
               </button>
             </div>
+
+            {/* Terms and Privacy links */}
+            {!isLogin && (
+              <p className="mt-4 text-center text-xs text-muted-foreground">
+                {language === "fr" 
+                  ? "En vous inscrivant, vous acceptez nos "
+                  : "By signing up, you agree to our "}
+                <a href="/terms" className="text-primary hover:underline">
+                  {language === "fr" ? "Conditions d'utilisation" : "Terms of Service"}
+                </a>
+                {language === "fr" ? " et notre " : " and "}
+                <a href="/privacy" className="text-primary hover:underline">
+                  {language === "fr" ? "Politique de confidentialité" : "Privacy Policy"}
+                </a>
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
