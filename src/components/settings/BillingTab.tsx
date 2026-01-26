@@ -11,7 +11,7 @@ import {
   Zap
 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface BillingTabProps {
   currentPlan?: "free" | "pro" | "enterprise";
@@ -19,7 +19,6 @@ interface BillingTabProps {
 
 const BillingTab = ({ currentPlan = "free" }: BillingTabProps) => {
   const { language } = useLanguage();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState<string | null>(null);
   
   const t = {
@@ -63,11 +62,15 @@ const BillingTab = ({ currentPlan = "free" }: BillingTabProps) => {
   const handleUpgrade = async (plan: string) => {
     setLoading(plan);
     
-    // TODO: Implement Stripe checkout when integration is ready
-    // For now, show coming soon message
+    // Show coming soon message with toast
     setTimeout(() => {
+      toast.info(
+        language === "fr" 
+          ? `Plan ${plan} sélectionné - Stripe bientôt disponible`
+          : `Plan ${plan} selected - Stripe coming soon`
+      );
       setLoading(null);
-    }, 1000);
+    }, 500);
   };
 
   const proFeatures = [

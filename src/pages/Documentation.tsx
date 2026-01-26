@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import SEOHead from "@/components/layout/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -272,6 +273,12 @@ const Documentation = () => {
 
   return (
     <ErrorBoundary>
+      <SEOHead
+        title={language === "fr" ? "Documentation Développeur - ContextLens" : "Developer Documentation - ContextLens"}
+        description={language === "fr" 
+          ? "Guides d'intégration SDK pour lunettes connectées - Tier 0 à Tier 3"
+          : "SDK integration guides for smart glasses - Tier 0 to Tier 3"}
+      />
       <div className="min-h-screen bg-background text-foreground">
         <Header />
         <main className="pt-24 pb-16">
@@ -679,8 +686,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 <Card className="glass-card border-border/50">
                   <CardHeader>
                     <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 rounded-xl bg-violet-500/10 flex items-center justify-center">
-                        <Cpu className="h-6 w-6 text-violet-500" />
+                      <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center">
+                        <Cpu className="h-6 w-6 text-accent" />
                       </div>
                       <div>
                         <CardTitle>Rokid Integration</CardTitle>
@@ -689,8 +696,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                      <p className="text-sm text-amber-600 dark:text-amber-400">
+                    <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/30">
+                      <p className="text-sm text-destructive">
                         <strong>Note:</strong> Rokid SDK access requires joining the Developer Program.
                         Contact Rokid directly for access.
                       </p>
@@ -758,8 +765,8 @@ contextLens.onCameraFrame { frame ->
                 <Card className="glass-card border-border/50">
                   <CardHeader>
                     <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                        <Smartphone className="h-6 w-6 text-emerald-400" />
+                      <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center">
+                        <Smartphone className="h-6 w-6 text-accent" />
                       </div>
                       <div>
                         <CardTitle>Phone Fallback Mode</CardTitle>

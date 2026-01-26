@@ -36,6 +36,7 @@ import APIKeyManager from "@/components/settings/APIKeyManager";
 import BillingTab from "@/components/settings/BillingTab";
 import GDPRCompliancePanel from "@/components/settings/GDPRCompliancePanel";
 import ErrorBoundary from "@/components/ui/error-boundary";
+import SEOHead from "@/components/layout/SEOHead";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -249,6 +250,10 @@ const Settings = () => {
 
   return (
     <ErrorBoundary>
+    <SEOHead
+      title={language === "fr" ? "Paramètres - ContextLens" : "Settings - ContextLens"}
+      description={language === "fr" ? "Gérez votre profil, sécurité et préférences" : "Manage your profile, security and preferences"}
+    />
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50">

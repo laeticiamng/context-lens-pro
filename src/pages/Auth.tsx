@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import ForgotPasswordDialog from "@/components/auth/ForgotPasswordDialog";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
+import SEOHead from "@/components/layout/SEOHead";
 import { signUpSchema, signInSchema } from "@/lib/validations";
 
 const Auth = () => {
@@ -108,6 +109,11 @@ const Auth = () => {
   };
 
   return (
+    <>
+      <SEOHead
+        title={language === "fr" ? (isLogin ? "Connexion" : "Inscription") + " - ContextLens" : (isLogin ? "Sign In" : "Sign Up") + " - ContextLens"}
+        description={language === "fr" ? "Accédez à votre compte ContextLens" : "Access your ContextLens account"}
+      />
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="absolute inset-0" style={{ background: "var(--gradient-hero)" }} />
       
@@ -231,6 +237,7 @@ const Auth = () => {
         </Card>
       </div>
     </div>
+    </>
   );
 };
 

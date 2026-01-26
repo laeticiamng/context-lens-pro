@@ -1,7 +1,7 @@
 // Subscription Status Card Component
 // CLP-LUNETTES-IRM-2026-001
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -11,6 +11,7 @@ import {
   Scan,
   TrendingUp,
   Settings,
+  AlertCircle,
 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import type { MRISubscription } from '@/hooks/mri';
@@ -112,10 +113,20 @@ export function SubscriptionCard({
             </span>
           </div>
           {!isUnlimited && (
-            <Progress 
-              value={scansPercentage} 
-              className={scansPercentage > 80 ? 'bg-destructive/20' : ''}
-            />
+            <>
+              <Progress 
+                value={scansPercentage} 
+                className={scansPercentage > 80 ? 'bg-destructive/20' : ''}
+              />
+              {scansPercentage > 80 && (
+                <p className="text-xs text-destructive flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {language === 'fr' 
+                    ? 'Limite bientôt atteinte' 
+                    : 'Limit almost reached'}
+                </p>
+              )}
+            </>
           )}
         </div>
 
