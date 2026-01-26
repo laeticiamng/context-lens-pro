@@ -50,6 +50,7 @@ const Settings = () => {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
   const [weeklyDigest, setWeeklyDigest] = useState(true);
+  const [savingNotifications, setSavingNotifications] = useState(false);
 
   // API Key (mock)
   const apiKey = "cl_live_" + (user?.id?.slice(0, 16) || "xxxxxxxxxxxx");
@@ -63,7 +64,7 @@ const Settings = () => {
       }
       setUser(session.user);
       
-      // Fetch profile
+      // Fetch profile with notification preferences
       const { data: profile } = await supabase
         .from("profiles")
         .select("*")
@@ -73,6 +74,13 @@ const Settings = () => {
       if (profile) {
         setDisplayName(profile.display_name || "");
         setAvatarUrl(profile.avatar_url || "");
+        // Load notification preferences
+        const prefs = profile.notification_preferences as any;
+        if (prefs) {
+          setEmailNotifications(prefs.email ?? true);
+          setPushNotifications(prefs.push ?? false);
+          setWeeklyDigest(prefs.weekly_digest ?? true);
+        }
       }
       
       setLoading(false);
@@ -80,6 +88,31 @@ const Settings = () => {
     
     fetchUser();
   }, [navigate]);
+
+  const handleSaveNotifications = async () => {
+    if (!user) return;
+    setSavingNotifications(true);
+    
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        notification_preferences: {
+          email: emailNotifications,
+          push: pushNotifications,
+          weekly_digest: weeklyDigest,
+        },
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", user.id);
+      
+    if (error) {
+      toast({ title: "Error", description: "Failed to save preferences", variant: "destructive" });
+    } else {
+      toast({ title: "Saved", description: "Notification preferences updated" });
+    }
+    
+    setSavingNotifications(false);
+  };
 
   const handleSaveProfile = async () => {
     if (!user) return;
@@ -274,7 +307,6 @@ const Settings = () => {
             />
           </TabsContent>
 
-          {/* Notifications Tab */}
           <TabsContent value="notifications">
             <Card className="glass-card border-border/50">
               <CardHeader>
@@ -314,6 +346,15 @@ const Settings = () => {
                     onCheckedChange={setWeeklyDigest}
                   />
                 </div>
+
+                <Button 
+                  variant="hero" 
+                  onClick={handleSaveNotifications}
+                  disabled={savingNotifications}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {savingNotifications ? "Saving..." : "Save Preferences"}
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
