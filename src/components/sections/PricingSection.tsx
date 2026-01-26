@@ -1,10 +1,14 @@
-import { Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { useState } from "react";
 
 const plans = [
   {
     name: "Free",
-    price: "0",
+    priceMonthly: 0,
+    priceYearly: 0,
     period: "forever",
     description: "Perfect for trying out ContextLens",
     features: [
@@ -17,10 +21,12 @@ const plans = [
     cta: "Get Started",
     variant: "glass" as const,
     highlight: false,
+    popular: false,
   },
   {
     name: "Pro",
-    price: "9.99",
+    priceMonthly: 9.99,
+    priceYearly: 99,
     period: "/month",
     description: "For professionals who need more power",
     features: [
@@ -35,10 +41,12 @@ const plans = [
     cta: "Start Free Trial",
     variant: "hero" as const,
     highlight: true,
+    popular: true,
   },
   {
     name: "Enterprise",
-    price: "Custom",
+    priceMonthly: null,
+    priceYearly: null,
     period: "",
     description: "For teams and organizations",
     features: [
@@ -53,21 +61,59 @@ const plans = [
     cta: "Contact Sales",
     variant: "glass" as const,
     highlight: false,
+    popular: false,
   },
 ];
 
 const PricingSection = () => {
+  const navigate = useNavigate();
+  const [isYearly, setIsYearly] = useState(false);
+
+  const handlePlanClick = (planName: string) => {
+    if (planName === "Free") {
+      navigate("/auth");
+    } else if (planName === "Enterprise") {
+      navigate("/contact");
+    } else {
+      navigate("/auth");
+    }
+  };
+
+  const getPrice = (plan: typeof plans[0]) => {
+    if (plan.priceMonthly === null) return "Custom";
+    if (plan.priceMonthly === 0) return "0";
+    return isYearly ? Math.round(plan.priceYearly / 12).toString() : plan.priceMonthly.toString();
+  };
+
+  const getPeriod = (plan: typeof plans[0]) => {
+    if (plan.priceMonthly === null) return "";
+    if (plan.priceMonthly === 0) return "forever";
+    return "/month";
+  };
+
   return (
     <section id="pricing" className="py-24 md:py-32 bg-secondary/20">
       <div className="container px-4">
         {/* Section Header */}
-        <div className="max-w-3xl mx-auto text-center mb-16">
+        <div className="max-w-3xl mx-auto text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             Simple, <span className="text-gradient">transparent</span> pricing
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-muted-foreground mb-8">
             Start free, upgrade when you need more. No hidden fees.
           </p>
+
+          {/* Billing Toggle */}
+          <div className="inline-flex items-center gap-3 p-1 rounded-full bg-secondary/50 border border-border/50">
+            <span className={`px-3 py-1.5 rounded-full text-sm transition-colors ${!isYearly ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+              Monthly
+            </span>
+            <Switch checked={isYearly} onCheckedChange={setIsYearly} />
+            <span className={`px-3 py-1.5 rounded-full text-sm transition-colors ${isYearly ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+              Yearly
+              <span className="ml-1 text-xs text-accent">Save 17%</span>
+            </span>
+          </div>
         </div>
 
         {/* Pricing Cards */}
@@ -85,17 +131,31 @@ const PricingSection = () => {
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent" />
               )}
 
+              {plan.popular && (
+                <div className="absolute top-4 right-4">
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                    <Sparkles className="h-3 w-3" />
+                    Popular
+                  </span>
+                </div>
+              )}
+
               <div className="p-6">
                 {/* Plan Header */}
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold mb-2">{plan.name}</h3>
                   <div className="flex items-baseline gap-1">
-                    {plan.price !== "Custom" && (
+                    {getPrice(plan) !== "Custom" && (
                       <span className="text-sm text-muted-foreground">€</span>
                     )}
-                    <span className="text-4xl font-bold">{plan.price}</span>
-                    <span className="text-muted-foreground">{plan.period}</span>
+                    <span className="text-4xl font-bold">{getPrice(plan)}</span>
+                    <span className="text-muted-foreground">{getPeriod(plan)}</span>
                   </div>
+                  {isYearly && plan.priceYearly && plan.priceYearly > 0 && (
+                    <p className="text-xs text-accent mt-1">
+                      €{plan.priceYearly} billed annually
+                    </p>
+                  )}
                   <p className="text-sm text-muted-foreground mt-2">
                     {plan.description}
                   </p>
@@ -115,6 +175,7 @@ const PricingSection = () => {
                 <Button 
                   variant={plan.variant} 
                   className="w-full"
+                  onClick={() => handlePlanClick(plan.name)}
                 >
                   {plan.cta}
                 </Button>
