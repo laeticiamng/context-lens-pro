@@ -1,7 +1,8 @@
 import { forwardRef } from "react";
 import { Link } from "react-router-dom";
-import { Glasses, Github, Twitter, Linkedin } from "lucide-react";
+import { Glasses, Github, Twitter, Linkedin, Youtube } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import NewsletterSignup from "./NewsletterSignup";
 
 const Footer = forwardRef<HTMLElement>((_, ref) => {
   const { t, language } = useLanguage();
@@ -33,6 +34,29 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
     ],
   };
 
+  const socialLinks = [
+    { 
+      name: "Twitter", 
+      href: "https://twitter.com/contextlens", 
+      icon: Twitter 
+    },
+    { 
+      name: "GitHub", 
+      href: "https://github.com/contextlens", 
+      icon: Github 
+    },
+    { 
+      name: "LinkedIn", 
+      href: "https://linkedin.com/company/contextlens", 
+      icon: Linkedin 
+    },
+    { 
+      name: "YouTube", 
+      href: "https://youtube.com/@contextlens", 
+      icon: Youtube 
+    },
+  ];
+
   return (
     <footer ref={ref} className="border-t border-border/50 bg-card/50">
       <div className="container px-4 py-16">
@@ -52,31 +76,26 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
                 ? "Transformez n'importe quelles lunettes connectées en prompteur contextuel. IA, privacy-first, universel."
                 : "Transform any smart glasses into a contextual prompter. AI-powered, privacy-first, universal."}
             </p>
-            <div className="flex gap-4">
-              <a 
-                href="https://twitter.com/contextlens" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-              >
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a 
-                href="https://github.com/contextlens" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-              >
-                <Github className="h-5 w-5" />
-              </a>
-              <a 
-                href="https://linkedin.com/company/contextlens" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-              >
-                <Linkedin className="h-5 w-5" />
-              </a>
+            
+            {/* Social Links */}
+            <div className="flex gap-3 mb-6">
+              {socialLinks.map((social) => (
+                <a 
+                  key={social.name}
+                  href={social.href} 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  aria-label={social.name}
+                >
+                  <social.icon className="h-5 w-5" />
+                </a>
+              ))}
+            </div>
+
+            {/* Newsletter */}
+            <div className="max-w-xs">
+              <NewsletterSignup variant="compact" source="footer" />
             </div>
           </div>
 
@@ -173,6 +192,11 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             <span>🇪🇺 {language === "fr" ? "Conforme UE" : "EU Privacy Compliant"}</span>
             <span>•</span>
             <span>{language === "fr" ? "Compatible RGPD" : "GDPR Ready"}</span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+              {language === "fr" ? "Tous les systèmes opérationnels" : "All systems operational"}
+            </span>
           </div>
         </div>
       </div>
