@@ -23,6 +23,7 @@ import {
 import { Lock, Eye, EyeOff, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
 
 interface PasswordChangeDialogProps {
@@ -32,6 +33,7 @@ interface PasswordChangeDialogProps {
 
 const PasswordChangeDialog = ({ open, onOpenChange }: PasswordChangeDialogProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -58,8 +60,8 @@ const PasswordChangeDialog = ({ open, onOpenChange }: PasswordChangeDialogProps)
       if (error) throw error;
 
       toast({
-        title: "Password Updated",
-        description: "Your password has been changed successfully.",
+        title: t.password.updated,
+        description: t.password.updatedDesc,
       });
       
       // Reset form
@@ -70,8 +72,8 @@ const PasswordChangeDialog = ({ open, onOpenChange }: PasswordChangeDialogProps)
       onOpenChange(false);
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update password",
+        title: t.common.error,
+        description: error.message || (t.common.error),
         variant: "destructive",
       });
     } finally {
@@ -86,16 +88,16 @@ const PasswordChangeDialog = ({ open, onOpenChange }: PasswordChangeDialogProps)
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5 text-primary" />
-              Change Password
+              {t.password.changeTitle}
             </DialogTitle>
             <DialogDescription>
-              Enter a new password for your account
+              {t.password.changeDesc}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
+              <Label htmlFor="newPassword">{t.password.newPassword}</Label>
               <div className="relative">
                 <Input
                   id="newPassword"
@@ -117,7 +119,7 @@ const PasswordChangeDialog = ({ open, onOpenChange }: PasswordChangeDialogProps)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Label htmlFor="confirmPassword">{t.password.confirmPassword}</Label>
               <Input
                 id="confirmPassword"
                 type={showPasswords ? "text" : "password"}
@@ -126,21 +128,21 @@ const PasswordChangeDialog = ({ open, onOpenChange }: PasswordChangeDialogProps)
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
               {confirmPassword && newPassword !== confirmPassword && (
-                <p className="text-xs text-destructive">Passwords do not match</p>
+                <p className="text-xs text-destructive">{t.password.passwordsDoNotMatch}</p>
               )}
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="ghost" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t.common.cancel}
             </Button>
             <Button 
               variant="hero" 
               onClick={() => setShowConfirm(true)}
               disabled={!isValid}
             >
-              Update Password
+              {t.password.updatePassword}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -151,17 +153,16 @@ const PasswordChangeDialog = ({ open, onOpenChange }: PasswordChangeDialogProps)
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-500" />
-              Confirm Password Change
+              {t.password.confirmTitle}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to change your password? You'll need to use the new password 
-              for all future logins.
+              {t.password.confirmDesc}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
             <AlertDialogAction onClick={handleSubmit} disabled={loading}>
-              {loading ? "Updating..." : "Yes, Change Password"}
+              {loading ? t.password.updating : t.password.yesChange}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

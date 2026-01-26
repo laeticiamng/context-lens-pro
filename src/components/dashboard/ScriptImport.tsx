@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, FileJson, FileText, AlertCircle, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface ImportedScript {
   title: string;
@@ -25,6 +26,7 @@ interface ScriptImportProps {
 }
 
 const ScriptImport = ({ onImport }: ScriptImportProps) => {
+  const { t, language } = useLanguage();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [jsonInput, setJsonInput] = useState("");
@@ -38,7 +40,7 @@ const ScriptImport = ({ onImport }: ScriptImportProps) => {
     const scripts = Array.isArray(parsed) ? parsed : [parsed];
     
     return scripts.map((s: any) => ({
-      title: s.title || "Untitled Import",
+      title: s.title || (language === "fr" ? "Import sans titre" : "Untitled Import"),
       content: s.content || "",
       tags: Array.isArray(s.tags) ? s.tags : [],
     }));
@@ -50,7 +52,7 @@ const ScriptImport = ({ onImport }: ScriptImportProps) => {
 
     sections.forEach((section) => {
       const lines = section.split("\n");
-      const title = lines[0]?.trim() || "Untitled";
+      const title = lines[0]?.trim() || (language === "fr" ? "Sans titre" : "Untitled");
       const content = lines.slice(1).join("\n").trim();
       
       // Extract tags from content (look for #tag patterns)
@@ -74,19 +76,19 @@ const ScriptImport = ({ onImport }: ScriptImportProps) => {
       const scripts = type === "json" ? parseJSON(input) : parseMarkdown(input);
 
       if (scripts.length === 0) {
-        throw new Error("No valid scripts found");
+        throw new Error(language === "fr" ? "Aucun script valide trouvé" : "No valid scripts found");
       }
 
       await onImport(scripts);
       toast({
-        title: "Import successful",
-        description: `Imported ${scripts.length} script(s)`,
+        title: t.scriptImport.success,
+        description: t.scriptImport.successDesc.replace("{count}", scripts.length.toString()),
       });
       setOpen(false);
       setJsonInput("");
       setMarkdownInput("");
     } catch (err: any) {
-      setError(err.message || "Failed to parse input");
+      setError(err.message || (language === "fr" ? "Échec de l'analyse" : "Failed to parse input"));
     } finally {
       setLoading(false);
     }
@@ -113,14 +115,14 @@ const ScriptImport = ({ onImport }: ScriptImportProps) => {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Upload className="h-4 w-4 mr-2" />
-          Import
+          {t.common.import}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Import Scripts</DialogTitle>
+          <DialogTitle>{t.scriptImport.title}</DialogTitle>
           <DialogDescription>
-            Import scripts from JSON or Markdown files
+            {t.scriptImport.description}
           </DialogDescription>
         </DialogHeader>
 
@@ -146,7 +148,7 @@ const ScriptImport = ({ onImport }: ScriptImportProps) => {
 
           <TabsContent value="json" className="space-y-4">
             <div className="space-y-2">
-              <Label>JSON Data</Label>
+              <Label>{t.scriptImport.jsonData}</Label>
               <Textarea
                 placeholder={`[
   {
@@ -168,7 +170,7 @@ const ScriptImport = ({ onImport }: ScriptImportProps) => {
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload className="h-4 w-4 mr-2" />
-                Upload File
+                {t.scriptImport.uploadFile}
               </Button>
               <Button
                 variant="hero"
@@ -176,14 +178,14 @@ const ScriptImport = ({ onImport }: ScriptImportProps) => {
                 onClick={() => handleImport("json")}
                 disabled={!jsonInput.trim() || loading}
               >
-                {loading ? "Importing..." : "Import JSON"}
+                {loading ? t.scriptImport.importing : t.scriptImport.importJson}
               </Button>
             </div>
           </TabsContent>
 
           <TabsContent value="markdown" className="space-y-4">
             <div className="space-y-2">
-              <Label>Markdown Content</Label>
+              <Label>{t.scriptImport.markdownContent}</Label>
               <Textarea
                 placeholder={`# Sales Pitch
 Opening line with value proposition
@@ -206,7 +208,7 @@ Agenda item 2`}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload className="h-4 w-4 mr-2" />
-                Upload File
+                {t.scriptImport.uploadFile}
               </Button>
               <Button
                 variant="hero"
@@ -214,7 +216,7 @@ Agenda item 2`}
                 onClick={() => handleImport("markdown")}
                 disabled={!markdownInput.trim() || loading}
               >
-                {loading ? "Importing..." : "Import Markdown"}
+                {loading ? t.scriptImport.importing : t.scriptImport.importMarkdown}
               </Button>
             </div>
           </TabsContent>

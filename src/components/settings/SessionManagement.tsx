@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface Session {
   id: string;
@@ -25,6 +26,7 @@ interface Session {
 
 const SessionManagement = () => {
   const { toast } = useToast();
+  const { t, language } = useLanguage();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -36,8 +38,8 @@ const SessionManagement = () => {
       browser: navigator.userAgent.includes("Chrome") ? "Chrome" : 
                navigator.userAgent.includes("Firefox") ? "Firefox" : 
                navigator.userAgent.includes("Safari") ? "Safari" : "Browser",
-      location: "Current Location",
-      lastActive: "Now",
+      location: language === "fr" ? "Localisation actuelle" : "Current Location",
+      lastActive: language === "fr" ? "Maintenant" : "Now",
       isCurrent: true,
     };
 
@@ -49,13 +51,13 @@ const SessionManagement = () => {
         device: "Mobile",
         browser: "Safari iOS",
         location: "Paris, France",
-        lastActive: "2 hours ago",
+        lastActive: language === "fr" ? "Il y a 2 heures" : "2 hours ago",
         isCurrent: false,
       },
     ];
 
     setSessions(mockSessions);
-  }, []);
+  }, [language]);
 
   const handleRevokeSession = async (sessionId: string) => {
     setLoading(true);
@@ -64,8 +66,8 @@ const SessionManagement = () => {
     
     setSessions(prev => prev.filter(s => s.id !== sessionId));
     toast({
-      title: "Session Revoked",
-      description: "The device has been signed out.",
+      title: t.session.revoked,
+      description: t.session.revokedDesc,
     });
     setLoading(false);
   };
@@ -76,8 +78,8 @@ const SessionManagement = () => {
     
     setSessions(prev => prev.filter(s => s.isCurrent));
     toast({
-      title: "All Other Sessions Revoked",
-      description: "All other devices have been signed out.",
+      title: t.session.allRevoked,
+      description: t.session.allRevokedDesc,
     });
     setLoading(false);
   };
@@ -94,10 +96,10 @@ const SessionManagement = () => {
           <div>
             <CardTitle className="text-base flex items-center gap-2">
               <Monitor className="h-5 w-5 text-primary" />
-              Active Sessions
+              {t.session.title}
             </CardTitle>
             <CardDescription>
-              Manage devices where you're signed in
+              {t.session.description}
             </CardDescription>
           </div>
           {sessions.length > 1 && (
@@ -108,7 +110,7 @@ const SessionManagement = () => {
               disabled={loading}
             >
               <LogOut className="h-4 w-4 mr-2" />
-              Sign Out Others
+              {t.session.signOutOthers}
             </Button>
           )}
         </div>
@@ -133,7 +135,7 @@ const SessionManagement = () => {
                   <span className="font-medium text-sm">{session.device}</span>
                   <span className="text-xs text-muted-foreground">• {session.browser}</span>
                   {session.isCurrent && (
-                    <Badge variant="secondary" className="text-xs">Current</Badge>
+                    <Badge variant="secondary" className="text-xs">{t.session.current}</Badge>
                   )}
                 </div>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -167,8 +169,7 @@ const SessionManagement = () => {
           <div className="flex items-start gap-2 p-3 rounded-lg bg-secondary/30">
             <AlertCircle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
             <p className="text-xs text-muted-foreground">
-              If you don't recognize a session, revoke it immediately and change your password 
-              to secure your account.
+              {t.session.securityTip}
             </p>
           </div>
         </div>

@@ -175,6 +175,94 @@ interface CommonTranslations {
   import: string;
 }
 
+interface MarketplaceTranslations {
+  title: string;
+  comingSoon: string;
+  description: string;
+  free: string;
+  creatorProgram: string;
+  creatorProgramDesc: string;
+}
+
+interface UxControlsTranslations {
+  title: string;
+  description: string;
+  action: string;
+  next: string;
+  nextDesc: string;
+  prev: string;
+  prevDesc: string;
+  pin: string;
+  pinDesc: string;
+  unpin: string;
+  unpinDesc: string;
+  speedUp: string;
+  speedUpDesc: string;
+  speedDown: string;
+  speedDownDesc: string;
+  mode: string;
+  modeDesc: string;
+  silentNote: string;
+}
+
+interface ScriptImportTranslations {
+  title: string;
+  description: string;
+  jsonData: string;
+  markdownContent: string;
+  uploadFile: string;
+  importJson: string;
+  importMarkdown: string;
+  importing: string;
+  success: string;
+  successDesc: string;
+}
+
+interface ApiKeyTranslations {
+  title: string;
+  description: string;
+  yourApiKey: string;
+  keepSecret: string;
+  quickStart: string;
+  regenerateKey: string;
+  regenerateTitle: string;
+  regenerateDesc: string;
+  regenerating: string;
+  regenerated: string;
+  regeneratedDesc: string;
+  securityNotice: string;
+  securityNoticeDesc: string;
+  copied: string;
+  copiedDesc: string;
+}
+
+interface SessionTranslations {
+  title: string;
+  description: string;
+  current: string;
+  signOutOthers: string;
+  revoked: string;
+  revokedDesc: string;
+  allRevoked: string;
+  allRevokedDesc: string;
+  securityTip: string;
+}
+
+interface PasswordTranslations {
+  changeTitle: string;
+  changeDesc: string;
+  newPassword: string;
+  confirmPassword: string;
+  passwordsDoNotMatch: string;
+  updatePassword: string;
+  confirmTitle: string;
+  confirmDesc: string;
+  updating: string;
+  yesChange: string;
+  updated: string;
+  updatedDesc: string;
+}
+
 export interface TranslationKeys {
   nav: NavTranslations;
   hero: HeroTranslations;
@@ -194,6 +282,12 @@ export interface TranslationKeys {
   dashboard: DashboardTranslations;
   settings: SettingsTranslations;
   common: CommonTranslations;
+  marketplace: MarketplaceTranslations;
+  uxControls: UxControlsTranslations;
+  scriptImport: ScriptImportTranslations;
+  apiKey: ApiKeyTranslations;
+  session: SessionTranslations;
+  password: PasswordTranslations;
 }
 
 export const translations = {
@@ -372,6 +466,94 @@ export const translations = {
       export: "Export",
       import: "Import",
     },
+    // Marketplace
+    marketplace: {
+      title: "Script Marketplace",
+      comingSoon: "Coming Soon",
+      description: "Discover and share professional script packs",
+      free: "Free",
+      creatorProgram: "Creator Program",
+      creatorProgramDesc: "Publish your scripts and earn 70% of each sale.",
+    },
+    // UX Controls
+    uxControls: {
+      title: "UX Controls Mapping",
+      description: "Universal actions mapped to each device's input methods",
+      action: "Action",
+      next: "NEXT",
+      nextDesc: "Next block/page",
+      prev: "PREV",
+      prevDesc: "Previous block/page",
+      pin: "PIN",
+      pinDesc: "Keep on screen",
+      unpin: "UNPIN",
+      unpinDesc: "Release pinned",
+      speedUp: "SPEED+",
+      speedUpDesc: "Faster scroll",
+      speedDown: "SPEED-",
+      speedDownDesc: "Slower scroll",
+      mode: "MODE",
+      modeDesc: "Toggle cards ⇄ continuous",
+      silentNote: "All controls work silently without voice commands. Perfect for meetings, presentations, and healthcare.",
+    },
+    // Script Import
+    scriptImport: {
+      title: "Import Scripts",
+      description: "Import scripts from JSON or Markdown files",
+      jsonData: "JSON Data",
+      markdownContent: "Markdown Content",
+      uploadFile: "Upload File",
+      importJson: "Import JSON",
+      importMarkdown: "Import Markdown",
+      importing: "Importing...",
+      success: "Import successful",
+      successDesc: "Imported {count} script(s)",
+    },
+    // API Key
+    apiKey: {
+      title: "API Access",
+      description: "Manage your API keys for SDK integration",
+      yourApiKey: "Your API Key",
+      keepSecret: "Keep this key secret. Use it in your SDK integration.",
+      quickStart: "Quick Start",
+      regenerateKey: "Regenerate Key",
+      regenerateTitle: "Regenerate API Key?",
+      regenerateDesc: "This will immediately invalidate your current API key. All applications using the old key will stop working until you update them with the new key.",
+      regenerating: "Regenerating...",
+      regenerated: "API Key Regenerated",
+      regeneratedDesc: "Your old key will stop working immediately. Update your integrations.",
+      securityNotice: "Security Notice",
+      securityNoticeDesc: "Never expose your API key in client-side code or public repositories. Use environment variables and server-side calls for production apps.",
+      copied: "Copied",
+      copiedDesc: "API key copied to clipboard",
+    },
+    // Session Management
+    session: {
+      title: "Active Sessions",
+      description: "Manage devices where you're signed in",
+      current: "Current",
+      signOutOthers: "Sign Out Others",
+      revoked: "Session Revoked",
+      revokedDesc: "The device has been signed out.",
+      allRevoked: "All Other Sessions Revoked",
+      allRevokedDesc: "All other devices have been signed out.",
+      securityTip: "If you don't recognize a session, revoke it immediately and change your password to secure your account.",
+    },
+    // Password
+    password: {
+      changeTitle: "Change Password",
+      changeDesc: "Enter a new password for your account",
+      newPassword: "New Password",
+      confirmPassword: "Confirm New Password",
+      passwordsDoNotMatch: "Passwords do not match",
+      updatePassword: "Update Password",
+      confirmTitle: "Confirm Password Change",
+      confirmDesc: "Are you sure you want to change your password? You'll need to use the new password for all future logins.",
+      updating: "Updating...",
+      yesChange: "Yes, Change Password",
+      updated: "Password Updated",
+      updatedDesc: "Your password has been changed successfully.",
+    },
   },
   fr: {
     // Navigation
@@ -547,6 +729,94 @@ export const translations = {
       filter: "Filtrer",
       export: "Exporter",
       import: "Importer",
+    },
+    // Marketplace
+    marketplace: {
+      title: "Marketplace de Scripts",
+      comingSoon: "Bientôt disponible",
+      description: "Découvrez et partagez des packs de scripts professionnels",
+      free: "Gratuit",
+      creatorProgram: "Programme Créateur",
+      creatorProgramDesc: "Publiez vos scripts et gagnez 70% de chaque vente.",
+    },
+    // UX Controls
+    uxControls: {
+      title: "Mapping des Contrôles UX",
+      description: "Actions universelles mappées sur les méthodes d'entrée de chaque appareil",
+      action: "Action",
+      next: "SUIVANT",
+      nextDesc: "Bloc/page suivant",
+      prev: "PRÉCÉD.",
+      prevDesc: "Bloc/page précédent",
+      pin: "ÉPINGLER",
+      pinDesc: "Garder à l'écran",
+      unpin: "DÉSÉPINGLER",
+      unpinDesc: "Libérer l'épingle",
+      speedUp: "VITESSE+",
+      speedUpDesc: "Défilement plus rapide",
+      speedDown: "VITESSE-",
+      speedDownDesc: "Défilement plus lent",
+      mode: "MODE",
+      modeDesc: "Basculer cartes ⇄ continu",
+      silentNote: "Tous les contrôles fonctionnent silencieusement sans commandes vocales. Parfait pour les réunions, présentations et le secteur médical.",
+    },
+    // Script Import
+    scriptImport: {
+      title: "Importer des Scripts",
+      description: "Importez des scripts depuis des fichiers JSON ou Markdown",
+      jsonData: "Données JSON",
+      markdownContent: "Contenu Markdown",
+      uploadFile: "Charger un fichier",
+      importJson: "Importer JSON",
+      importMarkdown: "Importer Markdown",
+      importing: "Importation...",
+      success: "Importation réussie",
+      successDesc: "{count} script(s) importé(s)",
+    },
+    // API Key
+    apiKey: {
+      title: "Accès API",
+      description: "Gérez vos clés API pour l'intégration SDK",
+      yourApiKey: "Votre clé API",
+      keepSecret: "Gardez cette clé secrète. Utilisez-la dans votre intégration SDK.",
+      quickStart: "Démarrage rapide",
+      regenerateKey: "Régénérer la clé",
+      regenerateTitle: "Régénérer la clé API ?",
+      regenerateDesc: "Cela invalidera immédiatement votre clé API actuelle. Toutes les applications utilisant l'ancienne clé cesseront de fonctionner jusqu'à ce que vous les mettiez à jour avec la nouvelle clé.",
+      regenerating: "Régénération...",
+      regenerated: "Clé API régénérée",
+      regeneratedDesc: "Votre ancienne clé cessera de fonctionner immédiatement. Mettez à jour vos intégrations.",
+      securityNotice: "Avis de sécurité",
+      securityNoticeDesc: "N'exposez jamais votre clé API dans le code côté client ou les dépôts publics. Utilisez des variables d'environnement et des appels côté serveur pour les applications en production.",
+      copied: "Copié",
+      copiedDesc: "Clé API copiée dans le presse-papiers",
+    },
+    // Session Management
+    session: {
+      title: "Sessions actives",
+      description: "Gérez les appareils où vous êtes connecté",
+      current: "Actuelle",
+      signOutOthers: "Déconnecter les autres",
+      revoked: "Session révoquée",
+      revokedDesc: "L'appareil a été déconnecté.",
+      allRevoked: "Toutes les autres sessions révoquées",
+      allRevokedDesc: "Tous les autres appareils ont été déconnectés.",
+      securityTip: "Si vous ne reconnaissez pas une session, révoquez-la immédiatement et changez votre mot de passe pour sécuriser votre compte.",
+    },
+    // Password
+    password: {
+      changeTitle: "Changer le mot de passe",
+      changeDesc: "Entrez un nouveau mot de passe pour votre compte",
+      newPassword: "Nouveau mot de passe",
+      confirmPassword: "Confirmer le nouveau mot de passe",
+      passwordsDoNotMatch: "Les mots de passe ne correspondent pas",
+      updatePassword: "Mettre à jour le mot de passe",
+      confirmTitle: "Confirmer le changement de mot de passe",
+      confirmDesc: "Êtes-vous sûr de vouloir changer votre mot de passe ? Vous devrez utiliser le nouveau mot de passe pour toutes vos futures connexions.",
+      updating: "Mise à jour...",
+      yesChange: "Oui, changer le mot de passe",
+      updated: "Mot de passe mis à jour",
+      updatedDesc: "Votre mot de passe a été changé avec succès.",
     },
   },
 } as const;

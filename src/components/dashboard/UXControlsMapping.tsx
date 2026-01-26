@@ -12,76 +12,89 @@ import {
   Watch,
   Glasses
 } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface ControlMapping {
-  action: string;
+  actionKey: keyof typeof actionTranslations;
   icon: React.ElementType;
-  description: string;
   evenG2: string;
   vuzixZ100: string;
   rokid: string;
   phone: string;
 }
 
+const actionTranslations = {
+  next: { en: "NEXT", fr: "SUIVANT" },
+  prev: { en: "PREV", fr: "PRÉCÉD." },
+  pin: { en: "PIN", fr: "ÉPINGLER" },
+  unpin: { en: "UNPIN", fr: "DÉSÉPINGLER" },
+  speedUp: { en: "SPEED+", fr: "VITESSE+" },
+  speedDown: { en: "SPEED-", fr: "VITESSE-" },
+  mode: { en: "MODE", fr: "MODE" },
+};
+
+const descriptionTranslations = {
+  next: { en: "Next block/page", fr: "Bloc/page suivant" },
+  prev: { en: "Previous block/page", fr: "Bloc/page précédent" },
+  pin: { en: "Keep on screen", fr: "Garder à l'écran" },
+  unpin: { en: "Release pinned", fr: "Libérer l'épingle" },
+  speedUp: { en: "Faster scroll", fr: "Défilement plus rapide" },
+  speedDown: { en: "Slower scroll", fr: "Défilement plus lent" },
+  mode: { en: "Toggle cards ⇄ continuous", fr: "Basculer cartes ⇄ continu" },
+};
+
 const controlMappings: ControlMapping[] = [
   {
-    action: "NEXT",
+    actionKey: "next",
     icon: ArrowDown,
-    description: "Next block/page",
     evenG2: "Swipe ↓ touchbar",
     vuzixZ100: "Tap button",
     rokid: "Tap temple",
     phone: "Tap ▶ button",
   },
   {
-    action: "PREV",
+    actionKey: "prev",
     icon: ArrowUp,
-    description: "Previous block/page",
     evenG2: "Swipe ↑ touchbar",
     vuzixZ100: "Double tap",
     rokid: "Double tap",
     phone: "Tap ◀ button",
   },
   {
-    action: "PIN",
+    actionKey: "pin",
     icon: Pin,
-    description: "Keep on screen",
     evenG2: "Press R1 ring",
     vuzixZ100: "Long press",
     rokid: "Long press",
     phone: "Tap 📌 button",
   },
   {
-    action: "UNPIN",
+    actionKey: "unpin",
     icon: PinOff,
-    description: "Release pinned",
     evenG2: "Press R1 ring",
     vuzixZ100: "Long press",
     rokid: "Long press",
     phone: "Tap 📌 again",
   },
   {
-    action: "SPEED+",
+    actionKey: "speedUp",
     icon: FastForward,
-    description: "Faster scroll",
     evenG2: "Slide ring →",
     vuzixZ100: "Slider in app",
     rokid: "Swipe →",
     phone: "Slider control",
   },
   {
-    action: "SPEED-",
+    actionKey: "speedDown",
     icon: Rewind,
-    description: "Slower scroll",
     evenG2: "Slide ring ←",
     vuzixZ100: "Slider in app",
     rokid: "Swipe ←",
     phone: "Slider control",
   },
   {
-    action: "MODE",
+    actionKey: "mode",
     icon: LayoutGrid,
-    description: "Toggle cards ⇄ continuous",
     evenG2: "Double-tap bar",
     vuzixZ100: "Toggle in app",
     rokid: "Shake gesture",
@@ -89,23 +102,18 @@ const controlMappings: ControlMapping[] = [
   },
 ];
 
-const deviceIcons = {
-  evenG2: Glasses,
-  vuzixZ100: Glasses,
-  rokid: Glasses,
-  phone: Smartphone,
-};
-
 const UXControlsMapping = () => {
+  const { t, language } = useLanguage();
+
   return (
     <Card className="glass-card border-border/50">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <Watch className="h-5 w-5 text-primary" />
-          UX Controls Mapping
+          {t.uxControls.title}
         </CardTitle>
         <CardDescription>
-          Universal actions mapped to each device's input methods
+          {t.uxControls.description}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -113,7 +121,7 @@ const UXControlsMapping = () => {
           <table className="w-full min-w-[600px]">
             <thead>
               <tr className="border-b border-border/50">
-                <th className="text-left p-3 text-sm font-medium text-muted-foreground">Action</th>
+                <th className="text-left p-3 text-sm font-medium text-muted-foreground">{t.uxControls.action}</th>
                 <th className="text-center p-3">
                   <div className="flex items-center justify-center gap-1.5">
                     <Glasses className="h-4 w-4 text-primary" />
@@ -141,51 +149,56 @@ const UXControlsMapping = () => {
               </tr>
             </thead>
             <tbody>
-              {controlMappings.map((control, i) => (
-                <tr 
-                  key={control.action} 
-                  className={`border-b border-border/30 ${i % 2 === 0 ? "bg-secondary/10" : ""}`}
-                >
-                  <td className="p-3">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <control.icon className="h-4 w-4 text-primary" />
+              {controlMappings.map((control, i) => {
+                const actionName = actionTranslations[control.actionKey][language];
+                const description = descriptionTranslations[control.actionKey][language];
+                
+                return (
+                  <tr 
+                    key={control.actionKey} 
+                    className={`border-b border-border/30 ${i % 2 === 0 ? "bg-secondary/10" : ""}`}
+                  >
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <control.icon className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <span className="font-medium text-sm">{actionName}</span>
+                          <p className="text-xs text-muted-foreground">{description}</p>
+                        </div>
                       </div>
-                      <div>
-                        <span className="font-medium text-sm">{control.action}</span>
-                        <p className="text-xs text-muted-foreground">{control.description}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-3 text-center">
-                    <Badge variant="secondary" className="text-xs font-normal">
-                      {control.evenG2}
-                    </Badge>
-                  </td>
-                  <td className="p-3 text-center">
-                    <Badge variant="secondary" className="text-xs font-normal">
-                      {control.vuzixZ100}
-                    </Badge>
-                  </td>
-                  <td className="p-3 text-center">
-                    <Badge variant="secondary" className="text-xs font-normal">
-                      {control.rokid}
-                    </Badge>
-                  </td>
-                  <td className="p-3 text-center">
-                    <Badge variant="secondary" className="text-xs font-normal">
-                      {control.phone}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="p-3 text-center">
+                      <Badge variant="secondary" className="text-xs font-normal">
+                        {control.evenG2}
+                      </Badge>
+                    </td>
+                    <td className="p-3 text-center">
+                      <Badge variant="secondary" className="text-xs font-normal">
+                        {control.vuzixZ100}
+                      </Badge>
+                    </td>
+                    <td className="p-3 text-center">
+                      <Badge variant="secondary" className="text-xs font-normal">
+                        {control.rokid}
+                      </Badge>
+                    </td>
+                    <td className="p-3 text-center">
+                      <Badge variant="secondary" className="text-xs font-normal">
+                        {control.phone}
+                      </Badge>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
 
         <div className="mt-4 p-3 rounded-lg bg-secondary/30 text-center">
           <p className="text-xs text-muted-foreground">
-            All controls work silently without voice commands. Perfect for meetings, presentations, and healthcare.
+            {t.uxControls.silentNote}
           </p>
         </div>
       </CardContent>

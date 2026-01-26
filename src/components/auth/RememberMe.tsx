@@ -1,7 +1,6 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface RememberMeProps {
   checked: boolean;
@@ -9,6 +8,8 @@ interface RememberMeProps {
 }
 
 const RememberMe = ({ checked, onCheckedChange }: RememberMeProps) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex items-center gap-2">
       <Checkbox
@@ -20,7 +21,7 @@ const RememberMe = ({ checked, onCheckedChange }: RememberMeProps) => {
         htmlFor="remember"
         className="text-sm text-muted-foreground cursor-pointer"
       >
-        Remember me for 30 days
+        {t.auth.rememberMe}
       </Label>
     </div>
   );
