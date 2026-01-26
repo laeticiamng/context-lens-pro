@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnatomyARView } from '@/components/ar/anatomy';
 import SEOHead from '@/components/layout/SEOHead';
+import ErrorBoundary from '@/components/ui/error-boundary';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { usePatientSearch } from '@/hooks/emotionscare/usePatientData';
 
@@ -63,7 +64,7 @@ export default function VisionIRM() {
 
   // Patient selection screen
   return (
-    <>
+    <ErrorBoundary>
       <SEOHead
         title={t.title}
         description={t.subtitle}
@@ -207,6 +208,6 @@ export default function VisionIRM() {
           </div>
         </main>
       </div>
-    </>
+    </ErrorBoundary>
   );
 }

@@ -1,5 +1,6 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import SEOHead from "@/components/layout/SEOHead";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const Terms = () => {
@@ -7,6 +8,10 @@ const Terms = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SEOHead 
+        title={language === "fr" ? "Conditions d'Utilisation - ContextLens" : "Terms of Service - ContextLens"}
+        description={language === "fr" ? "Nos conditions générales d'utilisation" : "Our terms of service and usage policy"}
+      />
       <Header />
       <main className="pt-24 pb-16">
         <div className="container px-4 max-w-4xl">

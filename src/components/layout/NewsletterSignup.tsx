@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, ArrowRight, Check, Loader2 } from "lucide-react";
@@ -11,7 +11,8 @@ interface NewsletterSignupProps {
   source?: string;
 }
 
-const NewsletterSignup = ({ variant = "default", source = "newsletter" }: NewsletterSignupProps) => {
+const NewsletterSignup = forwardRef<HTMLDivElement, NewsletterSignupProps>(
+  ({ variant = "default", source = "newsletter" }, ref) => {
   const { toast } = useToast();
   const { language } = useLanguage();
   const [email, setEmail] = useState("");
@@ -131,7 +132,7 @@ const NewsletterSignup = ({ variant = "default", source = "newsletter" }: Newsle
 
   // Default variant
   return (
-    <div className="space-y-3">
+    <div ref={ref} className="space-y-3">
       <div>
         <h4 className="font-semibold text-sm">{t.title}</h4>
         <p className="text-xs text-muted-foreground">{t.description}</p>
@@ -155,6 +156,8 @@ const NewsletterSignup = ({ variant = "default", source = "newsletter" }: Newsle
       </form>
     </div>
   );
-};
+});
+
+NewsletterSignup.displayName = "NewsletterSignup";
 
 export default NewsletterSignup;

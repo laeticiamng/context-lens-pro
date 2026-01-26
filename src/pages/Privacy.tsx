@@ -1,5 +1,6 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import SEOHead from "@/components/layout/SEOHead";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const Privacy = () => {
@@ -7,6 +8,10 @@ const Privacy = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SEOHead 
+        title={language === "fr" ? "Politique de Confidentialité - ContextLens" : "Privacy Policy - ContextLens"}
+        description={language === "fr" ? "Notre politique de confidentialité et conformité RGPD" : "Our privacy policy and GDPR compliance"}
+      />
       <Header />
       <main className="pt-24 pb-16">
         <div className="container px-4 max-w-4xl">
