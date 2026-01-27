@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { HelmetProvider } from "react-helmet-async";
 import ErrorBoundary from "@/components/ui/error-boundary";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
@@ -39,6 +40,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <OfflineIndicator />
+            <CookieConsent />
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
