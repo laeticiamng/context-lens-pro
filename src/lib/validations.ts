@@ -22,19 +22,21 @@ export const signInSchema = z.object({
   password: z.string().min(1, { message: "Password is required" }),
 });
 
-// Contact form validation
+// Contact form validation with sanitization
 export const contactSchema = z.object({
   name: z
     .string()
     .trim()
     .min(1, { message: "Name is required" })
-    .max(100, { message: "Name must be less than 100 characters" }),
+    .max(100, { message: "Name must be less than 100 characters" })
+    .refine((val) => !/<[^>]*>/.test(val), { message: "Invalid characters in name" }),
   email: emailSchema,
   subject: z
     .string()
     .trim()
     .min(1, { message: "Subject is required" })
-    .max(200, { message: "Subject must be less than 200 characters" }),
+    .max(200, { message: "Subject must be less than 200 characters" })
+    .refine((val) => !/<[^>]*>/.test(val), { message: "Invalid characters in subject" }),
   message: z
     .string()
     .trim()
@@ -42,7 +44,7 @@ export const contactSchema = z.object({
     .max(5000, { message: "Message must be less than 5000 characters" }),
 });
 
-// Script validation
+// Script validation with XSS protection
 export const scriptSchema = z.object({
   title: z
     .string()
@@ -73,6 +75,7 @@ export const profileSchema = z.object({
     .string()
     .trim()
     .max(100, { message: "Display name must be less than 100 characters" })
+    .refine((val) => !val || !/<[^>]*>/.test(val), { message: "Invalid characters" })
     .optional(),
   avatar_url: z.string().url().optional().or(z.literal("")),
 });
@@ -83,6 +86,70 @@ export const waitlistSchema = z.object({
   source: z.string().max(100).optional(),
 });
 
+// MRI Cabinet validation
+export const cabinetSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, { message: "Name must be at least 2 characters" })
+    .max(200, { message: "Name must be less than 200 characters" }),
+  siret: z
+    .string()
+    .regex(/^\d{14}$/, { message: "SIRET must be exactly 14 digits" })
+    .optional()
+    .or(z.literal("")),
+  email: emailSchema.optional().or(z.literal("")),
+  phone: z
+    .string()
+    .regex(/^(\+?\d{1,4}[\s-]?)?(\d{2,4}[\s-]?){2,4}\d{2,4}$/, { message: "Invalid phone format" })
+    .optional()
+    .or(z.literal("")),
+  address: z.string().max(500).optional(),
+  city: z.string().max(100).optional(),
+  postal_code: z
+    .string()
+    .regex(/^\d{5}$/, { message: "Postal code must be 5 digits" })
+    .optional()
+    .or(z.literal("")),
+  country: z.string().max(100).optional(),
+});
+
+// MRI Device validation
+export const mriDeviceSchema = z.object({
+  manufacturer: z
+    .string()
+    .trim()
+    .min(1, { message: "Manufacturer is required" })
+    .max(100),
+  model: z
+    .string()
+    .trim()
+    .min(1, { message: "Model is required" })
+    .max(100),
+  serial_number: z
+    .string()
+    .trim()
+    .min(1, { message: "Serial number is required" })
+    .max(100),
+  device_type: z.string().min(1, { message: "Device type is required" }),
+  ip_address: z
+    .string()
+    .regex(/^(\d{1,3}\.){3}\d{1,3}$/, { message: "Invalid IP address" })
+    .optional()
+    .or(z.literal("")),
+});
+
+// Patient reference validation (sanitized for medical data)
+export const patientRefSchema = z.object({
+  patient_reference: z
+    .string()
+    .trim()
+    .min(1, { message: "Patient reference is required" })
+    .max(100, { message: "Patient reference must be less than 100 characters" })
+    .regex(/^[a-zA-Z0-9\-_]+$/, { message: "Only alphanumeric characters, hyphens and underscores allowed" }),
+  protocol_id: z.string().min(1, { message: "Protocol is required" }),
+});
+
 // Type exports
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
@@ -91,3 +158,6 @@ export type ScriptInput = z.infer<typeof scriptSchema>;
 export type DeviceInput = z.infer<typeof deviceSchema>;
 export type ProfileInput = z.infer<typeof profileSchema>;
 export type WaitlistInput = z.infer<typeof waitlistSchema>;
+export type CabinetInput = z.infer<typeof cabinetSchema>;
+export type MRIDeviceInput = z.infer<typeof mriDeviceSchema>;
+export type PatientRefInput = z.infer<typeof patientRefSchema>;
