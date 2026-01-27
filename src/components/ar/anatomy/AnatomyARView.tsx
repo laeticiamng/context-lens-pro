@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useCallback, useState } from 'react';
+import { Suspense, useEffect, useCallback, useState, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, Grid } from '@react-three/drei';
 import { 
@@ -8,7 +8,6 @@ import {
   useOrganLoader,
   useAnatomyVoiceCommands 
 } from '@/hooks/anatomy';
-import { useAnatomyStore } from '@/stores/anatomyStore';
 import { AnatomyOverlay } from './AnatomyOverlay';
 import { AnatomyHUD } from './AnatomyHUD';
 import { BodyTracker } from './BodyTracker';
@@ -72,16 +71,12 @@ function CalibratingIndicator({ quality, language }: { quality: number; language
 
 export function AnatomyARView({ patientId, patientName, onSessionEnd }: AnatomyARViewProps) {
   const { language } = useLanguage();
-  const store = useAnatomyStore();
   const [showBodyTracker, setShowBodyTracker] = useState(false);
+  const [focusedOrgan, setFocusedOrgan] = useState<string | null>(null);
   
-  // Initialize patient in store
-  useEffect(() => {
-    store.setPatientId(patientId);
-    return () => {
-      store.reset();
-    };
-  }, [patientId, store]);
+  // Use ref to track if component is mounted
+  const isMountedRef = useRef(true);
+  const lastZoneRef = useRef<BodyZone | null>(null);
   
   // Body tracking
   const {
@@ -95,7 +90,6 @@ export function AnatomyARView({ patientId, patientName, onSessionEnd }: AnatomyA
   // Gaze zone detection
   const {
     currentZone,
-    gazePoint,
     adjacentZones,
     setManualZone,
   } = useGazeZone(bodyLandmarks);
@@ -122,8 +116,15 @@ export function AnatomyARView({ patientId, patientName, onSessionEnd }: AnatomyA
     isListening,
     startListening,
     stopListening,
-    processCommand,
   } = useAnatomyVoiceCommands();
+
+  // Set mounted ref
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Start tracking on mount
   useEffect(() => {
@@ -133,9 +134,11 @@ export function AnatomyARView({ patientId, patientName, onSessionEnd }: AnatomyA
     };
   }, [startTracking, stopTracking]);
 
-  // Load organs when zone changes
+  // Load organs when zone changes - with debounce to prevent loops
   useEffect(() => {
-    if (!currentZone) return;
+    if (!currentZone || currentZone === lastZoneRef.current) return;
+    
+    lastZoneRef.current = currentZone;
     
     // Load current zone with high LOD
     loadZone(currentZone, 'high');
@@ -220,7 +223,7 @@ export function AnatomyARView({ patientId, patientName, onSessionEnd }: AnatomyA
         patientName={patientName}
         currentZone={currentZone}
         loadedOrgans={loadedOrgans}
-        focusedOrgan={store.focusedOrgan}
+        focusedOrgan={focusedOrgan}
         isCalibrated={isCalibrated}
         calibrationQuality={calibrationQuality}
         isVoiceActive={isListening}

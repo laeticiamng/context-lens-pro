@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useAnatomyStore } from '@/stores/anatomyStore';
 
 export interface BodyLandmark {
   x: number;
@@ -60,12 +59,11 @@ export function useBodyTracking(): UseBodyTrackingResult {
   const [trackingConfidence, setTrackingConfidence] = useState(0);
   const [error, setError] = useState<Error | null>(null);
   
-  const setTracking = useAnatomyStore(state => state.setTracking);
-  
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const isRunningRef = useRef(false);
+  const isMountedRef = useRef(true);
 
   // Mock pose detection for demo (real implementation would use MediaPipe)
   const generateMockLandmarks = useCallback((): BodyLandmark[] => {
@@ -150,7 +148,7 @@ export function useBodyTracking(): UseBodyTrackingResult {
 
       // Start detection loop (mock for demo)
       const detect = () => {
-        if (!isRunningRef.current) return;
+        if (!isRunningRef.current || !isMountedRef.current) return;
 
         const landmarks = generateMockLandmarks();
         setBodyLandmarks(landmarks);
@@ -159,7 +157,6 @@ export function useBodyTracking(): UseBodyTrackingResult {
         // Calculate average confidence
         const avgConfidence = landmarks.reduce((sum, lm) => sum + lm.visibility, 0) / landmarks.length;
         setTrackingConfidence(avgConfidence);
-        setTracking(true, avgConfidence);
 
         animationFrameRef.current = requestAnimationFrame(detect);
       };
@@ -169,12 +166,12 @@ export function useBodyTracking(): UseBodyTrackingResult {
       setError(err as Error);
       isRunningRef.current = false;
     }
-  }, [generateMockLandmarks, setTracking]);
+  }, [generateMockLandmarks]);
 
   const stopTracking = useCallback(() => {
     isRunningRef.current = false;
     setIsTracking(false);
-    setTracking(false, 0);
+    setTrackingConfidence(0);
 
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -189,7 +186,7 @@ export function useBodyTracking(): UseBodyTrackingResult {
     if (videoRef.current) {
       videoRef.current = null;
     }
-  }, [setTracking]);
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
