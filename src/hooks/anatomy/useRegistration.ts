@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Matrix4, Vector3 } from 'three';
-import { useAnatomyStore } from '@/stores/anatomyStore';
 import { anatomyApi, type AnatomyLandmark } from '@/services/emotionscare/anatomyApi';
 import type { BodyLandmark } from './useBodyTracking';
 import { POSE_LANDMARKS } from './useBodyTracking';
@@ -37,8 +36,20 @@ export function useRegistration(
   const [isCalibrating, setIsCalibrating] = useState(false);
   const [irlLandmarks, setIrlLandmarks] = useState<AnatomyLandmark[] | null>(null);
   
-  const setCalibration = useAnatomyStore(state => state.setCalibration);
   const calibratingRef = useRef(false);
+  const isMountedRef = useRef(true);
+  const calibrationTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Set mounted ref
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (calibrationTimerRef.current) {
+        clearTimeout(calibrationTimerRef.current);
+      }
+    };
+  }, []);
 
   // Fetch IRL landmarks from API
   useEffect(() => {
@@ -50,7 +61,9 @@ export function useRegistration(
     async function fetchLandmarks() {
       try {
         const data = await anatomyApi.getLandmarks(patientId!);
-        setIrlLandmarks(data.landmarks);
+        if (isMountedRef.current) {
+          setIrlLandmarks(data.landmarks);
+        }
       } catch (err) {
         console.error('[Registration] Failed to fetch landmarks:', err);
       }
@@ -109,13 +122,10 @@ export function useRegistration(
 
     const scale = Math.sqrt(bodyScale / irlScale);
 
-    // For simplicity, we'll use translation and uniform scale
-    // In production, you'd use a full SVD-based Procrustes for rotation
     const translation = new Vector3()
       .copy(bodyCentroid)
       .sub(irlCentroid.clone().multiplyScalar(scale));
 
-    // Construct transformation matrix
     matrix.makeScale(scale, scale, scale);
     matrix.setPosition(translation);
 
@@ -129,58 +139,58 @@ export function useRegistration(
     calibratingRef.current = true;
     setIsCalibrating(true);
 
-    // Match landmarks
     const correspondences = matchLandmarks(bodyLandmarks, irlLandmarks);
 
     if (correspondences.length < 3) {
-      setCalibrationQuality(correspondences.length / 3);
-      setIsCalibrating(false);
+      if (isMountedRef.current) {
+        setCalibrationQuality(correspondences.length / 3);
+        setIsCalibrating(false);
+      }
       calibratingRef.current = false;
       return;
     }
 
-    // Compute transformation
     const matrix = computeTransformation(correspondences);
-    setTransformMatrix(matrix);
-    setIsCalibrated(true);
-    setCalibrationQuality(Math.min(1, correspondences.length / 5));
-    setCalibration(true, Math.min(1, correspondences.length / 5), matrix);
+    
+    if (isMountedRef.current) {
+      setTransformMatrix(matrix);
+      setIsCalibrated(true);
+      setCalibrationQuality(Math.min(1, correspondences.length / 5));
+      setIsCalibrating(false);
+    }
 
     console.log('[Registration] Calibration complete, quality:', correspondences.length / 5);
-
-    setIsCalibrating(false);
     calibratingRef.current = false;
-  }, [bodyLandmarks, irlLandmarks, matchLandmarks, computeTransformation, setCalibration]);
+  }, [bodyLandmarks, irlLandmarks, matchLandmarks, computeTransformation]);
 
   // Auto-calibrate when data is ready
   useEffect(() => {
-    if (bodyLandmarks && irlLandmarks && !isCalibrated) {
-      // Small delay to allow landmarks to stabilize
-      const timer = setTimeout(calibrate, 500);
-      return () => clearTimeout(timer);
+    if (bodyLandmarks && irlLandmarks && !isCalibrated && !calibratingRef.current) {
+      if (calibrationTimerRef.current) {
+        clearTimeout(calibrationTimerRef.current);
+      }
+      calibrationTimerRef.current = setTimeout(calibrate, 500);
     }
+    
+    return () => {
+      if (calibrationTimerRef.current) {
+        clearTimeout(calibrationTimerRef.current);
+      }
+    };
   }, [bodyLandmarks, irlLandmarks, isCalibrated, calibrate]);
-
-  // Continuous tracking update (update transformation each frame)
-  useEffect(() => {
-    if (!isCalibrated || !bodyLandmarks || !irlLandmarks) return;
-
-    const correspondences = matchLandmarks(bodyLandmarks, irlLandmarks);
-    if (correspondences.length >= 3) {
-      const matrix = computeTransformation(correspondences);
-      setTransformMatrix(matrix);
-    }
-  }, [bodyLandmarks, isCalibrated, irlLandmarks, matchLandmarks, computeTransformation]);
 
   // Recalibrate function
   const recalibrate = useCallback(() => {
+    if (calibrationTimerRef.current) {
+      clearTimeout(calibrationTimerRef.current);
+    }
+    
     setIsCalibrated(false);
     setCalibrationQuality(0);
-    setCalibration(false, 0);
+    calibratingRef.current = false;
     
-    // Trigger recalibration
-    setTimeout(calibrate, 100);
-  }, [calibrate, setCalibration]);
+    calibrationTimerRef.current = setTimeout(calibrate, 100);
+  }, [calibrate]);
 
   return {
     transformMatrix,

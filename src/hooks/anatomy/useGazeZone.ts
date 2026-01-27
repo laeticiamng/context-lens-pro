@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useAnatomyStore } from '@/stores/anatomyStore';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { BodyLandmark } from './useBodyTracking';
 import { POSE_LANDMARKS } from './useBodyTracking';
 import type { BodyZone } from '@/services/emotionscare/anatomyApi';
@@ -36,7 +35,8 @@ export function useGazeZone(bodyLandmarks: BodyLandmark[] | null): UseGazeZoneRe
   const [gazePoint, setGazePoint] = useState<{ x: number; y: number; z: number } | null>(null);
   const [manualZone, setManualZoneState] = useState<BodyZone | null>(null);
   
-  const setStoreZone = useAnatomyStore(state => state.setCurrentZone);
+  // Use ref to track last zone to prevent unnecessary updates
+  const lastZoneRef = useRef<BodyZone | null>(null);
 
   // Calculate zone based on gaze (simulated)
   const calculateGazeZone = useCallback((landmarks: BodyLandmark[]): BodyZone | null => {
@@ -49,10 +49,8 @@ export function useGazeZone(bodyLandmarks: BodyLandmark[] | null): UseGazeZoneRe
     const kneeY = (landmarks[POSE_LANDMARKS.LEFT_KNEE].y + landmarks[POSE_LANDMARKS.RIGHT_KNEE].y) / 2;
 
     // Simulate gaze direction (center of view for devices without eye tracking)
-    // In real implementation, this would come from WebXR eye tracking API
-    const gazeY = 0.4; // Looking at upper body area by default
+    const gazeY = 0.4;
 
-    // Determine zone based on gaze Y position relative to body landmarks
     if (gazeY < noseY + 0.05) {
       return 'head';
     } else if (gazeY < shoulderY + 0.1) {
@@ -108,8 +106,10 @@ export function useGazeZone(bodyLandmarks: BodyLandmark[] | null): UseGazeZoneRe
   // Update zone when landmarks or manual zone changes
   useEffect(() => {
     if (manualZone) {
-      setCurrentZone(manualZone);
-      setStoreZone(manualZone, ZONE_ADJACENCY[manualZone]);
+      if (manualZone !== lastZoneRef.current) {
+        setCurrentZone(manualZone);
+        lastZoneRef.current = manualZone;
+      }
       
       if (bodyLandmarks) {
         setGazePoint(getZoneCenter(manualZone, bodyLandmarks));
@@ -118,28 +118,37 @@ export function useGazeZone(bodyLandmarks: BodyLandmark[] | null): UseGazeZoneRe
     }
 
     if (!bodyLandmarks) {
-      setCurrentZone(null);
+      if (currentZone !== null) {
+        setCurrentZone(null);
+        lastZoneRef.current = null;
+      }
       setGazePoint(null);
-      setStoreZone(null, []);
       return;
     }
 
     const zone = calculateGazeZone(bodyLandmarks);
-    setCurrentZone(zone);
+    
+    // Only update if zone changed
+    if (zone !== lastZoneRef.current) {
+      setCurrentZone(zone);
+      lastZoneRef.current = zone;
+    }
 
     if (zone) {
       setGazePoint(getZoneCenter(zone, bodyLandmarks));
-      setStoreZone(zone, ZONE_ADJACENCY[zone]);
     } else {
       setGazePoint(null);
-      setStoreZone(null, []);
     }
-  }, [bodyLandmarks, manualZone, calculateGazeZone, getZoneCenter, setStoreZone]);
+  }, [bodyLandmarks, manualZone, calculateGazeZone, getZoneCenter, currentZone]);
 
   const adjacentZones = currentZone ? ZONE_ADJACENCY[currentZone] : [];
 
   const setManualZone = useCallback((zone: BodyZone) => {
     setManualZoneState(zone);
+    // Clear manual override after 10 seconds
+    setTimeout(() => {
+      setManualZoneState(null);
+    }, 10000);
   }, []);
 
   return {

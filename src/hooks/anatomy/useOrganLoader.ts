@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAnatomyStore } from '@/stores/anatomyStore';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { anatomyApi, type AnatomicalStructure, type BodyZone } from '@/services/emotionscare/anatomyApi';
 import { ZONE_ORGANS } from './useGazeZone';
 
@@ -25,21 +24,26 @@ const UNLOAD_DELAY = 30000;
 export function useOrganLoader(patientId: string | null): UseOrganLoaderResult {
   const [isLoading, setIsLoading] = useState(false);
   const [structures, setStructures] = useState<AnatomicalStructure[]>([]);
+  const [loadedOrgansMap, setLoadedOrgansMap] = useState<Map<string, LoadedOrgan>>(new Map());
   
-  const store = useAnatomyStore();
   const unloadTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
   const loadedZonesRef = useRef<Set<BodyZone>>(new Set());
+  const isMountedRef = useRef(true);
 
   // Fetch all structures on mount
   useEffect(() => {
+    isMountedRef.current = true;
+    
     if (!patientId) return;
 
     async function fetchStructures() {
       try {
         console.log('[OrganLoader] Fetching structures for patient:', patientId);
         const data = await anatomyApi.getStructures(patientId!);
-        setStructures(data);
-        console.log('[OrganLoader] Loaded', data.length, 'structures');
+        if (isMountedRef.current) {
+          setStructures(data);
+          console.log('[OrganLoader] Loaded', data.length, 'structures');
+        }
       } catch (err) {
         console.error('[OrganLoader] Failed to fetch structures:', err);
         // Continue with empty structures array - mock data will be used
@@ -47,6 +51,10 @@ export function useOrganLoader(patientId: string | null): UseOrganLoaderResult {
     }
 
     fetchStructures();
+    
+    return () => {
+      isMountedRef.current = false;
+    };
   }, [patientId]);
 
   // Load organs for a zone
@@ -56,54 +64,72 @@ export function useOrganLoader(patientId: string | null): UseOrganLoaderResult {
     setIsLoading(true);
     loadedZonesRef.current.add(zone);
 
-    const organCodes = ZONE_ORGANS[zone];
+    const organCodes = ZONE_ORGANS[zone] || [];
     
     for (const code of organCodes) {
       // Skip if already loaded
-      if (store.loadedOrgans.has(code)) continue;
+      if (loadedOrgansMap.has(code)) continue;
 
       // Find structure
       const structure = structures.find(s => s.structure_code === code);
       if (!structure) continue;
 
       // Mark as loading
-      store.addLoadedOrgan(code, {
-        structure,
-        meshUrl: '',
-        isLoading: true,
-        loadedAt: Date.now(),
+      setLoadedOrgansMap(prev => {
+        const newMap = new Map(prev);
+        newMap.set(code, {
+          structure,
+          meshUrl: '',
+          isLoading: true,
+          loadedAt: Date.now(),
+        });
+        return newMap;
       });
 
       try {
         // Fetch mesh URL
         const meshUrl = await anatomyApi.getMeshUrl(patientId, code, lod);
         
-        store.addLoadedOrgan(code, {
-          structure,
-          meshUrl,
-          isLoading: false,
-          loadedAt: Date.now(),
-        });
+        if (isMountedRef.current) {
+          setLoadedOrgansMap(prev => {
+            const newMap = new Map(prev);
+            newMap.set(code, {
+              structure,
+              meshUrl,
+              isLoading: false,
+              loadedAt: Date.now(),
+            });
+            return newMap;
+          });
+        }
 
         console.log(`[OrganLoader] Loaded ${code} for zone ${zone}`);
       } catch (err) {
         console.error(`[OrganLoader] Failed to load ${code}:`, err);
-        store.removeLoadedOrgan(code);
+        if (isMountedRef.current) {
+          setLoadedOrgansMap(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(code);
+            return newMap;
+          });
+        }
       }
     }
 
-    setIsLoading(false);
-  }, [patientId, structures, store]);
+    if (isMountedRef.current) {
+      setIsLoading(false);
+    }
+  }, [patientId, structures, loadedOrgansMap]);
 
   // Preload organs for a zone (low LOD)
   const preloadZone = useCallback(async (zone: BodyZone) => {
     if (!patientId) return;
 
-    const organCodes = ZONE_ORGANS[zone];
+    const organCodes = ZONE_ORGANS[zone] || [];
     
     for (const code of organCodes) {
       // Skip if already loaded
-      if (store.loadedOrgans.has(code)) continue;
+      if (loadedOrgansMap.has(code)) continue;
 
       const structure = structures.find(s => s.structure_code === code);
       if (!structure) continue;
@@ -112,23 +138,29 @@ export function useOrganLoader(patientId: string | null): UseOrganLoaderResult {
         // Preload with low LOD
         const meshUrl = await anatomyApi.getMeshUrl(patientId, code, 'low');
         
-        store.addLoadedOrgan(code, {
-          structure,
-          meshUrl,
-          isLoading: false,
-          loadedAt: Date.now(),
-        });
+        if (isMountedRef.current) {
+          setLoadedOrgansMap(prev => {
+            const newMap = new Map(prev);
+            newMap.set(code, {
+              structure,
+              meshUrl,
+              isLoading: false,
+              loadedAt: Date.now(),
+            });
+            return newMap;
+          });
+        }
 
         console.log(`[OrganLoader] Preloaded ${code} for zone ${zone}`);
       } catch (err) {
         console.error(`[OrganLoader] Failed to preload ${code}:`, err);
       }
     }
-  }, [patientId, structures, store]);
+  }, [patientId, structures, loadedOrgansMap]);
 
   // Unload organs for a zone
   const unloadZone = useCallback((zone: BodyZone) => {
-    const organCodes = ZONE_ORGANS[zone];
+    const organCodes = ZONE_ORGANS[zone] || [];
     
     for (const code of organCodes) {
       // Clear any pending unload timer
@@ -139,7 +171,13 @@ export function useOrganLoader(patientId: string | null): UseOrganLoaderResult {
 
       // Set delayed unload
       const timer = setTimeout(() => {
-        store.removeLoadedOrgan(code);
+        if (isMountedRef.current) {
+          setLoadedOrgansMap(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(code);
+            return newMap;
+          });
+        }
         unloadTimersRef.current.delete(code);
         console.log(`[OrganLoader] Unloaded ${code}`);
       }, UNLOAD_DELAY);
@@ -148,19 +186,22 @@ export function useOrganLoader(patientId: string | null): UseOrganLoaderResult {
     }
 
     loadedZonesRef.current.delete(zone);
-  }, [store]);
+  }, []);
 
   // Get specific organ
   const getOrgan = useCallback((code: string): LoadedOrgan | undefined => {
-    return store.loadedOrgans.get(code);
-  }, [store.loadedOrgans]);
+    return loadedOrgansMap.get(code);
+  }, [loadedOrgansMap]);
 
-  // Convert Map to array for return
-  const loadedOrgansArray = Array.from(store.loadedOrgans.values());
+  // Convert Map to array for return - memoized to prevent infinite loops
+  const loadedOrgansArray = useMemo(() => {
+    return Array.from(loadedOrgansMap.values());
+  }, [loadedOrgansMap]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      isMountedRef.current = false;
       unloadTimersRef.current.forEach(timer => clearTimeout(timer));
       unloadTimersRef.current.clear();
     };
