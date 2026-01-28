@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+// XSS Sanitization helper
+const sanitizeString = (val: string) => {
+  return val
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .trim();
+};
+
 // Auth validation schemas
 export const emailSchema = z
   .string()
@@ -29,7 +39,7 @@ export const contactSchema = z.object({
     .trim()
     .min(1, { message: "Name is required" })
     .max(100, { message: "Name must be less than 100 characters" })
-    .refine((val) => !/<[^>]*>/.test(val), { message: "Invalid characters in name" }),
+    .transform((val) => sanitizeString(val)),
   email: emailSchema,
   subject: z
     .string()
@@ -140,13 +150,21 @@ export const mriDeviceSchema = z.object({
 });
 
 // Patient reference validation (sanitized for medical data)
-export const patientRefSchema = z.object({
+export const patientRefSchema = z
+  .string()
+  .trim()
+  .min(3, { message: "Patient reference must be at least 3 characters" })
+  .max(100, { message: "Patient reference must be less than 100 characters" })
+  .transform((val) => sanitizeString(val));
+
+// Patient scan input validation
+export const patientScanSchema = z.object({
   patient_reference: z
     .string()
     .trim()
-    .min(1, { message: "Patient reference is required" })
+    .min(3, { message: "Patient reference is required (min 3 characters)" })
     .max(100, { message: "Patient reference must be less than 100 characters" })
-    .regex(/^[a-zA-Z0-9\-_]+$/, { message: "Only alphanumeric characters, hyphens and underscores allowed" }),
+    .transform((val) => sanitizeString(val)),
   protocol_id: z.string().min(1, { message: "Protocol is required" }),
 });
 
@@ -161,3 +179,4 @@ export type WaitlistInput = z.infer<typeof waitlistSchema>;
 export type CabinetInput = z.infer<typeof cabinetSchema>;
 export type MRIDeviceInput = z.infer<typeof mriDeviceSchema>;
 export type PatientRefInput = z.infer<typeof patientRefSchema>;
+export type PatientScanInput = z.infer<typeof patientScanSchema>;
