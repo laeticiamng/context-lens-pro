@@ -1,10 +1,12 @@
-import { useState, forwardRef } from "react";
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { useState, forwardRef, useMemo } from "react";
+import { ChevronDown, HelpCircle, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { Input } from "@/components/ui/input";
 
 const FAQSection = forwardRef<HTMLElement>((props, ref) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const { t, language } = useLanguage();
 
   const faqs = language === "fr" ? [
@@ -75,6 +77,27 @@ const FAQSection = forwardRef<HTMLElement>((props, ref) => {
     },
   ];
 
+  // Filter FAQs based on search query
+  const filteredFaqs = useMemo(() => {
+    if (!searchQuery.trim()) return faqs;
+    const query = searchQuery.toLowerCase();
+    return faqs.filter(
+      faq => 
+        faq.question.toLowerCase().includes(query) || 
+        faq.answer.toLowerCase().includes(query)
+    );
+  }, [faqs, searchQuery]);
+
+  // Highlight matching text
+  const highlightText = (text: string, query: string) => {
+    if (!query.trim()) return text;
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, i) => 
+      regex.test(part) ? <mark key={i} className="bg-primary/30 text-foreground px-0.5 rounded">{part}</mark> : part
+    );
+  };
+
   return (
     <section ref={ref} id="faq" className="py-24 md:py-32">
       <div className="container px-4">
@@ -87,7 +110,7 @@ const FAQSection = forwardRef<HTMLElement>((props, ref) => {
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             {t.faq.title} <span className="text-gradient">{t.faq.titleHighlight}</span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-muted-foreground mb-6">
             {language === "fr" 
               ? "Tout ce que vous devez savoir sur ContextLens. Vous n'avez pas trouvé votre réponse ?" 
               : "Everything you need to know about ContextLens. Can't find an answer?"}{" "}
@@ -95,43 +118,76 @@ const FAQSection = forwardRef<HTMLElement>((props, ref) => {
               {language === "fr" ? "Contactez-nous" : "Contact us"}
             </a>.
           </p>
+
+          {/* Search bar */}
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder={language === "fr" ? "Rechercher une question..." : "Search questions..."}
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setOpenIndex(null);
+              }}
+              className="pl-10"
+              aria-label={language === "fr" ? "Rechercher dans la FAQ" : "Search FAQ"}
+            />
+          </div>
         </div>
 
         {/* FAQ List */}
         <div className="max-w-3xl mx-auto space-y-3">
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className="glass-card rounded-xl border border-border/50 overflow-hidden"
-            >
-              <button
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full flex items-center justify-between p-5 text-left hover:bg-secondary/30 transition-colors"
-              >
-                <span className="font-medium pr-4">{faq.question}</span>
-                <ChevronDown 
-                  className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform duration-200 ${
-                    openIndex === index ? "rotate-180" : ""
-                  }`} 
-                />
-              </button>
-              <AnimatePresence>
-                {openIndex === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="px-5 pb-5 text-muted-foreground leading-relaxed">
-                      {faq.answer}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+          {filteredFaqs.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <HelpCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>{language === "fr" ? "Aucun résultat trouvé" : "No results found"}</p>
+              <p className="text-sm mt-2">
+                <a href="/contact" className="text-primary hover:underline">
+                  {language === "fr" ? "Posez-nous votre question" : "Ask us your question"}
+                </a>
+              </p>
             </div>
-          ))}
+          ) : (
+            filteredFaqs.map((faq, index) => (
+              <div
+                key={index}
+                className="glass-card rounded-xl border border-border/50 overflow-hidden"
+              >
+                <button
+                  onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                  className="w-full flex items-center justify-between p-5 text-left hover:bg-secondary/30 transition-colors"
+                  aria-expanded={openIndex === index}
+                  aria-controls={`faq-answer-${index}`}
+                >
+                  <span className="font-medium pr-4">
+                    {highlightText(faq.question, searchQuery)}
+                  </span>
+                  <ChevronDown 
+                    className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform duration-200 ${
+                      openIndex === index ? "rotate-180" : ""
+                    }`} 
+                  />
+                </button>
+                <AnimatePresence>
+                  {openIndex === index && (
+                    <motion.div
+                      id={`faq-answer-${index}`}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 pb-5 text-muted-foreground leading-relaxed">
+                        {highlightText(faq.answer, searchQuery)}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </section>

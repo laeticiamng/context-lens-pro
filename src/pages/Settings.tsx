@@ -35,6 +35,7 @@ import SettingsSkeleton from "@/components/settings/SettingsSkeleton";
 import APIKeyManager from "@/components/settings/APIKeyManager";
 import BillingTab from "@/components/settings/BillingTab";
 import GDPRCompliancePanel from "@/components/settings/GDPRCompliancePanel";
+import { AccountDeletionDialog } from "@/components/settings/AccountDeletionDialog";
 import ErrorBoundary from "@/components/ui/error-boundary";
 import SEOHead from "@/components/layout/SEOHead";
 
@@ -212,14 +213,6 @@ const Settings = () => {
   const handleDeleteData = async () => {
     if (!user) return;
     
-    // Show confirmation with real deletion
-    const confirmed = window.confirm(
-      "Are you sure you want to delete ALL your data? This action cannot be undone. " +
-      "All scripts, devices, and analytics will be permanently deleted."
-    );
-    
-    if (!confirmed) return;
-    
     try {
       // Delete all user data
       await supabase.from("usage_analytics").delete().eq("user_id", user.id);
@@ -228,8 +221,10 @@ const Settings = () => {
       await supabase.from("profiles").delete().eq("user_id", user.id);
       
       toast({ 
-        title: "Data Deleted", 
-        description: "All your data has been permanently deleted." 
+        title: language === "fr" ? "Données supprimées" : "Data Deleted", 
+        description: language === "fr" 
+          ? "Toutes vos données ont été supprimées définitivement."
+          : "All your data has been permanently deleted." 
       });
       
       // Sign out after deletion
@@ -237,8 +232,10 @@ const Settings = () => {
       navigate("/");
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to delete some data. Please contact support.",
+        title: language === "fr" ? "Erreur" : "Error",
+        description: language === "fr" 
+          ? "Échec de la suppression. Veuillez contacter le support."
+          : "Failed to delete some data. Please contact support.",
         variant: "destructive",
       });
     }
@@ -376,11 +373,33 @@ const Settings = () => {
             <SessionManagement />
             
             {user && (
-              <GDPRCompliancePanel
-                userId={user.id}
-                onExportData={handleExportData}
-                onDeleteData={handleDeleteData}
-              />
+              <>
+                <GDPRCompliancePanel
+                  userId={user.id}
+                  onExportData={handleExportData}
+                  onDeleteData={handleDeleteData}
+                />
+                
+                {/* Account Deletion with proper confirmation dialog */}
+                <Card className="glass-card border-destructive/30 bg-destructive/5">
+                  <CardHeader>
+                    <CardTitle className="text-destructive">
+                      {language === "fr" ? "Zone dangereuse" : "Danger Zone"}
+                    </CardTitle>
+                    <CardDescription>
+                      {language === "fr" 
+                        ? "Supprimez définitivement votre compte et toutes vos données."
+                        : "Permanently delete your account and all your data."}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <AccountDeletionDialog 
+                      userEmail={user.email || ''}
+                      onConfirmDelete={handleDeleteData}
+                    />
+                  </CardContent>
+                </Card>
+              </>
             )}
             
             <PrivacyControls 
