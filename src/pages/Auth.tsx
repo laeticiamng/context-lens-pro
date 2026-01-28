@@ -178,6 +178,7 @@ const Auth = () => {
                     className={`pl-10 pr-10 ${errors.password ? "border-destructive" : ""}`}
                     required
                     minLength={6}
+                    autoComplete={isLogin ? "current-password" : "new-password"}
                   />
                   <button
                     type="button"

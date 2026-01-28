@@ -182,11 +182,18 @@ const methodColors: Record<string, string> = {
 
 const APIEndpointsDocs = () => {
   const [copiedEndpoint, setCopiedEndpoint] = useState<string | null>(null);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const copyEndpoint = (path: string) => {
     navigator.clipboard.writeText(`https://api.contextlens.io${path}`);
     setCopiedEndpoint(path);
     setTimeout(() => setCopiedEndpoint(null), 2000);
+  };
+
+  const copyCode = (code: string, id: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(id);
+    setTimeout(() => setCopiedCode(null), 2000);
   };
 
   return (
@@ -246,16 +253,44 @@ const APIEndpointsDocs = () => {
                   <p className="text-sm text-muted-foreground">{endpoint.description}</p>
 
                   {endpoint.request && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Request Body</p>
+                    <div className="relative group">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs font-medium text-muted-foreground">Request Body</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => copyCode(endpoint.request!, `req-${i}`)}
+                        >
+                          {copiedCode === `req-${i}` ? (
+                            <><Check className="h-3 w-3 mr-1 text-accent" /> Copied</>
+                          ) : (
+                            <><Copy className="h-3 w-3 mr-1" /> Copy</>
+                          )}
+                        </Button>
+                      </div>
                       <pre className="text-xs bg-secondary/50 p-3 rounded-lg overflow-x-auto">
                         <code>{endpoint.request}</code>
                       </pre>
                     </div>
                   )}
 
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Response</p>
+                  <div className="relative group">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-medium text-muted-foreground">Response</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => copyCode(endpoint.response, `res-${i}`)}
+                      >
+                        {copiedCode === `res-${i}` ? (
+                          <><Check className="h-3 w-3 mr-1 text-accent" /> Copied</>
+                        ) : (
+                          <><Copy className="h-3 w-3 mr-1" /> Copy</>
+                        )}
+                      </Button>
+                    </div>
                     <pre className="text-xs bg-secondary/50 p-3 rounded-lg overflow-x-auto">
                       <code>{endpoint.response}</code>
                     </pre>
