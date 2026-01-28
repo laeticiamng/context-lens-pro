@@ -8,3 +8,4 @@ export { ProtocolSelector } from './ProtocolSelector';
 export { CabinetSetupForm } from './CabinetSetupForm';
 export { SubscriptionPlans } from './SubscriptionPlans';
 export { AddMRIDeviceDialog } from './AddMRIDeviceDialog';
+export { ReportGenerator } from './ReportGenerator';
