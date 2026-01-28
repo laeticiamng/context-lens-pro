@@ -57,12 +57,18 @@ describe("Platform Smoke Tests", () => {
       
       expect(contactSchema.safeParse(validData).success).toBe(true);
       
-      // Test XSS prevention
+      // Test XSS sanitization - now transforms instead of rejecting
       const xssData = {
         ...validData,
         name: "<script>alert('xss')</script>",
       };
-      expect(contactSchema.safeParse(xssData).success).toBe(false);
+      const result = contactSchema.safeParse(xssData);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        // Verify XSS is sanitized (escaped)
+        expect(result.data.name).not.toContain('<script>');
+        expect(result.data.name).toContain('&lt;script&gt;');
+      }
     });
 
     it("should validate cabinet SIRET format", async () => {
@@ -85,21 +91,25 @@ describe("Platform Smoke Tests", () => {
     });
 
     it("should validate patient reference format", async () => {
-      const { patientRefSchema } = await import("@/lib/validations");
+      const { patientRefSchema, patientScanSchema } = await import("@/lib/validations");
       
-      const validRef = {
+      // patientRefSchema is now a simple string schema
+      expect(patientRefSchema.safeParse("PAT-2024-001").success).toBe(true);
+      expect(patientRefSchema.safeParse("AB").success).toBe(false); // Too short
+      
+      // patientScanSchema is for the full object
+      const validScan = {
         patient_reference: "PAT-2024-001",
         protocol_id: "full-body-scan",
       };
+      expect(patientScanSchema.safeParse(validScan).success).toBe(true);
       
-      expect(patientRefSchema.safeParse(validRef).success).toBe(true);
-      
-      // Invalid - contains special characters
-      const invalidRef = {
-        patient_reference: "PAT<script>",
+      // Invalid - too short
+      const invalidScan = {
+        patient_reference: "AB",
         protocol_id: "full-body-scan",
       };
-      expect(patientRefSchema.safeParse(invalidRef).success).toBe(false);
+      expect(patientScanSchema.safeParse(invalidScan).success).toBe(false);
     });
   });
 
