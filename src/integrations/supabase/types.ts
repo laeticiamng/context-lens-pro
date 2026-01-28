@@ -516,36 +516,6 @@ export type Database = {
           started_at: string | null
           status: string | null
         }
-        Insert: {
-          anomalies_detected?: number | null
-          body_zones?: string[] | null
-          cabinet_id?: string | null
-          completed_at?: string | null
-          created_at?: string | null
-          device_id?: string | null
-          duration_seconds?: number | null
-          id?: string | null
-          patient_reference_masked?: never
-          protocol_id?: string | null
-          risk_level?: string | null
-          started_at?: string | null
-          status?: string | null
-        }
-        Update: {
-          anomalies_detected?: number | null
-          body_zones?: string[] | null
-          cabinet_id?: string | null
-          completed_at?: string | null
-          created_at?: string | null
-          device_id?: string | null
-          duration_seconds?: number | null
-          id?: string | null
-          patient_reference_masked?: never
-          protocol_id?: string | null
-          risk_level?: string | null
-          started_at?: string | null
-          status?: string | null
-        }
         Relationships: [
           {
             foreignKeyName: "mri_scans_cabinet_id_fkey"
