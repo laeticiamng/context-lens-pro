@@ -500,10 +500,80 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      secure_scans: {
+        Row: {
+          anomalies_detected: number | null
+          body_zones: string[] | null
+          cabinet_id: string | null
+          completed_at: string | null
+          created_at: string | null
+          device_id: string | null
+          duration_seconds: number | null
+          id: string | null
+          patient_reference_masked: string | null
+          protocol_id: string | null
+          risk_level: string | null
+          started_at: string | null
+          status: string | null
+        }
+        Insert: {
+          anomalies_detected?: number | null
+          body_zones?: string[] | null
+          cabinet_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          device_id?: string | null
+          duration_seconds?: number | null
+          id?: string | null
+          patient_reference_masked?: never
+          protocol_id?: string | null
+          risk_level?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          anomalies_detected?: number | null
+          body_zones?: string[] | null
+          cabinet_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          device_id?: string | null
+          duration_seconds?: number | null
+          id?: string | null
+          patient_reference_masked?: never
+          protocol_id?: string | null
+          risk_level?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mri_scans_cabinet_id_fkey"
+            columns: ["cabinet_id"]
+            isOneToOne: false
+            referencedRelation: "cabinets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mri_scans_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "mri_devices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_patient_scan_details: {
+        Args: { scan_id: string }
+        Returns: {
+          findings: Json
+          id: string
+          patient_reference: string
+          report_url: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
