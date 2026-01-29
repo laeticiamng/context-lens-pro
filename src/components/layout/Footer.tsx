@@ -16,8 +16,8 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
     ],
     resources: [
       { label: "Documentation", href: "/docs" },
-      { label: language === "fr" ? "Référence API" : "API Reference", href: "/docs" },
-      { label: language === "fr" ? "Guide SDK" : "SDK Guide", href: "/docs" },
+      { label: language === "fr" ? "API Interactive" : "API Docs", href: "/api-docs" },
+      { label: language === "fr" ? "Guide SDK" : "SDK Guide", href: "/api-docs" },
       { label: "Blog", href: "#" },
     ],
     company: [

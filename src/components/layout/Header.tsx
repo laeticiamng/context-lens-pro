@@ -57,6 +57,7 @@ const Header = () => {
     { label: language === "fr" ? "Appareils" : "Devices", href: "#devices" },
     { label: "Pipeline", href: "#pipeline" },
     { label: "Documentation", href: "/docs" },
+    { label: "API Docs", href: "/api-docs" },
   ];
 
   const medicalLinks = [
