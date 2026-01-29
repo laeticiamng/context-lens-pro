@@ -13,20 +13,20 @@ const DemoSection = () => {
       
       <div className="container relative z-10 px-4">
         {/* Section Header */}
-        <div className="max-w-3xl mx-auto text-center mb-16">
+        <div className="max-w-3xl mx-auto text-center mb-16 section-fade-in">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             {language === "fr" ? "Voyez " : "See "}
-            <span className="text-gradient">ContextLens</span>
+            <span className="text-gradient-animated">ContextLens</span>
             {language === "fr" ? " en action" : " in Action"}
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-muted-foreground leading-relaxed">
             {language === "fr" 
               ? "Découvrez comment ContextLens transforme vos lunettes connectées en système de prompteur intelligent avec conscience contextuelle en temps réel."
               : "Watch how ContextLens transforms your smart glasses into an intelligent prompter system with real-time contextual awareness."}
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto card-hover-lift">
           <InteractiveDemo />
         </div>
       </div>

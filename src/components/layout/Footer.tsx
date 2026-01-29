@@ -58,34 +58,34 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
   ];
 
   return (
-    <footer ref={ref} className="border-t border-border/50 bg-card/50">
+    <footer ref={ref} className="border-t border-border/50 bg-gradient-to-b from-card/50 to-background">
       <div className="container px-4 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12 mb-12">
           {/* Brand */}
-          <div className="col-span-2">
-            <Link to="/" className="flex items-center gap-2.5 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
+          <div className="sm:col-span-2">
+            <Link to="/" className="inline-flex items-center gap-2.5 mb-4 group">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent transition-transform duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30">
                 <Glasses className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold tracking-tight">
                 Context<span className="text-gradient">Lens</span>
               </span>
             </Link>
-            <p className="text-sm text-muted-foreground mb-6 max-w-xs">
+            <p className="text-sm text-muted-foreground mb-6 max-w-xs leading-relaxed">
               {language === "fr" 
                 ? "Transformez n'importe quelles lunettes connectées en prompteur contextuel. IA, privacy-first, universel."
                 : "Transform any smart glasses into a contextual prompter. AI-powered, privacy-first, universal."}
             </p>
             
             {/* Social Links */}
-            <div className="flex gap-3 mb-6">
+            <div className="flex gap-2 mb-6">
               {socialLinks.map((social) => (
                 <a 
                   key={social.name}
                   href={social.href} 
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  className="p-2.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all duration-200 hover:scale-110"
                   aria-label={social.name}
                 >
                   <social.icon className="h-5 w-5" />
@@ -100,14 +100,14 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           </div>
 
           {/* Links */}
-          <div>
-            <h4 className="font-semibold mb-4 text-sm">{t.footer.product}</h4>
+          <div className="sm:col-span-1">
+            <h4 className="font-semibold mb-4 text-sm text-foreground">{t.footer.product}</h4>
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
                   <a 
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200 link-underline"
                   >
                     {link.label}
                   </a>
@@ -116,22 +116,22 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             </ul>
           </div>
 
-          <div>
-            <h4 className="font-semibold mb-4 text-sm">{t.footer.resources}</h4>
+          <div className="sm:col-span-1">
+            <h4 className="font-semibold mb-4 text-sm text-foreground">{t.footer.resources}</h4>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
                   {link.href.startsWith("/") ? (
                     <Link 
                       to={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                     >
                       {link.label}
                     </Link>
                   ) : (
                     <a 
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                     >
                       {link.label}
                     </a>
@@ -141,22 +141,22 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             </ul>
           </div>
 
-          <div>
-            <h4 className="font-semibold mb-4 text-sm">{t.footer.company}</h4>
+          <div className="sm:col-span-1">
+            <h4 className="font-semibold mb-4 text-sm text-foreground">{t.footer.company}</h4>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
                   {link.href.startsWith("/") ? (
                     <Link 
                       to={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                     >
                       {link.label}
                     </Link>
                   ) : (
                     <a 
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                     >
                       {link.label}
                     </a>
@@ -166,14 +166,14 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             </ul>
           </div>
 
-          <div>
-            <h4 className="font-semibold mb-4 text-sm">{t.footer.legal}</h4>
+          <div className="sm:col-span-1">
+            <h4 className="font-semibold mb-4 text-sm text-foreground">{t.footer.legal}</h4>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.label}>
                   <Link 
                     to={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
                   >
                     {link.label}
                   </Link>
@@ -188,14 +188,17 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           <p className="text-sm text-muted-foreground">
             © 2026 ContextLens. {t.footer.copyright}
           </p>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span>🇪🇺 {language === "fr" ? "Conforme UE" : "EU Privacy Compliant"}</span>
-            <span>•</span>
+          <div className="flex flex-wrap justify-center items-center gap-3 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <span>🇪🇺</span>
+              <span>{language === "fr" ? "Conforme UE" : "EU Privacy Compliant"}</span>
+            </span>
+            <span className="hidden sm:inline">•</span>
             <span>{language === "fr" ? "Compatible RGPD" : "GDPR Ready"}</span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
+            <span className="hidden sm:inline">•</span>
+            <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-              {language === "fr" ? "Tous les systèmes opérationnels" : "All systems operational"}
+              <span>{language === "fr" ? "Systèmes opérationnels" : "All systems operational"}</span>
             </span>
           </div>
         </div>
