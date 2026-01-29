@@ -1,0 +1,1238 @@
+openapi: 3.1.0
+info:
+  title: ContextLens API
+  description: |
+    API REST pour la plateforme ContextLens - Scripts pour lunettes connectées et imagerie médicale IRM.
+    
+    ## Authentification
+    
+    Toutes les requêtes authentifiées nécessitent un header `Authorization: Bearer <token>`.
+    Le token est obtenu via l'authentification Supabase.
+    
+    ## Rate Limiting
+    
+    - Waitlist: 1 inscription par email par heure
+    - Contact: 1 message par email toutes les 5 minutes
+    
+    ## Environnements
+    
+    | Environnement | URL |
+    |---------------|-----|
+    | Production | `https://mchjjohewwspgvuudrcm.supabase.co` |
+    | Preview | `https://id-preview--7aa6e6bc-4a69-4870-9f01-24a1d73d6036.lovable.app` |
+    
+  version: 1.0.0
+  contact:
+    name: ContextLens Support
+    url: https://contextlens.io/contact
+  license:
+    name: Proprietary
+    url: https://contextlens.io/terms
+
+servers:
+  - url: https://mchjjohewwspgvuudrcm.supabase.co/rest/v1
+    description: Supabase REST API
+  - url: https://mchjjohewwspgvuudrcm.supabase.co/functions/v1
+    description: Edge Functions
+
+tags:
+  - name: Authentication
+    description: Authentification utilisateur
+  - name: Scripts
+    description: Gestion des scripts pour lunettes
+  - name: Devices
+    description: Appareils connectés
+  - name: Waitlist
+    description: Liste d'attente early access
+  - name: Contact
+    description: Messages de contact
+  - name: Profiles
+    description: Profils utilisateur
+  - name: Cabinets
+    description: Cabinets médicaux (LUNETTES IRM)
+  - name: MRI Devices
+    description: Appareils IRM
+  - name: MRI Scans
+    description: Scans IRM
+  - name: Subscriptions
+    description: Abonnements médicaux
+  - name: Protocols
+    description: Protocoles de screening
+  - name: Edge Functions
+    description: Fonctions serverless
+
+paths:
+  # ==================== AUTHENTICATION ====================
+  /auth/v1/signup:
+    post:
+      tags: [Authentication]
+      summary: Inscription utilisateur
+      description: Crée un nouveau compte utilisateur avec email et mot de passe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  minLength: 8
+                  example: SecurePass123!
+                options:
+                  type: object
+                  properties:
+                    emailRedirectTo:
+                      type: string
+                      format: uri
+      responses:
+        '200':
+          description: Inscription réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Email invalide ou mot de passe faible
+        '422':
+          description: Email déjà utilisé
+
+  /auth/v1/token:
+    post:
+      tags: [Authentication]
+      summary: Connexion utilisateur
+      description: Authentifie un utilisateur et retourne un token JWT
+      parameters:
+        - name: grant_type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [password]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Identifiants invalides
+
+  /auth/v1/logout:
+    post:
+      tags: [Authentication]
+      summary: Déconnexion
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scope
+          in: query
+          schema:
+            type: string
+            enum: [global, local]
+            default: global
+      responses:
+        '204':
+          description: Déconnexion réussie
+
+  # ==================== SCRIPTS ====================
+  /scripts:
+    get:
+      tags: [Scripts]
+      summary: Liste des scripts
+      description: Récupère tous les scripts de l'utilisateur authentifié
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/select'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: Liste des scripts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Script'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags: [Scripts]
+      summary: Créer un script
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScriptCreate'
+      responses:
+        '201':
+          description: Script créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Script'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /scripts?id=eq.{id}:
+    patch:
+      tags: [Scripts]
+      summary: Mettre à jour un script
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScriptUpdate'
+      responses:
+        '200':
+          description: Script mis à jour
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Script non trouvé
+
+    delete:
+      tags: [Scripts]
+      summary: Supprimer un script
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Script supprimé
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ==================== DEVICES ====================
+  /connected_devices:
+    get:
+      tags: [Devices]
+      summary: Liste des appareils connectés
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/select'
+        - $ref: '#/components/parameters/order'
+      responses:
+        '200':
+          description: Liste des appareils
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+
+    post:
+      tags: [Devices]
+      summary: Ajouter un appareil
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreate'
+      responses:
+        '201':
+          description: Appareil ajouté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+
+  /connected_devices?id=eq.{id}:
+    patch:
+      tags: [Devices]
+      summary: Mettre à jour un appareil
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdate'
+      responses:
+        '200':
+          description: Appareil mis à jour
+
+    delete:
+      tags: [Devices]
+      summary: Supprimer un appareil
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Appareil supprimé
+
+  # ==================== WAITLIST ====================
+  /waitlist:
+    post:
+      tags: [Waitlist]
+      summary: Rejoindre la liste d'attente
+      description: |
+        Inscrit un email à la liste d'attente early access.
+        Rate limité à 1 inscription par email par heure.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WaitlistCreate'
+      responses:
+        '201':
+          description: Inscription réussie
+        '409':
+          description: Email déjà inscrit
+        '429':
+          description: Rate limit atteint
+
+  # ==================== CONTACT ====================
+  /contact_messages:
+    post:
+      tags: [Contact]
+      summary: Envoyer un message de contact
+      description: |
+        Envoie un message via le formulaire de contact.
+        Rate limité à 1 message par email toutes les 5 minutes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactCreate'
+      responses:
+        '201':
+          description: Message envoyé
+        '429':
+          description: Rate limit atteint
+
+  # ==================== PROFILES ====================
+  /profiles:
+    get:
+      tags: [Profiles]
+      summary: Récupérer le profil
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profil utilisateur
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Profile'
+
+  /profiles?user_id=eq.{user_id}:
+    patch:
+      tags: [Profiles]
+      summary: Mettre à jour le profil
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+      responses:
+        '200':
+          description: Profil mis à jour
+
+  # ==================== CABINETS (LUNETTES IRM) ====================
+  /cabinets:
+    get:
+      tags: [Cabinets]
+      summary: Liste des cabinets médicaux
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des cabinets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cabinet'
+
+    post:
+      tags: [Cabinets]
+      summary: Créer un cabinet
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CabinetCreate'
+      responses:
+        '201':
+          description: Cabinet créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cabinet'
+
+  # ==================== MRI DEVICES ====================
+  /mri_devices:
+    get:
+      tags: [MRI Devices]
+      summary: Liste des appareils IRM
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cabinet_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Liste des appareils IRM
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MRIDevice'
+
+    post:
+      tags: [MRI Devices]
+      summary: Ajouter un appareil IRM
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MRIDeviceCreate'
+      responses:
+        '201':
+          description: Appareil IRM ajouté
+
+  # ==================== MRI SCANS ====================
+  /mri_scans:
+    get:
+      tags: [MRI Scans]
+      summary: Liste des scans IRM
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cabinet_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/limit'
+      responses:
+        '200':
+          description: Liste des scans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MRIScan'
+
+    post:
+      tags: [MRI Scans]
+      summary: Créer un scan
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MRIScanCreate'
+      responses:
+        '201':
+          description: Scan créé
+
+  # ==================== SUBSCRIPTIONS ====================
+  /mri_subscriptions:
+    get:
+      tags: [Subscriptions]
+      summary: Récupérer l'abonnement
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cabinet_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Abonnement actif
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+
+  # ==================== PROTOCOLS ====================
+  /screening_protocols:
+    get:
+      tags: [Protocols]
+      summary: Liste des protocoles de screening
+      description: Protocoles disponibles pour les scans IRM (accès public)
+      parameters:
+        - name: is_active
+          in: query
+          schema:
+            type: string
+            example: eq.true
+      responses:
+        '200':
+          description: Liste des protocoles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Protocol'
+
+  # ==================== EDGE FUNCTIONS ====================
+  /generate-report:
+    post:
+      tags: [Edge Functions]
+      summary: Générer un rapport PDF
+      description: Génère un rapport PDF pour un scan IRM
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scanId]
+              properties:
+                scanId:
+                  type: string
+                  format: uuid
+                format:
+                  type: string
+                  enum: [pdf, json]
+                  default: pdf
+      responses:
+        '200':
+          description: Rapport généré
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                  expiresAt:
+                    type: string
+                    format: date-time
+
+  /check-subscription:
+    post:
+      tags: [Edge Functions]
+      summary: Vérifier l'abonnement
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cabinetId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Statut de l'abonnement
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  active:
+                    type: boolean
+                  plan:
+                    type: string
+                  scansRemaining:
+                    type: integer
+
+  /create-checkout:
+    post:
+      tags: [Edge Functions]
+      summary: Créer une session Stripe Checkout
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [planId, cabinetId]
+              properties:
+                planId:
+                  type: string
+                  enum: [starter, pro, clinic]
+                cabinetId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: URL de checkout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+
+  /customer-portal:
+    post:
+      tags: [Edge Functions]
+      summary: Accéder au portail client Stripe
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cabinetId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: URL du portail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKey:
+      type: apiKey
+      in: header
+      name: apikey
+
+  parameters:
+    select:
+      name: select
+      in: query
+      description: Colonnes à retourner
+      schema:
+        type: string
+        example: "*"
+    order:
+      name: order
+      in: query
+      description: Ordre de tri
+      schema:
+        type: string
+        example: created_at.desc
+    limit:
+      name: limit
+      in: query
+      description: Nombre maximum de résultats
+      schema:
+        type: integer
+        default: 100
+    offset:
+      name: offset
+      in: query
+      description: Offset pour pagination
+      schema:
+        type: integer
+        default: 0
+
+  responses:
+    Unauthorized:
+      description: Non authentifié
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Invalid JWT"
+
+  schemas:
+    # ==================== AUTH ====================
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+          example: 3600
+        refresh_token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        created_at:
+          type: string
+          format: date-time
+
+    # ==================== SCRIPTS ====================
+    Script:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        content:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+        usage_count:
+          type: integer
+        last_used_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ScriptCreate:
+      type: object
+      required: [title, user_id]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+        content:
+          type: string
+          default: ""
+        tags:
+          type: array
+          items:
+            type: string
+        user_id:
+          type: string
+          format: uuid
+
+    ScriptUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+
+    # ==================== DEVICES ====================
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        device_name:
+          type: string
+        device_type:
+          type: string
+          enum: [even_g2, vuzix_z100, rokid, smartphone, other]
+        manufacturer:
+          type: string
+          nullable: true
+        tier:
+          type: integer
+          minimum: 0
+          maximum: 3
+        is_connected:
+          type: boolean
+        last_connected_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    DeviceCreate:
+      type: object
+      required: [device_name, device_type, user_id]
+      properties:
+        device_name:
+          type: string
+        device_type:
+          type: string
+        manufacturer:
+          type: string
+        tier:
+          type: integer
+          default: 0
+        user_id:
+          type: string
+          format: uuid
+
+    DeviceUpdate:
+      type: object
+      properties:
+        device_name:
+          type: string
+        is_connected:
+          type: boolean
+        last_connected_at:
+          type: string
+          format: date-time
+
+    # ==================== WAITLIST ====================
+    WaitlistCreate:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+        source:
+          type: string
+          default: landing_page
+          example: cta
+
+    # ==================== CONTACT ====================
+    ContactCreate:
+      type: object
+      required: [name, email, subject, message]
+      properties:
+        name:
+          type: string
+          minLength: 2
+        email:
+          type: string
+          format: email
+        subject:
+          type: string
+          minLength: 5
+        message:
+          type: string
+          minLength: 10
+
+    # ==================== PROFILES ====================
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+          nullable: true
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+        notification_preferences:
+          type: object
+          properties:
+            email:
+              type: boolean
+            push:
+              type: boolean
+            weekly_digest:
+              type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ProfileUpdate:
+      type: object
+      properties:
+        display_name:
+          type: string
+        avatar_url:
+          type: string
+          format: uri
+        notification_preferences:
+          type: object
+
+    # ==================== CABINETS ====================
+    Cabinet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        owner_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        siret:
+          type: string
+          pattern: '^\d{14}$'
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+          default: FR
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CabinetCreate:
+      type: object
+      required: [name, owner_id]
+      properties:
+        name:
+          type: string
+          minLength: 2
+        siret:
+          type: string
+          pattern: '^\d{14}$'
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        postal_code:
+          type: string
+          pattern: '^\d{5}$'
+        country:
+          type: string
+          default: FR
+        owner_id:
+          type: string
+          format: uuid
+
+    # ==================== MRI DEVICES ====================
+    MRIDevice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        cabinet_id:
+          type: string
+          format: uuid
+        device_type:
+          type: string
+          enum: [chipiron_squid, kyoto_opm, mock]
+        manufacturer:
+          type: string
+        model:
+          type: string
+        serial_number:
+          type: string
+        ip_address:
+          type: string
+          format: ipv4
+        firmware_version:
+          type: string
+        status:
+          type: string
+          enum: [online, offline, maintenance, error]
+        capabilities:
+          type: object
+        last_seen_at:
+          type: string
+          format: date-time
+        last_maintenance_at:
+          type: string
+          format: date-time
+        next_maintenance_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    MRIDeviceCreate:
+      type: object
+      required: [cabinet_id, manufacturer, model, serial_number]
+      properties:
+        cabinet_id:
+          type: string
+          format: uuid
+        device_type:
+          type: string
+          default: chipiron_squid
+        manufacturer:
+          type: string
+        model:
+          type: string
+        serial_number:
+          type: string
+        ip_address:
+          type: string
+          format: ipv4
+
+    # ==================== MRI SCANS ====================
+    MRIScan:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        cabinet_id:
+          type: string
+          format: uuid
+        device_id:
+          type: string
+          format: uuid
+        patient_reference:
+          type: string
+        protocol_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, in_progress, completed, failed, cancelled]
+        body_zones:
+          type: array
+          items:
+            type: string
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        duration_seconds:
+          type: integer
+        anomalies_detected:
+          type: integer
+        risk_level:
+          type: string
+          enum: [low, medium, high, critical]
+        findings:
+          type: object
+        report_url:
+          type: string
+          format: uri
+        created_at:
+          type: string
+          format: date-time
+
+    MRIScanCreate:
+      type: object
+      required: [cabinet_id, patient_reference, protocol_id]
+      properties:
+        cabinet_id:
+          type: string
+          format: uuid
+        device_id:
+          type: string
+          format: uuid
+        patient_reference:
+          type: string
+        protocol_id:
+          type: string
+        body_zones:
+          type: array
+          items:
+            type: string
+
+    # ==================== SUBSCRIPTIONS ====================
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        cabinet_id:
+          type: string
+          format: uuid
+        plan_id:
+          type: string
+          enum: [starter, pro, clinic]
+        status:
+          type: string
+          enum: [active, past_due, cancelled, trialing]
+        scans_limit:
+          type: integer
+        scans_this_period:
+          type: integer
+        glasses_included:
+          type: integer
+        current_period_start:
+          type: string
+          format: date-time
+        current_period_end:
+          type: string
+          format: date-time
+        stripe_customer_id:
+          type: string
+        stripe_subscription_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    # ==================== PROTOCOLS ====================
+    Protocol:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        name_fr:
+          type: string
+        description:
+          type: string
+        description_fr:
+          type: string
+        body_zones:
+          type: array
+          items:
+            type: string
+        duration_minutes:
+          type: integer
+        sequence_types:
+          type: array
+          items:
+            type: string
+        targets:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
