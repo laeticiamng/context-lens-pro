@@ -17,9 +17,9 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
       {/* Background effects */}
-      <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-[0.02]" />
+      <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-[0.03]" />
       <div 
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full"
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full animate-pulse-glow"
         style={{ background: "var(--gradient-glow)" }}
       />
       <div 
@@ -30,15 +30,15 @@ const HeroSection = () => {
       <div className="container relative z-10 px-4 py-20 md:py-32">
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
-          <div className="animate-fade-up inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-sm text-primary mb-8">
-            <Sparkles className="h-4 w-4" />
+          <div className="animate-fade-up inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-sm text-primary mb-8 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 cursor-default">
+            <Sparkles className="h-4 w-4 animate-glow-pulse" />
             <span>{t.hero.badge}</span>
           </div>
 
           {/* Headline */}
           <h1 className="animate-fade-up delay-100 text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-balance">
             {t.hero.title}{" "}
-            <span className="text-gradient">{t.hero.titleHighlight}</span>
+            <span className="text-gradient-animated">{t.hero.titleHighlight}</span>
           </h1>
 
           {/* Subheadline */}
@@ -85,8 +85,8 @@ const HeroSection = () => {
 
         {/* Hero Visual - Floating glasses mockup */}
         <div className="relative mt-16 md:mt-24 max-w-5xl mx-auto">
-          <div className="animate-float glass-card-elevated rounded-2xl p-1 animate-pulse-glow">
-            <div className="aspect-[16/9] rounded-xl bg-gradient-to-br from-secondary to-muted flex items-center justify-center overflow-hidden">
+          <div className="animate-float glass-card-elevated rounded-2xl p-1 animate-pulse-glow card-hover-lift">
+            <div className="aspect-[16/9] rounded-xl bg-gradient-to-br from-secondary via-muted to-secondary flex items-center justify-center overflow-hidden">
               <div className="relative w-full h-full flex items-center justify-center">
                 {/* Simulated HUD display */}
                 <div className="absolute inset-8 border border-primary/20 rounded-xl" />

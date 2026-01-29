@@ -94,40 +94,41 @@ const PricingSection = () => {
   };
 
   return (
-    <section id="pricing" className="py-24 md:py-32 bg-secondary/20">
+    <section id="pricing" className="py-24 md:py-32 bg-gradient-to-b from-secondary/20 via-background to-background">
       <div className="container px-4">
         {/* Section Header */}
-        <div className="max-w-3xl mx-auto text-center mb-12">
+        <div className="max-w-3xl mx-auto text-center mb-12 section-fade-in">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            {t.pricing.title} <span className="text-gradient">{t.pricing.titleHighlight}</span>
+            {t.pricing.title} <span className="text-gradient-animated">{t.pricing.titleHighlight}</span>
           </h2>
-          <p className="text-lg text-muted-foreground mb-8">
+          <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
             {t.pricing.description}
           </p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex items-center gap-3 p-1 rounded-full bg-secondary/50 border border-border/50">
-            <span className={`px-3 py-1.5 rounded-full text-sm transition-colors ${!isYearly ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+          <div className="inline-flex items-center gap-3 p-1.5 rounded-full bg-secondary/50 border border-border/50 backdrop-blur-sm">
+            <span className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${!isYearly ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground"}`}>
               {language === "fr" ? "Mensuel" : "Monthly"}
             </span>
             <Switch checked={isYearly} onCheckedChange={setIsYearly} />
-            <span className={`px-3 py-1.5 rounded-full text-sm transition-colors ${isYearly ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+            <span className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isYearly ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground"}`}>
               {language === "fr" ? "Annuel" : "Yearly"}
-              <span className="ml-1 text-xs text-accent">{language === "fr" ? "-17%" : "Save 17%"}</span>
+              <span className="ml-1.5 text-xs text-accent font-bold">{language === "fr" ? "-17%" : "Save 17%"}</span>
             </span>
           </div>
         </div>
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {plans.map((plan) => (
+          {plans.map((plan, index) => (
             <div
               key={plan.name}
-              className={`relative rounded-2xl overflow-hidden ${
+              className={`relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 ${
                 plan.highlight 
-                  ? "glass-card-elevated border-primary/50" 
-                  : "glass-card"
+                  ? "glass-card-elevated border-primary/50 shadow-xl shadow-primary/10" 
+                  : "glass-card hover:border-primary/30 hover:shadow-lg"
               }`}
+              style={{ animationDelay: `${index * 100}ms` }}
             >
               {plan.highlight && (
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent" />
