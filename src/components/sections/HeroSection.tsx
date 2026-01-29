@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Glasses, Smartphone } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { VisitorCounter } from "@/components/ui/visitor-counter";
 
 const HeroSection = () => {
   const { t, language } = useLanguage();
@@ -34,6 +35,11 @@ const HeroSection = () => {
       
       <div className="container relative z-10 px-4 py-20 md:py-32">
         <div className="max-w-4xl mx-auto text-center">
+          {/* Visitor Counter */}
+          <div className="animate-fade-up mb-4">
+            <VisitorCounter />
+          </div>
+
           {/* Badge */}
           <div className="animate-fade-up inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-sm text-primary mb-8 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 cursor-default">
             <Sparkles className="h-4 w-4 animate-glow-pulse" />
