@@ -1,0 +1,121 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+// Medical subscription tiers
+const SUBSCRIPTION_TIERS = {
+  starter: {
+    price_id: "price_1Suj3ADFa5Y9NR1IljnGAri2",
+    product_id: "prod_TsU1zd21xvG4Cz",
+    name: "Starter",
+    scans_limit: 50,
+    glasses_included: 1,
+  },
+  pro: {
+    price_id: "price_1Suj3BDFa5Y9NR1ICC9UAnym",
+    product_id: "prod_TsU15D48Tt0ppb",
+    name: "Pro",
+    scans_limit: 200,
+    glasses_included: 3,
+  },
+  clinic: {
+    price_id: "price_1Suj3DDFa5Y9NR1IH2h0ihbS",
+    product_id: "prod_TsU1ULsdmS6yDm",
+    name: "Clinic",
+    scans_limit: 999999,
+    glasses_included: 10,
+  },
+};
+
+const logStep = (step: string, details?: Record<string, unknown>) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
+
+  try {
+    logStep("Function started");
+
+    const { tier, cabinet_id } = await req.json();
+    if (!tier || !SUBSCRIPTION_TIERS[tier as keyof typeof SUBSCRIPTION_TIERS]) {
+      throw new Error("Invalid subscription tier");
+    }
+    if (!cabinet_id) {
+      throw new Error("Cabinet ID is required");
+    }
+
+    const tierConfig = SUBSCRIPTION_TIERS[tier as keyof typeof SUBSCRIPTION_TIERS];
+    logStep("Tier selected", { tier, price_id: tierConfig.price_id });
+
+    const authHeader = req.headers.get("Authorization")!;
+    const token = authHeader.replace("Bearer ", "");
+    const { data } = await supabaseClient.auth.getUser(token);
+    const user = data.user;
+    if (!user?.email) throw new Error("User not authenticated or email not available");
+    logStep("User authenticated", { userId: user.id, email: user.email });
+
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+    
+    // Check if customer exists
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    let customerId;
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
+      logStep("Found existing Stripe customer", { customerId });
+    }
+
+    const origin = req.headers.get("origin") || "https://lovable.dev";
+    
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      customer_email: customerId ? undefined : user.email,
+      line_items: [
+        {
+          price: tierConfig.price_id,
+          quantity: 1,
+        },
+      ],
+      mode: "subscription",
+      success_url: `${origin}/lunettes-irm?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/lunettes-irm?canceled=true`,
+      metadata: {
+        cabinet_id,
+        tier,
+        user_id: user.id,
+        scans_limit: tierConfig.scans_limit.toString(),
+        glasses_included: tierConfig.glasses_included.toString(),
+      },
+    });
+
+    logStep("Checkout session created", { sessionId: session.id, url: session.url });
+
+    return new Response(JSON.stringify({ url: session.url }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR in create-checkout", { message: errorMessage });
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
+  }
+});
