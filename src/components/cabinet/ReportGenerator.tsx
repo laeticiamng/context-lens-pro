@@ -21,10 +21,12 @@ import {
   Calendar,
   Image,
   BarChart3,
-  Stethoscope
+  Stethoscope,
+  Sparkles
 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ReportConfig {
   includeScans: boolean;
@@ -32,28 +34,37 @@ interface ReportConfig {
   includeImages: boolean;
   includeRecommendations: boolean;
   dateRange: 'week' | 'month' | 'quarter' | 'year';
-  format: 'pdf' | 'docx';
+  format: 'pdf' | 'docx' | 'json' | 'markdown' | 'html';
 }
 
 interface ReportGeneratorProps {
   cabinetId: string;
   patientReference?: string;
+  scanId?: string;
 }
 
 type ReportStatus = 'idle' | 'generating' | 'ready' | 'error';
 
-export function ReportGenerator({ cabinetId, patientReference }: ReportGeneratorProps) {
+interface GeneratedReport {
+  report_id: string;
+  content: string;
+  ai_summary: string | null;
+  format: string;
+}
+
+export function ReportGenerator({ cabinetId, patientReference, scanId }: ReportGeneratorProps) {
   const { language } = useLanguage();
   const { toast } = useToast();
   const [status, setStatus] = useState<ReportStatus>('idle');
   const [progress, setProgress] = useState(0);
+  const [generatedReport, setGeneratedReport] = useState<GeneratedReport | null>(null);
   const [config, setConfig] = useState<ReportConfig>({
     includeScans: true,
     includeStats: true,
     includeImages: true,
     includeRecommendations: true,
     dateRange: 'month',
-    format: 'pdf',
+    format: 'json',
   });
 
   const handleGenerateReport = async () => {
@@ -61,68 +72,97 @@ export function ReportGenerator({ cabinetId, patientReference }: ReportGenerator
     setProgress(0);
 
     try {
-      // Simulate report generation progress
-      for (let i = 0; i <= 100; i += 10) {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        setProgress(i);
+      // Progress simulation for UX
+      const progressInterval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 10, 90));
+      }, 200);
+
+      // Call Edge Function if scanId is provided
+      if (scanId) {
+        const { data, error } = await supabase.functions.invoke('generate-report', {
+          body: { 
+            scan_id: scanId, 
+            format: config.format === 'pdf' || config.format === 'docx' ? 'json' : config.format,
+            language 
+          }
+        });
+
+        clearInterval(progressInterval);
+        setProgress(100);
+
+        if (error) throw error;
+        if (data.error) throw new Error(data.error);
+
+        setGeneratedReport(data);
+        setStatus('ready');
+        
+        toast({
+          title: language === 'fr' ? 'Rapport généré' : 'Report Generated',
+          description: data.ai_summary 
+            ? (language === 'fr' ? 'Rapport avec résumé IA prêt' : 'Report with AI summary ready')
+            : (language === 'fr' ? 'Rapport prêt au téléchargement' : 'Report ready for download'),
+        });
+      } else {
+        // Fallback demo mode
+        for (let i = 0; i <= 100; i += 10) {
+          await new Promise(resolve => setTimeout(resolve, 200));
+          setProgress(i);
+        }
+        setGeneratedReport({
+          report_id: `DEMO-${Date.now()}`,
+          content: JSON.stringify({ demo: true, cabinetId, config }, null, 2),
+          ai_summary: null,
+          format: config.format
+        });
+        setStatus('ready');
+        toast({
+          title: language === 'fr' ? 'Rapport généré (démo)' : 'Report Generated (demo)',
+          description: language === 'fr' ? 'Mode démonstration' : 'Demo mode',
+        });
       }
-
-      // In production, this would call an Edge Function to generate the PDF
-      // const { data, error } = await supabase.functions.invoke('generate-report', {
-      //   body: { cabinetId, patientReference, config }
-      // });
-
-      setStatus('ready');
-      toast({
-        title: language === 'fr' ? 'Rapport généré' : 'Report Generated',
-        description: language === 'fr' 
-          ? 'Votre rapport est prêt au téléchargement'
-          : 'Your report is ready to download',
-      });
     } catch (error) {
       setStatus('error');
       toast({
         title: language === 'fr' ? 'Erreur' : 'Error',
-        description: language === 'fr' 
-          ? 'Échec de la génération du rapport'
-          : 'Failed to generate report',
+        description: error instanceof Error ? error.message : 'Unknown error',
         variant: 'destructive',
       });
     }
   };
 
   const handleDownload = () => {
-    // Simulate download
-    const dummyContent = `
-RAPPORT MÉDICAL LUNETTES IRM
-============================
-Cabinet ID: ${cabinetId}
-Patient: ${patientReference || 'N/A'}
-Date: ${new Date().toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US')}
+    if (!generatedReport) return;
 
-Configuration:
-- Scans inclus: ${config.includeScans ? 'Oui' : 'Non'}
-- Statistiques: ${config.includeStats ? 'Oui' : 'Non'}
-- Images: ${config.includeImages ? 'Oui' : 'Non'}
-- Recommandations: ${config.includeRecommendations ? 'Oui' : 'Non'}
-- Période: ${config.dateRange}
+    const content = generatedReport.ai_summary 
+      ? `${generatedReport.content}\n\n--- AI SUMMARY ---\n${generatedReport.ai_summary}`
+      : generatedReport.content;
+    
+    const mimeTypes: Record<string, string> = {
+      json: 'application/json',
+      markdown: 'text/markdown',
+      html: 'text/html',
+      pdf: 'text/plain',
+      docx: 'text/plain'
+    };
+    const extensions: Record<string, string> = {
+      json: 'json',
+      markdown: 'md',
+      html: 'html',
+      pdf: 'txt',
+      docx: 'txt'
+    };
 
-[Ce rapport de démonstration serait généré en PDF via Edge Functions]
-    `;
-
-    const blob = new Blob([dummyContent], { type: 'text/plain' });
+    const blob = new Blob([content], { type: mimeTypes[generatedReport.format] || 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `rapport-irm-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `rapport-${generatedReport.report_id}.${extensions[generatedReport.format] || 'txt'}`;
     a.click();
     URL.revokeObjectURL(url);
 
     toast({
       title: language === 'fr' ? 'Téléchargé' : 'Downloaded',
-      description: language === 'fr' 
-        ? 'Rapport téléchargé avec succès'
-        : 'Report downloaded successfully',
+      description: `${generatedReport.report_id}`,
     });
   };
 
@@ -254,8 +294,9 @@ Configuration:
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pdf">PDF</SelectItem>
-                      <SelectItem value="docx">Word (DOCX)</SelectItem>
+                      <SelectItem value="json">JSON</SelectItem>
+                      <SelectItem value="markdown">Markdown</SelectItem>
+                      <SelectItem value="html">HTML</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -287,7 +328,7 @@ Configuration:
           </div>
         )}
 
-        {status === 'ready' && (
+        {status === 'ready' && generatedReport && (
           <div className="space-y-4 py-4 text-center">
             <CheckCircle className="h-12 w-12 text-accent mx-auto" />
             <div>
@@ -295,10 +336,17 @@ Configuration:
                 {language === 'fr' ? 'Rapport prêt !' : 'Report Ready!'}
               </h3>
               <p className="text-sm text-muted-foreground mt-1">
-                {language === 'fr' 
-                  ? 'Cliquez ci-dessous pour télécharger'
-                  : 'Click below to download'}
+                ID: {generatedReport.report_id}
               </p>
+              {generatedReport.ai_summary && (
+                <div className="mt-3 p-3 rounded-lg bg-primary/10 text-left">
+                  <div className="flex items-center gap-2 text-primary text-xs font-medium mb-1">
+                    <Sparkles className="h-3 w-3" />
+                    {language === 'fr' ? 'Résumé IA' : 'AI Summary'}
+                  </div>
+                  <p className="text-sm">{generatedReport.ai_summary}</p>
+                </div>
+              )}
             </div>
             <div className="flex gap-2 justify-center">
               <Button onClick={handleDownload}>
@@ -332,12 +380,18 @@ Configuration:
         )}
 
         {/* Feature badge */}
-        <div className="pt-4 border-t border-border/50">
-          <Badge variant="outline" className="text-xs">
+        <div className="pt-4 border-t border-border/50 flex items-center justify-between">
+          <Badge variant="outline" className="text-xs bg-accent/10 text-accent border-accent/30">
+            <Sparkles className="h-3 w-3 mr-1" />
             {language === 'fr' 
-              ? '🔜 Génération PDF via Edge Functions bientôt disponible'
-              : '🔜 PDF generation via Edge Functions coming soon'}
+              ? 'Edge Function déployée'
+              : 'Edge Function deployed'}
           </Badge>
+          {scanId && (
+            <span className="text-xs text-muted-foreground">
+              Scan: {scanId.slice(0, 8)}...
+            </span>
+          )}
         </div>
       </CardContent>
     </Card>
