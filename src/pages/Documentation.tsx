@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { 
   Copy, 
   Check, 
@@ -21,7 +22,8 @@ import {
   Terminal,
   FileCode,
   ArrowRight,
-  Server
+  Server,
+  Menu,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import APIEndpointsDocs from "@/components/docs/APIEndpointsDocs";
@@ -320,6 +322,28 @@ const Documentation = () => {
 
             {/* Main content with TOC sidebar */}
             <div className="max-w-6xl mx-auto flex gap-8">
+              {/* Mobile TOC Button */}
+              <div className="lg:hidden fixed bottom-6 right-6 z-50">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button size="lg" className="rounded-full shadow-lg">
+                      <Menu className="h-5 w-5 mr-2" />
+                      {language === "fr" ? "Navigation" : "Contents"}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-80">
+                    <SheetHeader>
+                      <SheetTitle>
+                        {language === "fr" ? "Table des matières" : "Table of Contents"}
+                      </SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6">
+                      <TableOfContents items={tocItems} />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+
               {/* TOC Sidebar - Hidden on mobile */}
               <aside className="hidden lg:block w-64 shrink-0">
                 <TableOfContents items={tocItems} />
