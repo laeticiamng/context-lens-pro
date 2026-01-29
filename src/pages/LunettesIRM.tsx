@@ -164,27 +164,28 @@ function LunettesIRMContent() {
       />
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Glasses className="h-8 w-8 text-primary" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-3">
+            <Glasses className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             LUNETTES IRM
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             {cabinet.name}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowAddDevice(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            {language === 'fr' ? 'Ajouter appareil' : 'Add Device'}
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={() => setShowAddDevice(true)}>
+            <Plus className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">{language === 'fr' ? 'Ajouter appareil' : 'Add Device'}</span>
           </Button>
-          <Button variant="outline" onClick={() => navigate('/settings')}>
-            <Settings className="h-4 w-4 mr-2" />
-            {language === 'fr' ? 'Paramètres' : 'Settings'}
+          <Button variant="outline" size="sm" onClick={() => navigate('/settings')}>
+            <Settings className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">{language === 'fr' ? 'Paramètres' : 'Settings'}</span>
           </Button>
           <Button 
             variant="outline" 
+            size="sm"
             onClick={() => {
               toast.info(
                 language === 'fr'
@@ -194,8 +195,8 @@ function LunettesIRMContent() {
               navigate('/docs');
             }}
           >
-            <HelpCircle className="h-4 w-4 mr-2" />
-            {language === 'fr' ? 'Aide' : 'Help'}
+            <HelpCircle className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">{language === 'fr' ? 'Aide' : 'Help'}</span>
           </Button>
         </div>
       </div>
@@ -273,7 +274,7 @@ function LunettesIRMContent() {
 
         <TabsContent value="overview" className="space-y-6">
           {/* Stats Grid */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             <DeviceStatusCard 
               device={mainDevice}
               onRefresh={() => {
