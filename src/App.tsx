@@ -21,6 +21,7 @@ import ClinicalAR from "./pages/ClinicalAR";
 import SharedScript from "./pages/SharedScript";
 import VisionIRM from "./pages/VisionIRM";
 import LunettesIRM from "./pages/LunettesIRM";
+import APIDocs from "./pages/APIDocs";
 import OfflineIndicator from "./components/OfflineIndicator";
 
 const queryClient = new QueryClient({
@@ -72,6 +73,7 @@ function AnimatedRoutes() {
           <Route path="/shared/:scriptId" element={<SharedScript />} />
           <Route path="/vision-irm" element={<VisionIRM />} />
           <Route path="/lunettes-irm" element={<LunettesIRM />} />
+          <Route path="/api-docs" element={<APIDocs />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
