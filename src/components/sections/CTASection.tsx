@@ -6,7 +6,7 @@ const CTASection = forwardRef<HTMLElement>((_, ref) => {
   const { t } = useLanguage();
 
   return (
-    <section ref={ref} className="py-24 md:py-32 relative overflow-hidden">
+    <section id="waitlist" ref={ref} className="py-24 md:py-32 relative overflow-hidden">
       {/* Background effects */}
       <div 
         className="absolute inset-0"
