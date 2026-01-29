@@ -153,6 +153,7 @@ const Auth = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     className={`pl-10 ${errors.email ? "border-destructive" : ""}`}
                     required
+                    autoComplete="email"
                   />
                 </div>
                 {errors.email && (
