@@ -1,16 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Glasses, Smartphone } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const HeroSection = () => {
-  const navigate = useNavigate();
   const { t, language } = useLanguage();
 
   const scrollToDemo = () => {
     const demoSection = document.getElementById("demo");
     if (demoSection) {
       demoSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const scrollToWaitlist = () => {
+    const waitlistSection = document.getElementById("waitlist");
+    if (waitlistSection) {
+      waitlistSection.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -48,7 +53,7 @@ const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="animate-fade-up delay-300 flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <Button variant="hero" size="xl" onClick={() => navigate("/auth")}>
+            <Button variant="hero" size="xl" onClick={scrollToWaitlist}>
               {t.hero.cta}
               <ArrowRight className="h-5 w-5" />
             </Button>
